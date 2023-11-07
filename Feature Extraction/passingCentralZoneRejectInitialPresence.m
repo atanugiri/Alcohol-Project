@@ -6,7 +6,7 @@
 
 function result = passingCentralZoneRejectInitialPresence(id,zoneSize)
 % close all; clc;
-% id = 137351; zoneSize = 0.5;
+% id = 265217; zoneSize = 0.4;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
