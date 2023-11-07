@@ -51,9 +51,8 @@ yNormalized = cleanedDataWithTone.Y(cleanedDataWithTone.t >= startingCoordinatet
 
 % plot normalized data
 h = figure;
-% p1 = plot(xWithTone,yWithTone,'Color',[0.9 0.7 0.1],'LineWidth',1.5);
 hold on;
-p2 = plot(xNormalized,yNormalized,'b','MarkerSize',10,'LineWidth',1.5);
+p1 = plot(xNormalized,yNormalized,'b','MarkerSize',10,'LineWidth',1.5);
 validX = xNormalized(~isnan(xNormalized));
 validY = yNormalized(~isnan(xNormalized));
 mrkr1 = plot(validX(1),validY(1),'g.','MarkerSize',30);
@@ -66,24 +65,22 @@ figureLimit = {{[-0.2 1.2],[-0.2 1.2]},{[-1.2 0.2],[-0.2 1.2]}, ...
 mazeIndex = find(ismember(maze,subject_data.mazenumber));
 feeder = subject_data.feeder;
 xlim(figureLimit{mazeIndex}{1}); ylim(figureLimit{mazeIndex}{2});
+
 % shade feeder zones by calling mazeMethods
-mazeMethods(mazeIndex,feeder);
-% gray patch
+mazeMethods(mazeIndex,feeder,0.4);
+
+% patch objects
 grayPatch = patch(nan,nan,'k');grayPatch.FaceColor = [0.3 0.3 0.3];
 grayPatch.FaceAlpha = 0.3;grayPatch.EdgeColor = "none";
-% yellow patch
+
 yellowPatch = patch(nan,nan,'k');yellowPatch.FaceColor = [1 1 0];
 yellowPatch.FaceAlpha = 0.3;yellowPatch.EdgeColor = "none";
-% red patch
+
 redPatch = patch(nan,nan,'k');redPatch.FaceColor = [1 0 0];
 redPatch.FaceAlpha = 0.2;redPatch.EdgeColor = "none";
 
-% add legend
-% legend([p1,p2,mrkr1,mrkr2,grayPatch,yellowPatch,redPatch], ...
-%     {'movement before tone','trajectory','initial location','final location', ...
-%     'feeders','offer','central zone'},'Location','best','Interpreter','latex');
-
-legend([p2,mrkr1,mrkr2,grayPatch,yellowPatch,redPatch], ...
+% Add legend and labels
+legend([p1,mrkr1,mrkr2,grayPatch,yellowPatch,redPatch], ...
     {'trajectory','initial location','final location', ...
     'feeders','offer','central zone'},'Location','best','Interpreter','latex');
 
@@ -93,6 +90,6 @@ ylabel('y(Normalized)',Interpreter='latex',FontSize=14);
 % title of graph
 sgtitle(sprintf('trajectory id:%d',id));
 fig_name = sprintf('trajectory id_%d',id);
-print(h,fig_name,'-dpng','-r400');
+% print(h,fig_name,'-dpng','-r400');
 % savefig(h,sprintf('%s.fig',fig_name));
 end
