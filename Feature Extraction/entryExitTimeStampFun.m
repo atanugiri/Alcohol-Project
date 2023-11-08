@@ -137,7 +137,6 @@ try
         (t(limitingTimeIndex) - t(1));
 
     if ~isnan(entryTime)
-        %%
         distanceAfterToneUntilEntryTimeStamp = 0;
         for i = 1:length(X(1:entryPointIndex))-1
             distanceAfterToneUntilEntryTimeStamp = distanceAfterToneUntilEntryTimeStamp + ...
@@ -145,7 +144,7 @@ try
         end
         velocityAfterToneUntilEntryTimeStamp = distanceAfterToneUntilEntryTimeStamp/ ...
             (t(entryPointIndex) - t(1));
-        %%
+
         if limitingTimeIndex > entryPointIndex
             distanceAfterEntryTimeStampUntilLimitingTimeStamp = 0;
             for i = 1:length(X(entryPointIndex:limitingTimeIndex))-1
