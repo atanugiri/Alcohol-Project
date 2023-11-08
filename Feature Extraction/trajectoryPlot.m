@@ -6,7 +6,6 @@
 %% This function call coordinateNormalization and mazeMethods functions.
 
 function h = trajectoryPlot(id)
-% close all; clc;
 % id = 102377;
 % make connection with database
 datasource = 'live_database';
@@ -34,7 +33,7 @@ end
 
 % includes the data before playstarttrialtone
 rawData = table(subject_data.coordinatetimes2{1}, subject_data.xcoordinates2{1}, ...
-        subject_data.ycoordinates2{1}, 'VariableNames',{'t','X','Y'});
+    subject_data.ycoordinates2{1}, 'VariableNames',{'t','X','Y'});
 
 % remove nan entries
 validIdx = all(isfinite(rawData{:,:}),2);
@@ -46,17 +45,21 @@ cleanedDataWithTone = table(cleanedData.t, normX, normY, 'VariableNames',{'t','X
 
 % set playstarttrialtone and exclude the data before playstarttrialtone
 startingCoordinatetimes = subject_data.playstarttrialtone;
-xNormalized = cleanedDataWithTone.X(cleanedDataWithTone.t >= startingCoordinatetimes);
-yNormalized = cleanedDataWithTone.Y(cleanedDataWithTone.t >= startingCoordinatetimes);
+toneFilter = cleanedDataWithTone.t >= startingCoordinatetimes;
+xNormalized = cleanedDataWithTone.X(toneFilter);
+yNormalized = cleanedDataWithTone.Y(toneFilter);
 
 % plot normalized data
 h = figure;
-hold on;
+subplot(1,2,1);
+plot(cleanedData.X(toneFilter), cleanedData.Y(toneFilter), 'LineWidth',1.5);
+title("Raw trajectory plot");
+
+subplot(1,2,2);
 p1 = plot(xNormalized,yNormalized,'b','MarkerSize',10,'LineWidth',1.5);
-validX = xNormalized(~isnan(xNormalized));
-validY = yNormalized(~isnan(xNormalized));
-mrkr1 = plot(validX(1),validY(1),'g.','MarkerSize',30);
-mrkr2 = plot(validX(end),validY(end),'r.','MarkerSize',30);
+hold on;
+mrkr1 = plot(xNormalized(1),yNormalized(1),'g.','MarkerSize',30);
+mrkr2 = plot(xNormalized(end),yNormalized(end),'r.','MarkerSize',30);
 % set figure limit
 maze = {'maze2','maze1','maze3','maze4'};
 figureLimit = {{[-0.2 1.2],[-0.2 1.2]},{[-1.2 0.2],[-0.2 1.2]}, ...
