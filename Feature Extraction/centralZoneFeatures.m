@@ -6,7 +6,7 @@
 
 function [passingCenter, timeInCenter] = centralZoneFeatures(id,zoneSize)
 
-% id = 134830; zoneSize = 0.4;
+% id = 265410; zoneSize = 0.4;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
@@ -19,6 +19,9 @@ subject_data = fetch(conn,query);
 try
     % convert all table entries from string to usable format
     subject_data.playstarttrialtone = str2double(subject_data.playstarttrialtone);
+    if isnan(subject_data.playstarttrialtone)
+        subject_data.playstarttrialtone = 2;
+    end
     subject_data.feeder = str2double(subject_data.feeder);
     subject_data.mazenumber = char(lower(strrep(subject_data.mazenumber,' ','')));
 
