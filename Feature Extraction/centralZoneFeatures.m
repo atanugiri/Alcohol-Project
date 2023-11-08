@@ -6,14 +6,14 @@
 
 function [passingCenter, timeInCenter] = centralZoneFeatures(id,zoneSize)
 
-% id = 265410; zoneSize = 0.4;
+% id = 266015; zoneSize = 0.4;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
 % write query
 query = sprintf("SELECT id, subjectid, trialname, referencetime, " + ...
-    "playstarttrialtone, mazenumber, feeder, coordinatetimes2, xcoordinates2, " + ...
-    "ycoordinates2  FROM live_table WHERE id = %d", id);
+    "playstarttrialtone, mazenumber, feeder, coordinatetimes2, truexnose, " + ...
+    "trueynose  FROM live_table WHERE id = %d", id);
 subject_data = fetch(conn,query);
 
 try
