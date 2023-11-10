@@ -21,7 +21,7 @@ tableName = 'ghrelin_featuretable';
 %     "ADD COLUMN logical_approach_2s text";
 % exec(conn, alterQuery);
 
-for index = 1:length(idList)
+for index = 15:20 %length(idList)
     id = idList(index);
     try
         [entryTime, exitTime, logicalApproach, logicalApproach2s] = entryExitTimeStamp(id);
@@ -35,14 +35,22 @@ for index = 1:length(idList)
         entryTime = strrep(entryTime, 'NaN', 'NULL');
         exitTime = strrep(exitTime, 'NaN', 'NULL');
 
+        % Handle empty strings
+        if isempty(entryTime)
+            entryTime = 'NULL';
+        end
+        if isempty(exitTime)
+            exitTime = 'NULL';
+        end
+
         updateQuery = sprintf("UPDATE %s SET entry_time=%s, exit_time=%s, " + ...
             "logical_approach=%s, logical_approach_2s=%s WHERE id=%d", tableName, ...
-            entryTimeValue, exitTimeValue, logicalApproach, logicalApproach2s, id);
+            entryTime, exitTime, logicalApproach, logicalApproach2s, id);
 
         exec(conn, updateQuery);
 
-    catch
-        fprintf("Calculation error in %d\n", id);
+    catch ME
+        fprintf("Calculation error in %d: %s\n", id, ME.message);
         continue;
     end
 end
