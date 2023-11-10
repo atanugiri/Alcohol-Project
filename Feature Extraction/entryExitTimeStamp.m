@@ -1,6 +1,6 @@
 function [entryTime,exitTime,logicalApproach,logicalApproach2s] = entryExitTimeStamp(id)
 
-% id = 265215;
+% id = 265233;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
