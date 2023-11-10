@@ -5,7 +5,7 @@
 % zone size.
 
 function [xEdge,yEdge,xEdgeOfFeeder,yEdgeOfFeeder] = centralZoneEdges(mazeIndex,zoneSize,feeder)
-% mazeIndex = 2; feeder = 4; zoneSize = 0.5;
+% mazeIndex = 2; feeder = 4; zoneSize = 0.4;
 feederSize = 0.3;
 switch mazeIndex
     case 1
