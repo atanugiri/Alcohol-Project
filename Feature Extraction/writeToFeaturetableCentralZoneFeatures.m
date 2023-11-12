@@ -1,3 +1,6 @@
+% Author: Atanu Giri
+% Date: 11/11/2023
+
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
 dateQuery = "SELECT id, referencetime FROM live_table ORDER BY id";
@@ -12,27 +15,35 @@ idList = dataInRange.id;
 
 tableName = 'ghrelin_featuretable';
 
+%% Add new column
+% alterQuery = "ALTER TABLE ghrelin_featuretable " + ...
+%     "ADD COLUMN passing_center text, " + ...
+%     "ADD COLUMN time_in_center text";
+% exec(conn, alterQuery);
+
 % Iterate over 'id' values and call the function
 for i = 1:length(idList)
     try
         id = idList(i);
         [passingCenter, timeInCenter] = centralZoneFeatures(id,0.4);
 
-        % Check if result is NaN and handle accordingly
-        if isnan(passingCenter)
-            query = sprintf("INSERT INTO %s (id, passingCenter, timeInCenter) " + ...
-                "VALUES (%d, NULL, %f)", tableName, id, timeInCenter);
-        
-        elseif isequal(passingCenter, 1)
-            query = sprintf("INSERT INTO %s (id, passingCenter, timeInCenter) " + ...
-                "VALUES (%d, %f, %f)", tableName, id, passingCenter, timeInCenter);
+        % Convert NaN values to 'NULL' for text columns
+        passingCenter = num2str(passingCenter);
+        timeInCenter = num2str(timeInCenter);
 
-        else
-            query = sprintf("INSERT INTO %s (id, passingCenter, timeInCenter) " + ...
-                "VALUES (%d, %f, NULL)", tableName, id, passingCenter);
+        passingCenter = strrep(passingCenter, 'NaN', 'NULL');
+        timeInCenter = strrep(timeInCenter, 'NaN', 'NULL');
+
+        % Handle empty strings
+        if isempty(passingCenter)
+            passingCenter = 'NULL';
+        end
+        if isempty(timeInCenter)
+            timeInCenter = 'NULL';
         end
 
-        exec(conn, query);
+       updateQuery = sprintf("UPDATE %s SET passing_center=%s, time_in_center=%s " + ...
+            "WHERE id=%d", tableName, passingCenter, timeInCenter, id);
 
     catch
         fprintf("Error in writeToFeaturetable for id = %d\n", id);
