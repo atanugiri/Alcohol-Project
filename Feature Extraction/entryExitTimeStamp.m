@@ -1,6 +1,9 @@
+% Author: Atanu Giri
+% Date: 11/09/2023
+
 function [entryTime,exitTime,logicalApproach,logicalApproach2s] = entryExitTimeStamp(id)
 
-% id = 265233;
+% id = 273717;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
