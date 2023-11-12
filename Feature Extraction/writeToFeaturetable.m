@@ -21,7 +21,7 @@ tableName = 'ghrelin_featuretable';
 %     "ADD COLUMN logical_approach_2s text";
 % exec(conn, alterQuery);
 
-for index = 15:20 %length(idList)
+for index = 6600:length(idList)
     id = idList(index);
     try
         [entryTime, exitTime, logicalApproach, logicalApproach2s] = entryExitTimeStamp(id);
