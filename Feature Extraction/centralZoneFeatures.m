@@ -6,7 +6,7 @@
 
 function [passingCenter, timeInCenter] = centralZoneFeatures(id,zoneSize)
 
-% id = 265220; zoneSize = 0.4;
+% id = 265215; zoneSize = 0.4;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
@@ -86,8 +86,8 @@ try
     if isequal(passingCenter,1)
         xCenterFilter = xAfterTone >= xEdge(1) & xAfterTone <= xEdge(2);
         yCenterFilter = yAfterTone >= yEdge(1) & yAfterTone <= yEdge(2);
-        xCenter = xAfterTone(xCenterFilter & yCenterFilter);
-        timeInCenter = length(xCenter)*0.1;
+        tCenter = tAfterTone(xCenterFilter & yCenterFilter);
+        timeInCenter = length(tCenter)*0.1;
 
         %         yCenter = Y(xCenterFilter & yCenterFilter);
         %         trajectoryPlot(id); hold on; plot(xCenter, yCenter, 'b.', 'MarkerSize',10);
@@ -98,6 +98,6 @@ catch
 end
 
 %% Plot figure
-h = trajectoryPlot(id);
+% h = trajectoryPlot(id);
 % fig_name = sprintf('passingCentralZone id_%d',id);
 end
