@@ -64,13 +64,13 @@ try
     timeInCenter = nan;
 
     % return nan if the subject already present in the central zone
-    if (xAfterTone(1) > xEdge(1) && xAfterTone(1) < xEdge(2)) && ...
-            (yAfterTone(1) > yEdge(1) && yAfterTone(1) < yEdge(2))
+    if (xAfterTone(1) >= xEdge(1) && xAfterTone(1) <= xEdge(2)) && ...
+            (yAfterTone(1) >= yEdge(1) && yAfterTone(1) <= yEdge(2))
         passingCenter = nan;
         xCenterFilter = xAfterTone >= xEdge(1) & xAfterTone <= xEdge(2);
         yCenterFilter = yAfterTone >= yEdge(1) & yAfterTone <= yEdge(2);
-        xCenter = xAfterTone(xCenterFilter & yCenterFilter);
-        timeInCenter = length(xCenter)*0.1;
+        tCenter = xAfterTone(xCenterFilter & yCenterFilter);
+        timeInCenter = length(tCenter)*0.1;
 
         % check if trajectory goes through central zone
     else
