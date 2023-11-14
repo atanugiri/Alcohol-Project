@@ -21,10 +21,10 @@ idList = dataInRange.id;
 
 tableName = 'ghrelin_featuretable';
 
-for i = 1:length(idList)
+for i = 1:5%length(idList)
     try
         id = idList(i);
-        [passingCenter, timeInCenter] = centralZoneFeatures(id, 0.4);
+        [passingCenter, timeInCenter] = centralZoneFeatures(id, 0.25);
 
         % Convert NaN values to NULL
         passingCenter = handleNaN(passingCenter);
@@ -38,7 +38,7 @@ for i = 1:length(idList)
         passingCenter = convertToString(passingCenter);
         timeInCenter = convertToString(timeInCenter);
 
-        updateQuery = sprintf("UPDATE %s SET passing_center=%s, time_in_center=%s " + ...
+        updateQuery = sprintf("UPDATE %s SET passing_center_25=%s, time_in_center_25=%s " + ...
             "WHERE id=%d", tableName, passingCenter, timeInCenter, id);
 
         % Execute the update query here
