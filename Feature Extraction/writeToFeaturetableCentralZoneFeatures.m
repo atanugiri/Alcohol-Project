@@ -21,7 +21,7 @@ idList = dataInRange.id;
 
 tableName = 'ghrelin_featuretable';
 
-for i = 1:5%length(idList)
+for i = 1:length(idList)
     try
         id = idList(i);
         [passingCenter, timeInCenter] = centralZoneFeatures(id, 0.25);
