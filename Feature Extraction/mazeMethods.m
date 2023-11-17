@@ -1,23 +1,32 @@
 % Author: Atanu Giri
-% Date: 12/01/2022
+% Date: 11/17/2023
+
+function mazeMethods(mazeIndex,feeder,zoneSize,feederSize)
+%
 % This method chooses the maze in which the trial is taking place. Then it
 % shades the feeder zones; highlight the offer and central zone in that maze
-
-function mazeMethods(mazeIndex,feeder,zoneSize)
+%
 % mazeIndex = 2; feeder = 1;
+
+if nargin < 4
+        feederSize = 0.25; % Default value if not provided
+end
+
 grayFace = [0.3 0.3 0.3 0.3]; yellowFace = [1 1 0 0.3];
+xWidth = (feederSize+0.05); yWidth = xWidth;
+
 switch mazeIndex
     case 1
         % Maze2 a.k.a 1st quadrant
         % rectangles are denoted according to feeder numbers in this maze
-        r1 = rectangle('Position',[0.75 -0.05 0.3 0.3],'EdgeColor','none', ...
-            'FaceColor',grayFace);
-        r2 = rectangle('Position',[-0.05 -0.05 0.3 0.3],'EdgeColor','none', ...
-            'FaceColor',grayFace);
-        r3 = rectangle('Position',[-0.05 0.75 0.3 0.3],'EdgeColor','none', ...
-            'FaceColor',grayFace);
-        r4 = rectangle('Position',[0.75 0.75 0.3 0.3],'EdgeColor','none', ...
-            'FaceColor',grayFace);
+        r1 = rectangle('Position',[(1-feederSize) -0.05 xWidth yWidth], ...
+            'EdgeColor','none','FaceColor',grayFace);
+        r2 = rectangle('Position',[-0.05 -0.05 xWidth yWidth], ...
+            'EdgeColor','none', 'FaceColor',grayFace);
+        r3 = rectangle('Position',[-0.05 (1-feederSize) xWidth yWidth], ...
+            'EdgeColor','none','FaceColor',grayFace);
+        r4 = rectangle('Position',[(1-feederSize) (1-feederSize) xWidth yWidth], ...
+            'EdgeColor','none','FaceColor',grayFace);
         
         xMid = 0.5; yMid = 0.5;
         helperPlot;
@@ -25,14 +34,14 @@ switch mazeIndex
     case 2
         % Maze1 a.k.a 2nd quadrant
         % rectangles are denoted according to feeder numbers in this maze
-        r1 = rectangle('Position',[-1.05 0.75 0.3 0.3],'EdgeColor','none', ...
-            'FaceColor',grayFace);
-        r2 = rectangle('Position',[-1.05 -0.05 0.3 0.3],'EdgeColor','none', ...
-            'FaceColor',grayFace);
-        r3 = rectangle('Position',[-0.25 -0.05 0.3 0.3],'EdgeColor','none', ...
-            'FaceColor',grayFace);
-        r4 = rectangle('Position',[-0.25 0.75 0.3 0.3],'EdgeColor','none', ...
-            'FaceColor',grayFace);
+        r1 = rectangle('Position',[-1.05 (1-feederSize) xWidth yWidth], ...
+            'EdgeColor','none','FaceColor',grayFace);
+        r2 = rectangle('Position',[-1.05 -0.05 xWidth yWidth], ...
+            'EdgeColor','none','FaceColor',grayFace);
+        r3 = rectangle('Position',[-feederSize -0.05 xWidth yWidth], ...
+            'EdgeColor','none','FaceColor',grayFace);
+        r4 = rectangle('Position',[-feederSize (1-feederSize) xWidth yWidth], ...
+            'EdgeColor','none','FaceColor',grayFace);
         
         xMid = -0.5; yMid = 0.5;
         helperPlot;
@@ -40,14 +49,14 @@ switch mazeIndex
     case 3
         % Maze3 a.k.a 3rd quadrant
         % rectangles are denoted according to feeder numbers in this maze
-        r1 = rectangle('Position',[-0.25 -1.05 0.3 0.3],'EdgeColor','none', ...
-            'FaceColor',grayFace);
-        r2 = rectangle('Position',[-0.25 -0.25 0.3 0.3],'EdgeColor','none', ...
-            'FaceColor',grayFace);
-        r3 = rectangle('Position',[-1.05 -0.25 0.3 0.3],'EdgeColor','none', ...
-            'FaceColor',grayFace);
-        r4 = rectangle('Position',[-1.05 -1.05 0.3 0.3],'EdgeColor','none', ...
-            'FaceColor',grayFace);
+        r1 = rectangle('Position',[-feederSize -1.05 xWidth yWidth], ...
+            'EdgeColor','none','FaceColor',grayFace);
+        r2 = rectangle('Position',[-feederSize -feederSize xWidth yWidth], ...
+            'EdgeColor','none','FaceColor',grayFace);
+        r3 = rectangle('Position',[-1.05 -feederSize xWidth yWidth], ...
+            'EdgeColor','none','FaceColor',grayFace);
+        r4 = rectangle('Position',[-1.05 -1.05 xWidth yWidth], ...
+            'EdgeColor','none','FaceColor',grayFace);
         
         xMid = -0.5; yMid = -0.5;
         helperPlot;
@@ -55,14 +64,14 @@ switch mazeIndex
     case 4
         % Maze4 a.k.a 4th quadrant
         % rectangles are denoted according to feeder numbers in this maze
-        r1 = rectangle('Position',[-0.05 -0.25 0.3 0.3],'EdgeColor','none', ...
-            'FaceColor',grayFace);
-        r2 = rectangle('Position',[0.75 -0.25 0.3 0.3],'EdgeColor','none', ...
-            'FaceColor',grayFace);
-        r3 = rectangle('Position',[0.75 -1.05 0.3 0.3],'EdgeColor','none', ...
-            'FaceColor',grayFace);
-        r4 = rectangle('Position',[-0.05 -1.05 0.3 0.3],'EdgeColor','none', ...
-            'FaceColor',grayFace);
+        r1 = rectangle('Position',[-0.05 -feederSize xWidth yWidth], ...
+            'EdgeColor','none','FaceColor',grayFace);
+        r2 = rectangle('Position',[(1-feederSize) -feederSize xWidth yWidth], ...
+            'EdgeColor','none','FaceColor',grayFace);
+        r3 = rectangle('Position',[(1-feederSize) -1.05 xWidth yWidth], ...
+            'EdgeColor','none','FaceColor',grayFace);
+        r4 = rectangle('Position',[-0.05 -1.05 xWidth yWidth], ...
+            'EdgeColor','none','FaceColor',grayFace);
 
         xMid = 0.5; yMid = -0.5;
         helperPlot;
