@@ -1,48 +1,62 @@
 % Author: Atanu Giri
-% Date: 12/12/2022
-% This function chooses the maze and feeder in which the trial is taking
-% place. It returns the edges of the central zone according to the input
-% zone size.
+% Date: 11/17/2023
 
-function [xEdge,yEdge,xEdgeOfFeeder,yEdgeOfFeeder] = centralZoneEdges(mazeIndex,zoneSize,feeder)
-% mazeIndex = 2; feeder = 4; zoneSize = 0.4;
-feederSize = 0.3;
+function [xEdgeCenter,yEdgeCenter,xEdgeReward,yEdgeReward] = ...
+centralZoneEdges(mazeIndex,zoneSize,feeder,feederSize)
+%
+% This function chooses the maze and feeder in which the trial is taking
+% place. It returns the edges of the central zone and reaward feeder 
+% according to the input size.
+%
+% mazeIndex = 1; feeder = 4; zoneSize = 0.4;
+if nargin < 4
+        feederSize = 0.25; % Default value if not provided
+end
+
 switch mazeIndex
     case 1
         % Maze2 a.k.a 1st quadrant
         xMid = 0.5; yMid = 0.5;
-        xEdge = [(xMid - zoneSize/2) (xMid + zoneSize/2)];
-        yEdge = [(yMid - zoneSize/2) (yMid + zoneSize/2)];
-        xEdgeOfZones = {[0.75 0.75+feederSize],[-0.05 -0.05+feederSize],[-0.05 -0.05+feederSize],[0.75 0.75+feederSize]};
-        yEdgeOfZones = {[-0.05 -0.05+feederSize],[-0.05 -0.05+feederSize],[0.75 0.75+feederSize],[0.75 0.75+feederSize]};
-        xEdgeOfFeeder = xEdgeOfZones{feeder}; yEdgeOfFeeder = yEdgeOfZones{feeder};
+        xEdgeCenter = [(xMid - zoneSize/2) (xMid + zoneSize/2)];
+        yEdgeCenter = [(yMid - zoneSize/2) (yMid + zoneSize/2)];
+        xEdgeOfRZ = {[(1-feederSize) 1.05],[-0.05 feederSize], ...
+            [-0.05 feederSize],[(1-feederSize) 1.05]};
+        yEdgeOfRZ = {[-0.05 feederSize],[-0.05 feederSize], ...
+            [(1-feederSize) 1.05],[(1-feederSize) 1.05]};
+        xEdgeReward = xEdgeOfRZ{feeder}; yEdgeReward = yEdgeOfRZ{feeder};
 
     case 2
         % Maze1 a.k.a 2nd quadrant
         xMid = -0.5; yMid = 0.5;
-        xEdge = [(xMid - zoneSize/2) (xMid + zoneSize/2)];
-        yEdge = [(yMid - zoneSize/2) (yMid + zoneSize/2)];
-        xEdgeOfZones = {[-1.05 -1.05+feederSize],[-1.05 -1.05+feederSize],[-0.25 -0.25+feederSize],[-0.25 -0.25+feederSize]};
-        yEdgeOfZones = {[0.75 0.75+feederSize],[-0.05 -0.05+feederSize],[-0.05 -0.05+feederSize],[0.75 0.75+feederSize]};
-        xEdgeOfFeeder = xEdgeOfZones{feeder}; yEdgeOfFeeder = yEdgeOfZones{feeder};
+        xEdgeCenter = [(xMid - zoneSize/2) (xMid + zoneSize/2)];
+        yEdgeCenter = [(yMid - zoneSize/2) (yMid + zoneSize/2)];
+        xEdgeOfRZ = {[-1.05 (-1+feederSize)],[-1.05 (-1+feederSize)], ...
+            [-feederSize 0.05],[-feederSize 0.05]};
+        yEdgeOfRZ = {[(1-feederSize) 1.05],[-0.05 feederSize], ...
+            [-0.05 feederSize],[(1-feederSize) 1.05]};
+        xEdgeReward = xEdgeOfRZ{feeder}; yEdgeReward = yEdgeOfRZ{feeder};
 
     case 3
         % Maze3 a.k.a 3rd quadrant
         xMid = -0.5; yMid = -0.5;
-        xEdge = [(xMid - zoneSize/2) (xMid + zoneSize/2)];
-        yEdge = [(yMid - zoneSize/2) (yMid + zoneSize/2)];
-        xEdgeOfZones = {[-0.25 -0.25+feederSize],[-0.25 -0.25+feederSize],[-1.05 -1.05+feederSize],[-1.05 -1.05+feederSize]};
-        yEdgeOfZones = {[-1.05 -1.05+feederSize],[-0.25 -0.25+feederSize],[-0.25 -0.25+feederSize],[-1.05 -1.05+feederSize]};
-        xEdgeOfFeeder = xEdgeOfZones{feeder}; yEdgeOfFeeder = yEdgeOfZones{feeder};
+        xEdgeCenter = [(xMid - zoneSize/2) (xMid + zoneSize/2)];
+        yEdgeCenter = [(yMid - zoneSize/2) (yMid + zoneSize/2)];
+        xEdgeOfRZ = {[-feederSize 0.05],[-feederSize 0.05], ...
+            [-1.05 (-1+feederSize)],[-1.05 (-1+feederSize)]};
+        yEdgeOfRZ = {[-1.05 (-1+feederSize)],[-feederSize 0.05], ...
+            [-feederSize 0.05],[-1.05 (-1+feederSize)]};
+        xEdgeReward = xEdgeOfRZ{feeder}; yEdgeReward = yEdgeOfRZ{feeder};
 
     case 4
         % Maze4 a.k.a 4th quadrant
         xMid = 0.5; yMid = -0.5;
-        xEdge = [(xMid - zoneSize/2) (xMid + zoneSize/2)];
-        yEdge = [(yMid - zoneSize/2) (yMid + zoneSize/2)];
-        xEdgeOfZones = {[-0.05 -0.05+feederSize],[0.75 0.75+feederSize],[0.75 0.75+feederSize],[-0.05 -0.05+feederSize]};
-        yEdgeOfZones = {[-0.25 -0.25+feederSize],[-0.25 -0.25+feederSize],[-1.05 -1.05+feederSize],[-1.05 -1.05+feederSize]};
-        xEdgeOfFeeder = xEdgeOfZones{feeder}; yEdgeOfFeeder = yEdgeOfZones{feeder};
+        xEdgeCenter = [(xMid - zoneSize/2) (xMid + zoneSize/2)];
+        yEdgeCenter = [(yMid - zoneSize/2) (yMid + zoneSize/2)];
+        xEdgeOfRZ = {[-0.05 feederSize],[(1-feederSize) 1.05], ...
+            [(1-feederSize) 1.05],[-0.05 feederSize]};
+        yEdgeOfRZ = {[-feederSize 0.05],[-feederSize 0.05], ...
+            [-1.05 (-1+feederSize)],[-1.05 (-1+feederSize)]};
+        xEdgeReward = xEdgeOfRZ{feeder}; yEdgeReward = yEdgeOfRZ{feeder};
     otherwise
         warning('Unexpected maze number.')
 
