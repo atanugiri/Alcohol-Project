@@ -6,7 +6,7 @@
 %% This function call coordinateNormalization and mazeMethods functions.
 
 function h = trajectoryPlot(id)
-% id = 102377;
+% id = 266806;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
@@ -70,7 +70,7 @@ feeder = subject_data.feeder;
 xlim(figureLimit{mazeIndex}{1}); ylim(figureLimit{mazeIndex}{2});
 
 % shade feeder zones by calling mazeMethods
-mazeMethods(mazeIndex,feeder,0.4);
+mazeMethods(mazeIndex,feeder,0.4,0.25); % Check parameters
 
 % patch objects
 grayPatch = patch(nan,nan,'k');grayPatch.FaceColor = [0.3 0.3 0.3];
