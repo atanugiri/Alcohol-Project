@@ -1,9 +1,9 @@
 % Author: Atanu Giri
 % Date: 11/09/2023
 
-function [entryTime,exitTime,logicalApproach,logicalApproach2s] = entryExitTimeStamp(id)
+function [entryTime,exitTime,logicalApproach,logicalApproach5s] = entryExitTimeStamp(id)
 
-% id = 273717;
+% id = 266806;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
@@ -23,7 +23,7 @@ try
     subject_data.feeder = str2double(subject_data.feeder);
     % remove space from mazenumber
     subject_data.mazenumber = char(lower(strrep(subject_data.mazenumber,' ','')));
-    
+
     % Accessing PGArray data as double
     for column = size(subject_data,2) - 2:size(subject_data,2)
         stringAllRows = string(subject_data.(column));
@@ -62,61 +62,69 @@ try
     mazeIndex = find(ismember(maze,subject_data.mazenumber));
     feeder = subject_data.feeder;
 
-    [~, ~, xEdgeOfFeeder, yEdgeOfFeeder] = centralZoneEdges(mazeIndex,0.4,feeder);
-    
+    [~, ~, xEdgeReward, yEdgeReward] = centralZoneEdges(mazeIndex,0.4,feeder,0.20);
+
     %% entrytime, exittime, logicalApproach
-    entryTime = nan;
-    for i = 1:length(xAfterTone)
-        if (xAfterTone(i) >= xEdgeOfFeeder(1) && xAfterTone(i) <= xEdgeOfFeeder(2)) && ...
-                (yAfterTone(i) >= yEdgeOfFeeder(1) && yAfterTone(i) <= yEdgeOfFeeder(2))
-            entryPointIndex = i;
-            entryTime = tAfterTone(i) - tAfterTone(1);
-            break;
-        end
+    if any(xAfterTone >= xEdgeReward(1) & xAfterTone <= xEdgeReward(2) & ...
+            yAfterTone >= yEdgeReward(1) & yAfterTone <= yEdgeReward(2))
+        logicalApproach = 1;
+    else
+        logicalApproach = 0;
     end
+
+    if logicalApproach == 0
+        entryTime = [];
     
+    elseif logicalApproach == 1
+        for i = 1:length(xAfterTone)
+            if xAfterTone(i) >= xEdgeReward(1) && xAfterTone(i) <= xEdgeReward(2) && ...
+                    yAfterTone(i) >= yEdgeReward(1) && yAfterTone(i) <= yEdgeReward(2)
+                entryPointIndex = i;
+                entryTime = tAfterTone(i) - tAfterTone(1);
+                break;
+            end
+        end
+
+    else
+        entryTime = -9999;
+    end
+
     % Check if entry point was found
-    if isnan(entryTime)
-        exitTime = nan;
+    if isempty(entryTime)
+        exitTime = [];
     else
         for i = entryPointIndex+1:length(xAfterTone)
             % Check if current x and y coordinates are outside rectangular zone
-            if xAfterTone(i) < xEdgeOfFeeder(1) || xAfterTone(i) > xEdgeOfFeeder(2) || ...
-                    yAfterTone(i) < yEdgeOfFeeder(1) || yAfterTone(i) > yEdgeOfFeeder(2)
+            if xAfterTone(i) < xEdgeReward(1) || xAfterTone(i) > xEdgeReward(2) || ...
+                    yAfterTone(i) < yEdgeReward(1) || yAfterTone(i) > yEdgeReward(2)
                 exitPointIndex = i;
                 exitTime = tAfterTone(i) - tAfterTone(1);
 
-%                 plot(xAfterTone(i),yAfterTone(i),'ko','MarkerSize',10,'LineWidth',2);
+                %                 plot(xAfterTone(i),yAfterTone(i),'ko','MarkerSize',10,'LineWidth',2);
                 break;
             else
                 exitPointIndex = nan;
-                exitTime = nan;
+                exitTime = -9999;
             end
         end
     end
 
-    if isnan(entryTime)
-        logicalApproach = 0;
-    else
-        logicalApproach = 1;
-    end
-
     %% logicalApproach2s
-    if isnan(entryTime)
-        logicalApproach2s = 0;
+    if isempty(entryTime)
+        logicalApproach5s = 0;
     else
-        xFeederFilter = xAfterTone >= xEdgeOfFeeder(1) & xAfterTone <= xEdgeOfFeeder(2);
-        yFeederFilter = yAfterTone >= yEdgeOfFeeder(1) & yAfterTone <= yEdgeOfFeeder(2);
+        xFeederFilter = xAfterTone >= xEdgeReward(1) & xAfterTone <= xEdgeReward(2);
+        yFeederFilter = yAfterTone >= yEdgeReward(1) & yAfterTone <= yEdgeReward(2);
         timeInFeeder = tAfterTone(xFeederFilter & yFeederFilter);
         timeInFeeder = length(timeInFeeder)*0.1;
-        
-        if timeInFeeder >= 2
-            logicalApproach2s = 1;
+
+        if timeInFeeder >= 5
+            logicalApproach5s = 1;
         else
-            logicalApproach2s = 0;
+            logicalApproach5s = 0;
         end
     end
-    
+
 
 catch
     sprintf("An error occured for id = %d\n", id);
