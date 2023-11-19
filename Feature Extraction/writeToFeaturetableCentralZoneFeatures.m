@@ -64,7 +64,7 @@ end
 
 function value = convertToString(value)
     % Convert to numeric if not NaN or empty
-    if ~isnan(value) && ~isempty(value)
+    if all(~isnan(value)) && all(~isempty(value))
         value = num2str(value); % Convert to string for uniformity
     end
 end

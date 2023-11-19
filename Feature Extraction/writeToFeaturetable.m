@@ -44,8 +44,8 @@ for index = 1:length(idList)
         logicalApproach = convertToString(logicalApproach);
         logicalApproach5s = convertToString(logicalApproach5s);
 
-        updateQuery = sprintf("UPDATE %s SET entry_time=%s, exit_time=%s, " + ...
-            "logical_approach=%s, logical_approach_2s=%s WHERE id=%d", tableName, ...
+        updateQuery = sprintf("UPDATE %s SET entry_time_2nd=%s, exit_time_2nd=%s, " + ...
+            "logical_approach_2nd=%s, logical_approach_5s=%s WHERE id=%d", tableName, ...
             entryTime, exitTime, logicalApproach, logicalApproach5s, id);
 
         exec(conn, updateQuery);
@@ -70,7 +70,7 @@ end
 
 function value = convertToString(value)
     % Convert to numeric if not NaN or empty
-    if ~isnan(value) && ~isempty(value)
+    if all(~isnan(value)) && all(~isempty(value))
         value = num2str(value); % Convert to string for uniformity
     end
 end
