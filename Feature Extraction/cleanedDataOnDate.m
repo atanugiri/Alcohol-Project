@@ -18,15 +18,15 @@ referencetime = char(subjectData.referencetime);
 currentDate = referencetime(1:10);
 
 % Select data of same date
-dataOnDateQuery = strcat("SELECT id, mazenumber, xcoordinates2, ycoordinates2 " + ...
+dataOnDateQuery = strcat("SELECT id, mazenumber, truexnose, trueynose " + ...
     "FROM live_table WHERE referencetime LIKE '",sprintf('%s',currentDate), "%';");
 dataOnDate = fetch(conn,dataOnDateQuery);
 close(conn);
 
 
 % Accessing PGArray data as double
-dataOnDate.xcoordinates2 = transformPgarray(dataOnDate.xcoordinates2);
-dataOnDate.ycoordinates2 = transformPgarray(dataOnDate.ycoordinates2);
+dataOnDate.(3) = transformPgarray(dataOnDate.(3));
+dataOnDate.(4) = transformPgarray(dataOnDate.(4));
 dataOnDate.mazenumber = string(dataOnDate.mazenumber);
 
 mazeLabel = {'maze 2','maze 1','maze 3','maze 4'};
