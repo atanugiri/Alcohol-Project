@@ -4,8 +4,8 @@ conn = database(datasource,'postgres','1234');
 dateQuery = "SELECT id, referencetime FROM live_table ORDER BY id";
 allDates = fetch(conn, dateQuery);
 allDates.referencetime = datetime(allDates.referencetime, 'Format', 'MM/dd/yyyy');
-startDate = datetime('09/12/2023', 'InputFormat', 'MM/dd/yyyy');
-endDate = datetime('10/31/2023', 'InputFormat', 'MM/dd/yyyy');
+startDate = datetime('09/25/2023', 'InputFormat', 'MM/dd/yyyy');
+endDate = datetime('09/27/2023', 'InputFormat', 'MM/dd/yyyy');
 endDate = endDate + days(1);
 
 dataInRange = allDates(allDates.referencetime >= startDate & allDates.referencetime <= endDate, :);
@@ -21,36 +21,56 @@ tableName = 'ghrelin_featuretable';
 %     "ADD COLUMN logical_approach_2s text";
 % exec(conn, alterQuery);
 
-for index = 6600:length(idList)
+for index = 1:length(idList)
     id = idList(index);
     try
-        [entryTime, exitTime, logicalApproach, logicalApproach2s] = entryExitTimeStamp(id);
+        [entryTime, exitTime, logicalApproach, logicalApproach5s] = entryExitTimeStamp(id);
+
+        % Convert NaN values to NULL
+        entryTime = handleNaN(entryTime);
+        exitTime = handleNaN(exitTime);
+        logicalApproach = handleNaN(logicalApproach);
+        logicalApproach5s = handleNaN(logicalApproach5s);
+
+        % Handle empty values
+        entryTime = handleEmpty(entryTime);
+        exitTime = handleEmpty(exitTime);
+        logicalApproach = handleEmpty(logicalApproach);
+        logicalApproach5s = handleEmpty(logicalApproach5s);
 
         % Convert NaN values to 'NULL' for text columns
-        entryTime = num2str(entryTime);
-        exitTime = num2str(exitTime);
-        logicalApproach = num2str(logicalApproach);
-        logicalApproach2s = num2str(logicalApproach2s);
-
-        entryTime = strrep(entryTime, 'NaN', 'NULL');
-        exitTime = strrep(exitTime, 'NaN', 'NULL');
-
-        % Handle empty strings
-        if isempty(entryTime)
-            entryTime = 'NULL';
-        end
-        if isempty(exitTime)
-            exitTime = 'NULL';
-        end
+        entryTime = convertToString(entryTime);
+        exitTime = convertToString(exitTime);
+        logicalApproach = convertToString(logicalApproach);
+        logicalApproach5s = convertToString(logicalApproach5s);
 
         updateQuery = sprintf("UPDATE %s SET entry_time=%s, exit_time=%s, " + ...
             "logical_approach=%s, logical_approach_2s=%s WHERE id=%d", tableName, ...
-            entryTime, exitTime, logicalApproach, logicalApproach2s, id);
+            entryTime, exitTime, logicalApproach, logicalApproach5s, id);
 
         exec(conn, updateQuery);
 
     catch ME
         fprintf("Calculation error in %d: %s\n", id, ME.message);
         continue;
+    end
+end
+
+function value = handleNaN(value)
+    if isnan(value)
+        value = 'NULL';
+    end
+end
+
+function value = handleEmpty(value)
+    if isempty(value)
+        value = 'NULL';
+    end
+end
+
+function value = convertToString(value)
+    % Convert to numeric if not NaN or empty
+    if ~isnan(value) && ~isempty(value)
+        value = num2str(value); % Convert to string for uniformity
     end
 end
