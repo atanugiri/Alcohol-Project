@@ -3,7 +3,7 @@
 
 function [entryTime,exitTime,logicalApproach,logicalApproach5s] = entryExitTimeStamp(id)
 
-% id = 266826;
+% id = 266661;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
@@ -34,8 +34,8 @@ try
     end
 
     % includes the data before playstarttrialtone
-    rawData = table(subject_data.coordinatetimes2{1}, subject_data.xcoordinates2{1}, ...
-        subject_data.ycoordinates2{1}, 'VariableNames',{'t','X','Y'});
+    rawData = table(subject_data.coordinatetimes2{1}, subject_data.truexnose{1}, ...
+        subject_data.trueynose{1}, 'VariableNames',{'t','X','Y'});
 
     % remove nan entries
     validIdx = all(isfinite(rawData{:,:}),2);

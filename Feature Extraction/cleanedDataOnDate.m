@@ -6,7 +6,7 @@
 % The clean data is used as reference to normalize the data for plotting trajectory
 
 function [xCleaned,yCleaned] = cleanedDataOnDate(id)
-% id = 265215;
+% id = 266661;
 
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
@@ -40,8 +40,8 @@ xInMaze = cell(1,4);
 yInMaze = cell(1,4);
 
 for mazeId = 1:4
-    xInMaze{mazeId} = vertcat(mazeData{mazeId}.xcoordinates2{:});
-    yInMaze{mazeId} = vertcat(mazeData{mazeId}.ycoordinates2{:});
+    xInMaze{mazeId} = vertcat(mazeData{mazeId}.(3){:});
+    yInMaze{mazeId} = vertcat(mazeData{mazeId}.(4){:});
 end
 
 clear mazeData;
