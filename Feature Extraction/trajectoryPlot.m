@@ -51,11 +51,11 @@ yNormalized = cleanedDataWithTone.Y(toneFilter);
 
 % plot normalized data
 h = figure;
-subplot(1,2,1);
-plot(cleanedData.X(toneFilter), cleanedData.Y(toneFilter), 'LineWidth',1.5);
-title("Raw trajectory plot");
-
-subplot(1,2,2);
+% subplot(1,2,1);
+% plot(cleanedData.X(toneFilter), cleanedData.Y(toneFilter), 'LineWidth',1.5);
+% title("Raw trajectory plot");
+% 
+% subplot(1,2,2);
 p1 = plot(xNormalized,yNormalized,'b','MarkerSize',10,'LineWidth',1.5);
 hold on;
 mrkr1 = plot(xNormalized(1),yNormalized(1),'g.','MarkerSize',30);
@@ -70,7 +70,7 @@ feeder = subject_data.feeder;
 xlim(figureLimit{mazeIndex}{1}); ylim(figureLimit{mazeIndex}{2});
 
 % shade feeder zones by calling mazeMethods
-mazeMethods(mazeIndex,feeder,0.4,0.25); % Check parameters
+mazeMethods(mazeIndex,0.25,0.4,feeder); % Check parameters
 
 % patch objects
 grayPatch = patch(nan,nan,'k');grayPatch.FaceColor = [0.3 0.3 0.3];
@@ -92,7 +92,7 @@ ylabel('y(Normalized)',Interpreter='latex',FontSize=14);
 
 % title of graph
 sgtitle(sprintf('trajectory id:%d',id));
-fig_name = sprintf('trajectory id_%d',id);
+% fig_name = sprintf('trajectory id_%d',id);
 % print(h,fig_name,'-dpng','-r400');
 % savefig(h,sprintf('%s.fig',fig_name));
 end
