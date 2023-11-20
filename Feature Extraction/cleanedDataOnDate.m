@@ -18,7 +18,7 @@ referencetime = char(subjectData.referencetime);
 currentDate = referencetime(1:10);
 
 % Select data of same date
-dataOnDateQuery = strcat("SELECT id, mazenumber, truexnose, trueynose " + ...
+dataOnDateQuery = strcat("SELECT id, mazenumber, xcoordinates2, ycoordinates2 " + ...
     "FROM live_table WHERE referencetime LIKE '",sprintf('%s',currentDate), "%';");
 dataOnDate = fetch(conn,dataOnDateQuery);
 close(conn);
