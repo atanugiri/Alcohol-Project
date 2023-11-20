@@ -7,7 +7,7 @@ subjectDataQ = "SELECT id, subjectid, referencetime FROM live_table WHERE " + ..
     "referencetime LIKE '%09/25/2023%' AND subjectid = 'joey'";
 subjectData = fetch(conn, subjectDataQ);
 
-for index = 1:3%height(subjectData)
+for index = 1:height(subjectData)
     try
         % Create a new figure for every 8 subplots
         if mod(index - 1, 8) == 0
