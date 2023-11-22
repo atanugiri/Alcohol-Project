@@ -6,14 +6,14 @@
 
 function [passingCenter, timeInCenter] = centralZoneFeatures(id,zoneSize)
 
-% id = 265215; zoneSize = 0.4;
+% id = 266661; zoneSize = 0.4;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
 % write query
 query = sprintf("SELECT id, subjectid, trialname, referencetime, " + ...
-    "playstarttrialtone, mazenumber, feeder, coordinatetimes2, xcoordinates2, " + ...
-    "ycoordinates2  FROM live_table WHERE id = %d", id);
+    "playstarttrialtone, mazenumber, feeder, trialcontrolsettings, coordinatetimes2, " + ...
+    "xcoordinates2, ycoordinates2 FROM live_table WHERE id = %d", id);
 subject_data = fetch(conn,query);
 
 try
@@ -23,6 +23,20 @@ try
         subject_data.playstarttrialtone = 2;
     end
     subject_data.feeder = str2double(subject_data.feeder);
+    subject_data.trialcontrolsettings = string(subject_data.trialcontrolsettings);
+
+    if contains(subject_data.trialcontrolsettings, "Diagonal","IgnoreCase",true)
+        feeder = 1;
+    elseif contains(subject_data.trialcontrolsettings, "Grid","IgnoreCase",true)
+        feeder = 2;
+    elseif contains(subject_data.trialcontrolsettings, "Horizontal","IgnoreCase",true)
+        feeder = 3;
+    elseif contains(subject_data.trialcontrolsettings, "Radial","IgnoreCase",true)
+        feeder = 4;
+    else
+        feeder = subject_data.feeder;
+    end
+
     subject_data.mazenumber = char(lower(strrep(subject_data.mazenumber,' ','')));
 
     % Accessing PGArray data as double
@@ -57,7 +71,6 @@ try
     % get the index in maze array
     maze = {'maze2','maze1','maze3','maze4'};
     mazeIndex = find(ismember(maze,subject_data.mazenumber));
-    feeder = subject_data.feeder;
     [xEdge, yEdge, ~, ~] = centralZoneEdges(mazeIndex,zoneSize,feeder);
 
     passingCenter = 0;
