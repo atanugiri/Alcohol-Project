@@ -3,8 +3,8 @@
 
 datasource = 'live_database';
 conn = database(datasource, 'postgres', '1234');
-subjectDataQ = "SELECT id, subjectid, referencetime FROM live_table WHERE " + ...
-    "referencetime LIKE '%09/25/2023%' AND subjectid = 'joey'";
+subjectDataQ = "SELECT id, subjectid, referencetime, trialname FROM live_table WHERE " + ...
+    "referencetime LIKE '%09/25/2023%' AND subjectid = 'joey' ORDER BY id";
 subjectData = fetch(conn, subjectDataQ);
 
 for index = 1:height(subjectData)
@@ -22,6 +22,7 @@ for index = 1:height(subjectData)
         % Create a 2x4 subplot grid
         s = subplot(2, 4, subplotIndex);
         id = subjectData.id(index);
+        title(sprintf("id: %d, %s",id, string(subjectData.trialname(index))));
         
         h = trajectoryPlot(id);
         ax = h.CurrentAxes;
