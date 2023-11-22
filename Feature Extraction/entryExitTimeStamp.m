@@ -10,8 +10,8 @@ conn = database(datasource,'postgres','1234');
 
 % write query
 query = sprintf("SELECT id, subjectid, trialname, referencetime, " + ...
-    "playstarttrialtone, mazenumber, feeder, coordinatetimes2, truexnose, " + ...
-    "trueynose FROM live_table WHERE id = %d", id);
+    "playstarttrialtone, mazenumber, feeder, trialcontrolsettings, coordinatetimes2, " + ...
+    "xcoordinates2, ycoordinates2 FROM live_table WHERE id = %d", id);
 subject_data = fetch(conn,query);
 
 try
@@ -21,6 +21,20 @@ try
         subject_data.playstarttrialtone = 2;
     end
     subject_data.feeder = str2double(subject_data.feeder);
+    subject_data.trialcontrolsettings = string(subject_data.trialcontrolsettings);
+
+    if contains(subject_data.trialcontrolsettings, "Diagonal","IgnoreCase",true)
+        feeder = 1;
+    elseif contains(subject_data.trialcontrolsettings, "Grid","IgnoreCase",true)
+        feeder = 2;
+    elseif contains(subject_data.trialcontrolsettings, "Horizontal","IgnoreCase",true)
+        feeder = 3;
+    elseif contains(subject_data.trialcontrolsettings, "Radial","IgnoreCase",true)
+        feeder = 4;
+    else
+        feeder = subject_data.feeder;
+    end
+
     % remove space from mazenumber
     subject_data.mazenumber = char(lower(strrep(subject_data.mazenumber,' ','')));
 
@@ -34,8 +48,8 @@ try
     end
 
     % includes the data before playstarttrialtone
-    rawData = table(subject_data.coordinatetimes2{1}, subject_data.truexnose{1}, ...
-        subject_data.trueynose{1}, 'VariableNames',{'t','X','Y'});
+    rawData = table(subject_data.coordinatetimes2{1}, subject_data.xcoordinates2{1}, ...
+        subject_data.ycoordinates2{1}, 'VariableNames',{'t','X','Y'});
 
     % remove nan entries
     validIdx = all(isfinite(rawData{:,:}),2);
@@ -60,7 +74,6 @@ try
 
     % get the index in maze array
     mazeIndex = find(ismember(maze,subject_data.mazenumber));
-    feeder = subject_data.feeder;
 
     [~, ~, xEdgeReward, yEdgeReward] = centralZoneEdges(mazeIndex,0.4,feeder,0.20);
 
