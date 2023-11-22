@@ -41,10 +41,10 @@ switch mazeIndex
         xMid = -0.5; yMid = -0.5;
         xEdgeCenter = [(xMid - zoneSize/2) (xMid + zoneSize/2)];
         yEdgeCenter = [(yMid - zoneSize/2) (yMid + zoneSize/2)];
-        xEdgeOfRZ = {[-feederSize 0.05],[-feederSize 0.05], ...
-            [-1.05 (-1+feederSize)],[-1.05 (-1+feederSize)]};
-        yEdgeOfRZ = {[-1.05 (-1+feederSize)],[-feederSize 0.05], ...
-            [-feederSize 0.05],[-1.05 (-1+feederSize)]};
+        xEdgeOfRZ = {[-feederSize 0.05],[-1.05 (-1+feederSize)], ...
+            [-1.05 (-1+feederSize)],[-feederSize 0.05]};
+        yEdgeOfRZ = {[-1.05 (-1+feederSize)],[-1.05 (-1+feederSize)], ...
+            [-feederSize 0.05],[-feederSize 0.05]};
         xEdgeReward = xEdgeOfRZ{feeder}; yEdgeReward = yEdgeOfRZ{feeder};
 
     case 4
