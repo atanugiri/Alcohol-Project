@@ -12,13 +12,26 @@ datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
 % write query
 query = sprintf("SELECT id, subjectid, trialname, referencetime, " + ...
-    "playstarttrialtone, mazenumber, feeder, coordinatetimes2, xcoordinates2, " + ...
-    "ycoordinates2 FROM live_table WHERE id = %d;", id);
+    "playstarttrialtone, mazenumber, feeder, trialcontrolsettings, coordinatetimes2, " + ...
+    "xcoordinates2, ycoordinates2 FROM live_table WHERE id = %d;", id);
 subject_data = fetch(conn,query);
 
 % convert all table entries from string to usable format
 subject_data.playstarttrialtone = str2double(subject_data.playstarttrialtone);
 subject_data.feeder = str2double(subject_data.feeder);
+subject_data.trialcontrolsettings = string(subject_data.trialcontrolsettings);
+
+if contains(subject_data.trialcontrolsettings, "Diagonal","IgnoreCase",true)
+    feeder = 1;
+elseif contains(subject_data.trialcontrolsettings, "Grid","IgnoreCase",true)
+    feeder = 2;
+elseif contains(subject_data.trialcontrolsettings, "Horizontal","IgnoreCase",true)
+    feeder = 3;
+elseif contains(subject_data.trialcontrolsettings, "Radial","IgnoreCase",true)
+    feeder = 4;
+else
+    feeder = subject_data.feeder;
+end
 % remove space from mazenumber
 subject_data.mazenumber = char(lower(strrep(subject_data.mazenumber,' ','')));
 
@@ -54,7 +67,7 @@ h = figure;
 % subplot(1,2,1);
 % plot(cleanedData.X(toneFilter), cleanedData.Y(toneFilter), 'LineWidth',1.5);
 % title("Raw trajectory plot");
-% 
+%
 % subplot(1,2,2);
 p1 = plot(xNormalized,yNormalized,'b','MarkerSize',10,'LineWidth',1.5);
 hold on;
@@ -66,7 +79,6 @@ figureLimit = {{[-0.2 1.2],[-0.2 1.2]},{[-1.2 0.2],[-0.2 1.2]}, ...
     {[-1.2 0.2],[-1.2 0.2]},{[-0.2 1.2],[-1.2 0.2]}};
 % get the index in maze array
 mazeIndex = find(ismember(maze,subject_data.mazenumber));
-feeder = subject_data.feeder;
 xlim(figureLimit{mazeIndex}{1}); ylim(figureLimit{mazeIndex}{2});
 
 % shade feeder zones by calling mazeMethods
