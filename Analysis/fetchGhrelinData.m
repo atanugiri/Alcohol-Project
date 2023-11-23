@@ -20,7 +20,8 @@ dataInRange = allDates(allDates.referencetime >= startDate & allDates.referencet
 idList = strjoin(arrayfun(@num2str, dataInRange.id, 'UniformOutput', false), ',');
 
 liveTableQuery = sprintf("SELECT id, subjectid, referencetime, gender, feeder, " + ...
-    "tasktypedone, approachavoid FROM live_table WHERE id IN (%s) ORDER BY id;", idList);
+    "trialcontrolsettings, tasktypedone, approachavoid FROM live_table " + ...
+    "WHERE id IN (%s) ORDER BY id;", idList);
 liveTableData = fetch(conn, liveTableQuery);
 
 if ~strcmpi(feature,'approachavoid')
@@ -39,6 +40,7 @@ mergedTable.referencetime = string(mergedTable.referencetime);
 mergedTable.subjectid = string(mergedTable.subjectid);
 mergedTable.gender = string(mergedTable.gender);
 mergedTable.feeder = str2double(mergedTable.feeder);
+mergedTable.trialcontrolsettings = string(mergedTable.trialcontrolsettings);
 mergedTable.tasktypedone = string(mergedTable.tasktypedone);
 mergedTable.(feature) = str2double(mergedTable.(feature));
 close(conn);

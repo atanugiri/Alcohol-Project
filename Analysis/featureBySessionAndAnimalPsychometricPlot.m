@@ -6,9 +6,25 @@
 % This function returns psychometric plot of a feature for each session and
 % animal
 %
-feature = 'passing_center';
+feature = 'logical_approach_3s';
 close all; clc;
 mergedTable = fetchGhrelinData(feature);
+
+mergedTable.realFeederId = nan(height(mergedTable),1);
+
+for i = 1:height(mergedTable)
+    if contains(mergedTable.trialcontrolsettings(i), "Diagonal","IgnoreCase",true)
+        mergedTable.realFeederId(i) = 1;
+    elseif contains(mergedTable.trialcontrolsettings(i), "Grid","IgnoreCase",true)
+        mergedTable.realFeederId(i) = 2;
+    elseif contains(mergedTable.trialcontrolsettings(i), "Horizontal","IgnoreCase",true)
+        mergedTable.realFeederId(i) = 3;
+    elseif contains(mergedTable.trialcontrolsettings(i), "Radial","IgnoreCase",true)
+        mergedTable.realFeederId(i) = 4;
+    else
+        mergedTable.realFeederId(i) = mergedTable.feeder;
+    end
+end
 
 ghrToyratData = mergedTable(mergedTable.tasktypedone == 'ghr toyrat', :);
 salToyratData = mergedTable(mergedTable.tasktypedone == 'sal toyrat', :);
@@ -20,8 +36,8 @@ ghrSessionData = cell(1,5);
 salSessionData = cell(1,5);
 
 %% Ghrelin, saline plot
-% myPlot(salToyratData, feature);
-myPlot(ghrToyratData, feature);
+myPlot(salToyratData, feature);
+% myPlot(ghrToyratData, feature);
 
 
 %% Description of myPlot
@@ -68,9 +84,10 @@ function [featureForEach, noOfTrials] = psychometricFunValues(dataTable, feature
 % dataTable = animalData; % For testing
 featureForEach = zeros(1, 4);
 noOfTrials = zeros(1,4);
+
 for conc = 1:4
     feederToFetch = 5 - conc;
-    dataFilter = dataTable.feeder == feederToFetch;
+    dataFilter = dataTable.realFeederId == feederToFetch;
     featureArray = dataTable.(feature)(dataFilter, :);
     featureArray = featureArray(isfinite(featureArray));
     noOfTrials(conc) = length(featureArray);
