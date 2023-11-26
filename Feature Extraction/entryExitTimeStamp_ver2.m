@@ -3,7 +3,7 @@
 
 function [entryTime,logicalApproach,logicalApproach3s] = entryExitTimeStamp_ver2(id)
 
-% id = 266661;
+% id = 265378;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
@@ -55,15 +55,16 @@ try
     validIdx = all(isfinite(rawData{:,:}),2);
     cleanedData = rawData(validIdx,:);
 
-    % invoke coordinateNormalization function to normalize the coordinates
-    [normX, normY] = coordinateNormalization(cleanedData.X, cleanedData.Y, id);
-    cleanedDataWithTone = table(cleanedData.t, normX, normY, ...
-        'VariableNames',{'t','X','Y'});
-
     maze = {'maze2','maze1','maze3','maze4'};
-
     % get the index in maze array
     mazeIndex = find(ismember(maze,subject_data.mazenumber));
+
+    % invoke coordinateNormalization function to normalize the coordinates
+%     [normX, normY] = coordinateNormalization(cleanedData.X, cleanedData.Y, id);
+    [normX, normY] = coordinateNormalization_hard_coded(cleanedData.X, ...
+        cleanedData.Y, mazeIndex);
+    cleanedDataWithTone = table(cleanedData.t, normX, normY, ...
+        'VariableNames',{'t','X','Y'});
 
     [~, ~, xEdgeReward, yEdgeReward] = centralZoneEdges(mazeIndex,0.4,feeder,0.25);
 
