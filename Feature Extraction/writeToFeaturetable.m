@@ -4,8 +4,8 @@ conn = database(datasource,'postgres','1234');
 dateQuery = "SELECT id, referencetime FROM live_table ORDER BY id";
 allDates = fetch(conn, dateQuery);
 allDates.referencetime = datetime(allDates.referencetime, 'Format', 'MM/dd/yyyy');
-startDate = datetime('09/25/2023', 'InputFormat', 'MM/dd/yyyy');
-endDate = datetime('09/27/2023', 'InputFormat', 'MM/dd/yyyy');
+startDate = datetime('09/12/2023', 'InputFormat', 'MM/dd/yyyy');
+endDate = datetime('09/12/2023', 'InputFormat', 'MM/dd/yyyy');
 endDate = endDate + days(1);
 
 dataInRange = allDates(allDates.referencetime >= startDate & allDates.referencetime <= endDate, :);
@@ -40,8 +40,8 @@ for index = 1:length(idList)
         logicalApproach = convertToString(logicalApproach);
         logicalApproach3s = convertToString(logicalApproach3s);
 
-        updateQuery = sprintf("UPDATE %s SET entry_time_20=%s, " + ...
-            "logical_approach_20=%s, logical_approach_3s_20=%s WHERE id=%d", tableName, ...
+        updateQuery = sprintf("UPDATE %s SET entry_time=%s, " + ...
+            "logical_approach=%s, logical_approach_3s=%s WHERE id=%d", tableName, ...
             entryTime, logicalApproach, logicalApproach3s, id);
 
         exec(conn, updateQuery);
