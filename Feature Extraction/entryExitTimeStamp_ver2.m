@@ -65,7 +65,7 @@ try
     % get the index in maze array
     mazeIndex = find(ismember(maze,subject_data.mazenumber));
 
-    [~, ~, xEdgeReward, yEdgeReward] = centralZoneEdges(mazeIndex,0.4,feeder,0.2);
+    [~, ~, xEdgeReward, yEdgeReward] = centralZoneEdges(mazeIndex,0.4,feeder,0.25);
 
     %% entrytime, logicalApproach
     pcFilter = cleanedDataWithTone.t >= 12 & cleanedDataWithTone.t <= 25;
