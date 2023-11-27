@@ -66,7 +66,7 @@ try
     cleanedDataWithTone = table(cleanedData.t, normX, normY, ...
         'VariableNames',{'t','X','Y'});
 
-    [~, ~, xEdgeReward, yEdgeReward] = centralZoneEdges(mazeIndex,0.4,feeder,0.15);
+    [~, ~, xEdgeReward, yEdgeReward] = centralZoneEdges(mazeIndex,0.4,feeder,0.10);
 
     %% entrytime, logicalApproach
     pcFilter = cleanedDataWithTone.t >= 12 & cleanedDataWithTone.t <= 25;
