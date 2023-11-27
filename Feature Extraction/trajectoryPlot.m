@@ -6,7 +6,7 @@
 %% This function call coordinateNormalization and mazeMethods functions.
 
 function h = trajectoryPlot(id)
-% id = 266806;
+% id = 267217;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
@@ -18,6 +18,9 @@ subject_data = fetch(conn,query);
 
 % convert all table entries from string to usable format
 subject_data.playstarttrialtone = str2double(subject_data.playstarttrialtone);
+if isnan(subject_data.playstarttrialtone)
+        subject_data.playstarttrialtone = 2;
+end
 subject_data.feeder = str2double(subject_data.feeder);
 subject_data.trialcontrolsettings = string(subject_data.trialcontrolsettings);
 
@@ -53,7 +56,15 @@ validIdx = all(isfinite(rawData{:,:}),2);
 cleanedData = rawData(validIdx,:);
 
 % invoke coordinateNormalization function to normalize the coordinates
-[normX, normY] = coordinateNormalization(cleanedData.X, cleanedData.Y, id);
+maze = {'maze2','maze1','maze3','maze4'};
+mazeIndex = find(ismember(maze,subject_data.mazenumber));
+
+% if ismember(mazeIndex, [1, 3, 4])
+[normX, normY] = coordinateNormalization_hard_coded(cleanedData.X, ...
+    cleanedData.Y, mazeIndex);
+% else
+%     [normX, normY] = coordinateNormalization(cleanedData.X, cleanedData.Y, id);
+% end
 cleanedDataWithTone = table(cleanedData.t, normX, normY, 'VariableNames',{'t','X','Y'});
 
 % set playstarttrialtone and exclude the data before playstarttrialtone
@@ -74,15 +85,13 @@ hold on;
 mrkr1 = plot(xNormalized(1),yNormalized(1),'g.','MarkerSize',30);
 mrkr2 = plot(xNormalized(end),yNormalized(end),'r.','MarkerSize',30);
 % set figure limit
-maze = {'maze2','maze1','maze3','maze4'};
 figureLimit = {{[-0.2 1.2],[-0.2 1.2]},{[-1.2 0.2],[-0.2 1.2]}, ...
     {[-1.2 0.2],[-1.2 0.2]},{[-0.2 1.2],[-1.2 0.2]}};
 % get the index in maze array
-mazeIndex = find(ismember(maze,subject_data.mazenumber));
 xlim(figureLimit{mazeIndex}{1}); ylim(figureLimit{mazeIndex}{2});
 
 % shade feeder zones by calling mazeMethods
-mazeMethods(mazeIndex,0.25,0.4,feeder); % Check parameters
+mazeMethods(mazeIndex,0.20,0.4,feeder); % Check parameters
 
 % patch objects
 grayPatch = patch(nan,nan,'k');grayPatch.FaceColor = [0.3 0.3 0.3];
