@@ -11,7 +11,7 @@ conn = database(datasource,'postgres','1234');
 % write query
 query = sprintf("SELECT id, subjectid, trialname, referencetime, " + ...
     "playstarttrialtone, mazenumber, feeder, trialcontrolsettings, coordinatetimes2, " + ...
-    "truexnose, trueynose FROM live_table WHERE id = %d", id);
+    "xcoordinates2, ycoordinates2 FROM live_table WHERE id = %d", id);
 subject_data = fetch(conn,query);
 
 try
@@ -48,8 +48,8 @@ try
     end
 
     % includes the data before playstarttrialtone
-    rawData = table(subject_data.coordinatetimes2{1}, subject_data.truexnose{1}, ...
-        subject_data.trueynose{1}, 'VariableNames',{'t','X','Y'});
+    rawData = table(subject_data.coordinatetimes2{1}, subject_data.xcoordinates2{1}, ...
+        subject_data.ycoordinates2{1}, 'VariableNames',{'t','X','Y'});
 
     % remove nan entries
     validIdx = all(isfinite(rawData{:,:}),2);
