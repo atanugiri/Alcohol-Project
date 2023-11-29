@@ -1,10 +1,10 @@
 % Author: Atanu Giri
 % Date: 11/22/2023
 
-function [entryTime,logicalApproach,logicalApproach3s,logicalApproach5s] = ...
+function [entryTime,logicalApproach,logicalApproach1_5s,logicalApproach2s] = ...
 logicalApproachFun(id)
 
-% id = 265942;
+% id = 266767;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
@@ -85,33 +85,33 @@ try
 
     %% logicalApproach3s
     if ~isequal(logicalApproach,1)
-        logicalApproach3s = 0;
+        logicalApproach1_5s = 0;
     else
         xFeederFilter = xPCrange >= xEdgeReward(1) & xPCrange <= xEdgeReward(2);
         yFeederFilter = yPCrange >= yEdgeReward(1) & yPCrange <= yEdgeReward(2);
         timeInFeeder = tPCrange(xFeederFilter & yFeederFilter);
         timeInFeeder = length(timeInFeeder)*0.1;
 
-        if timeInFeeder >= 3
-            logicalApproach3s = 1;
+        if timeInFeeder >= 1.5
+            logicalApproach1_5s = 1;
         else
-            logicalApproach3s = 0;
+            logicalApproach1_5s = 0;
         end
     end
 
     %% logicalApproach5s
     if ~isequal(logicalApproach,1)
-        logicalApproach5s = 0;
+        logicalApproach2s = 0;
     else
         xFeederFilter = xPCrange >= xEdgeReward(1) & xPCrange <= xEdgeReward(2);
         yFeederFilter = yPCrange >= yEdgeReward(1) & yPCrange <= yEdgeReward(2);
         timeInFeeder = tPCrange(xFeederFilter & yFeederFilter);
         timeInFeeder = length(timeInFeeder)*0.1;
 
-        if timeInFeeder >= 5
-            logicalApproach5s = 1;
+        if timeInFeeder >= 2
+            logicalApproach2s = 1;
         else
-            logicalApproach5s = 0;
+            logicalApproach2s = 0;
         end
     end
 
