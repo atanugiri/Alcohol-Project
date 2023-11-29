@@ -6,8 +6,8 @@ conn = database(datasource,'postgres','1234');
 dateQuery = "SELECT id, referencetime FROM live_table ORDER BY id";
 allDates = fetch(conn, dateQuery);
 allDates.referencetime = datetime(allDates.referencetime, 'Format', 'MM/dd/yyyy');
-startDate = datetime('09/25/2023', 'InputFormat', 'MM/dd/yyyy');
-endDate = datetime('09/27/2023', 'InputFormat', 'MM/dd/yyyy');
+startDate = datetime('09/12/2023', 'InputFormat', 'MM/dd/yyyy');
+endDate = datetime('10/31/2023', 'InputFormat', 'MM/dd/yyyy');
 endDate = endDate + days(1);
 
 dataInRange = allDates(allDates.referencetime >= startDate & allDates.referencetime <= endDate, :);
@@ -26,8 +26,8 @@ liveTableData.(5) = transformPgarray(liveTableData.(5));
 
 plotType = input('Ploy type? (all or session): ', 's');
 if strcmpi(plotType, 'all')
-    x = vertcat(liveTableData.(3){:});
-    y = vertcat(liveTableData.(4){:});
+    x = vertcat(liveTableData.(4){:});
+    y = vertcat(liveTableData.(5){:});
     plot(x,y,'.');
 end
 
@@ -59,13 +59,30 @@ if strcmpi(plotType, 'session')
             currentData = mazeData{maze};
             x = vertcat(currentData.(4){:});
             y = vertcat(currentData.(5){:});
+
+            scaleType = input("Scale type? ('norm' or 'non-norm'): ", 's');
+
+            if strcmpi(scaleType, 'non-norm')
+                plot(x,y,'k.');
+                hold on;
+            else
+
             id = currentData.id(1);
-            [xNormalized, yNormalized] = coordinateNormalization(x, y, id);
+
+%             if ismember(maze, [1, 3, 4]) % Strictly case by case
+                [xNormalized, yNormalized] = ...
+                    coordinateNormalization_hard_coded(x, y, maze);
+%             else
+%                 [xNormalized, yNormalized] = coordinateNormalization(x, y, id);
+% %             end
+            
             plot(xNormalized,yNormalized,'k.');
             title(sprintf('Trials: %d',height(currentData)));
             
-            mazeMethods(maze,0.25,0.3);
+            mazeMethods(maze,0.25,0.4);
+            end % end of if-else
         end % End of maze 1
+        
         sgtitle(sprintf('%s', dateList(date)));
 
     end % end of date 1
