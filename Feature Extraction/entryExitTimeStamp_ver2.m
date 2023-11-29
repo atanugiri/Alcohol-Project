@@ -4,7 +4,7 @@
 function [entryTime,logicalApproach,logicalApproach3s,logicalApproach5s] = ...
 entryExitTimeStamp_ver2(id)
 
-% id = 265378;
+% id = 265942;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
@@ -67,10 +67,10 @@ try
     cleanedDataWithTone = table(cleanedData.t, normX, normY, ...
         'VariableNames',{'t','X','Y'});
 
-    [~, ~, xEdgeReward, yEdgeReward] = centralZoneEdges(mazeIndex,0.4,feeder,0.18);
+    [~, ~, xEdgeReward, yEdgeReward] = centralZoneEdges(mazeIndex,0.4,feeder,0.20);
 
     %% entrytime, logicalApproach
-    pcFilter = cleanedDataWithTone.t >= 12 & cleanedDataWithTone.t <= 25;
+    pcFilter = cleanedDataWithTone.t >= 2 & cleanedDataWithTone.t <= 15;
     xPCrange = cleanedDataWithTone.X(pcFilter); % pc = present cost
     yPCrange = cleanedDataWithTone.Y(pcFilter);
     tPCrange = cleanedDataWithTone.t(pcFilter);
