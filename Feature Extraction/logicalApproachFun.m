@@ -70,7 +70,7 @@ try
     [~, ~, xEdgeReward, yEdgeReward] = centralZoneEdges(mazeIndex,0.4,feeder,0.20);
 
     %% entrytime, logicalApproach
-    pcFilter = cleanedDataWithTone.t >= 2.5 & cleanedDataWithTone.t <= 14.5;
+    pcFilter = cleanedDataWithTone.t >= 2 & cleanedDataWithTone.t <= 15;
     xPCrange = cleanedDataWithTone.X(pcFilter); % pc = present cost
     yPCrange = cleanedDataWithTone.Y(pcFilter);
     tPCrange = cleanedDataWithTone.t(pcFilter);
