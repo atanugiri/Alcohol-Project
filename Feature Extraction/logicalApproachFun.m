@@ -2,7 +2,7 @@
 % Date: 11/22/2023
 
 function [entryTime,logicalApproach,logicalApproach3s,logicalApproach5s] = ...
-entryExitTimeStamp_ver2(id)
+logicalApproachFun(id)
 
 % id = 265942;
 % make connection with database
