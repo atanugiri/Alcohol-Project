@@ -23,26 +23,31 @@ tableName = 'ghrelin_featuretable';
 for index = 1:length(idList)
     id = idList(index);
     try
-        [entryTime,logicalApproach,logicalApproach3s] = entryExitTimeStamp_ver2(id);
+        [entryTime,logicalApproach,logicalApproach3s,logicalApproach5s] = ...
+        entryExitTimeStamp_ver2(id);
 
         % Convert NaN values to NULL
         entryTime = handleNaN(entryTime);
         logicalApproach = handleNaN(logicalApproach);
         logicalApproach3s = handleNaN(logicalApproach3s);
+        logicalApproach5s = handleNaN(logicalApproach5s);
 
         % Handle empty values
         entryTime = handleEmpty(entryTime);
         logicalApproach = handleEmpty(logicalApproach);
         logicalApproach3s = handleEmpty(logicalApproach3s);
+        logicalApproach5s = handleEmpty(logicalApproach5s);
 
         % Convert NaN values to 'NULL' for text columns
         entryTime = convertToString(entryTime);
         logicalApproach = convertToString(logicalApproach);
         logicalApproach3s = convertToString(logicalApproach3s);
+        logicalApproach5s = convertToString(logicalApproach5s);
 
-        updateQuery = sprintf("UPDATE %s SET entry_time_20=%s, " + ...
-            "logical_approach_20=%s, logical_approach_3s_20=%s WHERE id=%d", tableName, ...
-            entryTime, logicalApproach, logicalApproach3s, id);
+        updateQuery = sprintf("UPDATE %s SET entry_time_18=%s, " + ...
+            "logical_approach_18=%s, logical_approach_3s_18=%s, " + ...
+            "logical_approach_5s_18 WHERE id=%d", tableName, ...
+            entryTime, logicalApproach, logicalApproach3s, logicalApproach5s, id);
 
         exec(conn, updateQuery);
 
