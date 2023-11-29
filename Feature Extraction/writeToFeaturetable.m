@@ -24,7 +24,7 @@ for index = 1:length(idList)
     id = idList(index);
     try
         [entryTime,logicalApproach,logicalApproach3s,logicalApproach5s] = ...
-        entryExitTimeStamp_ver2(id);
+            logicalApproachFun(id);
 
         % Convert NaN values to NULL
         entryTime = handleNaN(entryTime);
@@ -46,7 +46,7 @@ for index = 1:length(idList)
 
         updateQuery = sprintf("UPDATE %s SET entry_time_20_2nd=%s, " + ...
             "logical_approach_20_2nd=%s, logical_approach_3s_20_2nd=%s, " + ...
-            "logical_approach_5s_20_2nd WHERE id=%d", tableName, ...
+            "logical_approach_5s_20_2nd=%s WHERE id=%d", tableName, ...
             entryTime, logicalApproach, logicalApproach3s, logicalApproach5s, id);
 
         exec(conn, updateQuery);
