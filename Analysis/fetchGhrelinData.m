@@ -6,6 +6,8 @@ function mergedTable = fetchGhrelinData(feature)
 % This function fetches saline and ghrelin toyrat data and returns
 % processed table.
 %
+% feature = 'logical_approach';
+
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
 dateQuery = "SELECT id, referencetime FROM live_table ORDER BY id";
@@ -43,6 +45,22 @@ mergedTable.feeder = str2double(mergedTable.feeder);
 mergedTable.trialcontrolsettings = string(mergedTable.trialcontrolsettings);
 mergedTable.tasktypedone = string(mergedTable.tasktypedone);
 mergedTable.(feature) = str2double(mergedTable.(feature));
-close(conn);
 
+mergedTable.realFeederId = nan(height(mergedTable),1);
+
+for i = 1:height(mergedTable)
+    if contains(mergedTable.trialcontrolsettings(i), "Diagonal","IgnoreCase",true)
+        mergedTable.realFeederId(i) = 1;
+    elseif contains(mergedTable.trialcontrolsettings(i), "Grid","IgnoreCase",true)
+        mergedTable.realFeederId(i) = 2;
+    elseif contains(mergedTable.trialcontrolsettings(i), "Horizontal","IgnoreCase",true)
+        mergedTable.realFeederId(i) = 3;
+    elseif contains(mergedTable.trialcontrolsettings(i), "Radial","IgnoreCase",true)
+        mergedTable.realFeederId(i) = 4;
+    else
+        mergedTable.realFeederId(i) = mergedTable.feeder;
+    end
+end
+
+close(conn);
 end

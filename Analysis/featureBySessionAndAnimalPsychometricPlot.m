@@ -6,34 +6,12 @@
 % This function returns psychometric plot of a feature for each session and
 % animal
 %
-feature = 'logical_approach_3s';
+feature = 'logical_approach_3s_20';
 close all; clc;
 mergedTable = fetchGhrelinData(feature);
 
-mergedTable.realFeederId = nan(height(mergedTable),1);
-
-for i = 1:height(mergedTable)
-    if contains(mergedTable.trialcontrolsettings(i), "Diagonal","IgnoreCase",true)
-        mergedTable.realFeederId(i) = 1;
-    elseif contains(mergedTable.trialcontrolsettings(i), "Grid","IgnoreCase",true)
-        mergedTable.realFeederId(i) = 2;
-    elseif contains(mergedTable.trialcontrolsettings(i), "Horizontal","IgnoreCase",true)
-        mergedTable.realFeederId(i) = 3;
-    elseif contains(mergedTable.trialcontrolsettings(i), "Radial","IgnoreCase",true)
-        mergedTable.realFeederId(i) = 4;
-    else
-        mergedTable.realFeederId(i) = mergedTable.feeder;
-    end
-end
-
 ghrToyratData = mergedTable(mergedTable.tasktypedone == 'ghr toyrat', :);
 salToyratData = mergedTable(mergedTable.tasktypedone == 'sal toyrat', :);
-
-uniqueGhrSession = unique(ghrToyratData.referencetime);
-uniqueSalSession = unique(salToyratData.referencetime);
-
-ghrSessionData = cell(1,5);
-salSessionData = cell(1,5);
 
 %% Ghrelin, saline plot
 myPlot(salToyratData, feature);
@@ -42,8 +20,9 @@ myPlot(salToyratData, feature);
 
 %% Description of myPlot
 function myPlot(dataTable, feature)
+% dataTable = ghrToyratData; % For testing
 sessionList = unique(dataTable.referencetime);
-for session = 1:5
+for session = 1:length(sessionList)
     sessionData = dataTable(dataTable.referencetime == sessionList(session),:);
     if isequal(feature, 'passing_center_25')
         tf = isnan(sessionData.(feature));

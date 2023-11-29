@@ -5,8 +5,14 @@ function featureForEachSubjectId = masterPsychometricFunctionPlot(feature)
 % at 4 different concentration.
 %
 
-feature = 'approachavoid';
+feature = 'logical_approach_3s_20';
 mergedTable = fetchGhrelinData(feature);
+
+% Remove bad entries
+mergedTable(mergedTable.subjectid == "bob" & mergedTable.referencetime == ...
+    "09/12/2023",:) = [];
+mergedTable(mergedTable.subjectid == "none",:) = [];
+% mergedTable(mergedTable.subjectid == "joey",:) = [];
 
 ghrToyratData = mergedTable(mergedTable.tasktypedone == 'ghr toyrat', :);
 salToyratData = mergedTable(mergedTable.tasktypedone == 'sal toyrat', :);
@@ -44,7 +50,8 @@ ylabel(string(feature), "Interpreter","latex",'FontSize',15);
         for subject = 1:length(uniqueSubjectid)
             for conc = 1:4
                 feederToFetch = 5 - conc;
-                dataFilter = dataTable.subjectid == uniqueSubjectid(subject) & dataTable.feeder == feederToFetch;
+                dataFilter = dataTable.subjectid == uniqueSubjectid(subject) ...
+                    & dataTable.realFeederId == feederToFetch;
                 featureArray = dataTable.(feature)(dataFilter, :);
                 featureArray = featureArray(isfinite(featureArray));
                 featureForEach(subject, conc) = sum(featureArray)/length(featureArray);
@@ -58,4 +65,5 @@ ylabel(string(feature), "Interpreter","latex",'FontSize',15);
         end
 
     end % end of psychometricFunValues
+
 end % end of masterPsychometricFunctionPlot
