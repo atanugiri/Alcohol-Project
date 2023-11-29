@@ -6,7 +6,7 @@
 %% This function call coordinateNormalization and mazeMethods functions.
 
 function h = trajectoryPlot(id)
-% id = 267217;
+% id = 265942;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
@@ -67,11 +67,16 @@ mazeIndex = find(ismember(maze,subject_data.mazenumber));
 % end
 cleanedDataWithTone = table(cleanedData.t, normX, normY, 'VariableNames',{'t','X','Y'});
 
-% set playstarttrialtone and exclude the data before playstarttrialtone
+%% Data for plotting after playstarttrialtone
 startingCoordinatetimes = subject_data.playstarttrialtone;
 toneFilter = cleanedDataWithTone.t >= startingCoordinatetimes;
 xNormalized = cleanedDataWithTone.X(toneFilter);
 yNormalized = cleanedDataWithTone.Y(toneFilter);
+
+%% Data for plotting during present cost (pc) range
+pcFilter = cleanedDataWithTone.t >= 2 & cleanedDataWithTone.t <= 15;
+xPCrange = cleanedDataWithTone.X(pcFilter); % pc = present cost
+yPCrange = cleanedDataWithTone.Y(pcFilter);
 
 % plot normalized data
 h = figure;
@@ -80,10 +85,12 @@ h = figure;
 % title("Raw trajectory plot");
 %
 % subplot(1,2,2);
-p1 = plot(xNormalized,yNormalized,'b','MarkerSize',10,'LineWidth',1.5);
+p1 = plot(xPCrange,yPCrange,'k','MarkerSize',10,'LineWidth',2);
 hold on;
-mrkr1 = plot(xNormalized(1),yNormalized(1),'g.','MarkerSize',30);
-mrkr2 = plot(xNormalized(end),yNormalized(end),'r.','MarkerSize',30);
+mrkr1 = plot(xPCrange(1),yPCrange(1),'g.','MarkerSize',30);
+mrkr2 = plot(xPCrange(end),yPCrange(end),'r.','MarkerSize',30);
+plot(xNormalized,yNormalized,'b','MarkerSize',10,'LineWidth',1);
+
 % set figure limit
 figureLimit = {{[-0.2 1.2],[-0.2 1.2]},{[-1.2 0.2],[-0.2 1.2]}, ...
     {[-1.2 0.2],[-1.2 0.2]},{[-0.2 1.2],[-1.2 0.2]}};
