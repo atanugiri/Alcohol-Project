@@ -1,7 +1,8 @@
 % Author: Atanu Giri
 % Date: 11/22/2023
 
-function [entryTime,logicalApproach,logicalApproach3s] = entryExitTimeStamp_ver2(id)
+function [entryTime,logicalApproach,logicalApproach3s,logicalApproach5s] = ...
+entryExitTimeStamp_ver2(id)
 
 % id = 265378;
 % make connection with database
@@ -66,7 +67,7 @@ try
     cleanedDataWithTone = table(cleanedData.t, normX, normY, ...
         'VariableNames',{'t','X','Y'});
 
-    [~, ~, xEdgeReward, yEdgeReward] = centralZoneEdges(mazeIndex,0.4,feeder,0.20);
+    [~, ~, xEdgeReward, yEdgeReward] = centralZoneEdges(mazeIndex,0.4,feeder,0.18);
 
     %% entrytime, logicalApproach
     pcFilter = cleanedDataWithTone.t >= 12 & cleanedDataWithTone.t <= 25;
@@ -82,6 +83,39 @@ try
         logicalApproach = 0;
     end
 
+    %% logicalApproach3s
+    if ~isequal(logicalApproach,1)
+        logicalApproach3s = 0;
+    else
+        xFeederFilter = xPCrange >= xEdgeReward(1) & xPCrange <= xEdgeReward(2);
+        yFeederFilter = yPCrange >= yEdgeReward(1) & yPCrange <= yEdgeReward(2);
+        timeInFeeder = tPCrange(xFeederFilter & yFeederFilter);
+        timeInFeeder = length(timeInFeeder)*0.1;
+
+        if timeInFeeder >= 3
+            logicalApproach3s = 1;
+        else
+            logicalApproach3s = 0;
+        end
+    end
+
+    %% logicalApproach5s
+    if ~isequal(logicalApproach,1)
+        logicalApproach5s = 0;
+    else
+        xFeederFilter = xPCrange >= xEdgeReward(1) & xPCrange <= xEdgeReward(2);
+        yFeederFilter = yPCrange >= yEdgeReward(1) & yPCrange <= yEdgeReward(2);
+        timeInFeeder = tPCrange(xFeederFilter & yFeederFilter);
+        timeInFeeder = length(timeInFeeder)*0.1;
+
+        if timeInFeeder >= 5
+            logicalApproach5s = 1;
+        else
+            logicalApproach5s = 0;
+        end
+    end
+
+    %% Entrytime
     if logicalApproach == 0
         entryTime = [];
 
@@ -96,22 +130,6 @@ try
 
     else
         entryTime = -9999;
-    end
-
-    %% logicalApproach3s
-    if isempty(entryTime)
-        logicalApproach3s = 0;
-    else
-        xFeederFilter = xPCrange >= xEdgeReward(1) & xPCrange <= xEdgeReward(2);
-        yFeederFilter = yPCrange >= yEdgeReward(1) & yPCrange <= yEdgeReward(2);
-        timeInFeeder = tPCrange(xFeederFilter & yFeederFilter);
-        timeInFeeder = length(timeInFeeder)*0.1;
-
-        if timeInFeeder >= 3
-            logicalApproach3s = 1;
-        else
-            logicalApproach3s = 0;
-        end
     end
 
 catch
