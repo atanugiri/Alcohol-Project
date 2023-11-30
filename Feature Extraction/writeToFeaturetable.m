@@ -4,8 +4,8 @@ conn = database(datasource,'postgres','1234');
 dateQuery = "SELECT id, referencetime FROM live_table ORDER BY id";
 allDates = fetch(conn, dateQuery);
 allDates.referencetime = datetime(allDates.referencetime, 'Format', 'MM/dd/yyyy');
-startDate = datetime('09/12/2023', 'InputFormat', 'MM/dd/yyyy');
-endDate = datetime('10/31/2023', 'InputFormat', 'MM/dd/yyyy');
+startDate = datetime('06/27/2022', 'InputFormat', 'MM/dd/yyyy');
+endDate = datetime('07/29/2022', 'InputFormat', 'MM/dd/yyyy');
 endDate = endDate + days(1);
 
 dataInRange = allDates(allDates.referencetime >= startDate & allDates.referencetime <= endDate, :);
@@ -23,31 +23,26 @@ tableName = 'ghrelin_featuretable';
 for index = 1:length(idList)
     id = idList(index);
     try
-        [entryTime,logicalApproach,logicalApproach1_5s,logicalApproach2s] = ...
-            logicalApproachFun(id);
+        [entryTime,logicalApproach,logicalApproach3s] = logicalApproachFun(id);
 
         % Convert NaN values to NULL
         entryTime = handleNaN(entryTime);
         logicalApproach = handleNaN(logicalApproach);
-        logicalApproach1_5s = handleNaN(logicalApproach1_5s);
-        logicalApproach2s = handleNaN(logicalApproach2s);
+        logicalApproach3s = handleNaN(logicalApproach3s);
 
         % Handle empty values
         entryTime = handleEmpty(entryTime);
         logicalApproach = handleEmpty(logicalApproach);
-        logicalApproach1_5s = handleEmpty(logicalApproach1_5s);
-        logicalApproach2s = handleEmpty(logicalApproach2s);
+        logicalApproach3s = handleEmpty(logicalApproach3s);
 
         % Convert NaN values to 'NULL' for text columns
         entryTime = convertToString(entryTime);
         logicalApproach = convertToString(logicalApproach);
-        logicalApproach1_5s = convertToString(logicalApproach1_5s);
-        logicalApproach2s = convertToString(logicalApproach2s);
+        logicalApproach3s = convertToString(logicalApproach3s);
 
         updateQuery = sprintf("UPDATE %s SET entry_time=%s, " + ...
-            "logical_approach=%s, logical_approach_1_5s=%s, " + ...
-            "logical_approach_2s=%s WHERE id=%d", tableName, ...
-            entryTime, logicalApproach, logicalApproach1_5s, logicalApproach2s, id);
+            "logical_approach=%s, logical_approach_3s=%s WHERE id=%d", tableName, ...
+            entryTime, logicalApproach, logicalApproach3s, id);
 
         exec(conn, updateQuery);
 
