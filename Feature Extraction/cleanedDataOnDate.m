@@ -6,20 +6,27 @@
 % The clean data is used as reference to normalize the data for plotting trajectory
 
 function [xCleaned,yCleaned] = cleanedDataOnDate(id)
-% id = 266661;
+% id = 94461;
 
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
 dateQuery = sprintf("SELECT referencetime FROM live_table WHERE id = %d;", id);
 subjectData = fetch(conn,dateQuery);
 
+% We need same tasktype as id for coherent normalization
+taskTypeDoneQuery = sprintf("SELECT tasktypedone FROM live_table " + ...
+    "WHERE id = %d;", id);
+taskTypeDone = fetch(conn,taskTypeDoneQuery);
+
+
 % drop the timestamps from referencetime for clustering
 referencetime = char(subjectData.referencetime);
 currentDate = referencetime(1:10);
 
 % Select data of same date
-dataOnDateQuery = strcat("SELECT id, mazenumber, xcoordinates2, ycoordinates2 " + ...
-    "FROM live_table WHERE referencetime LIKE '",sprintf('%s',currentDate), "%';");
+dataOnDateQuery = sprintf("SELECT id, mazenumber, xcoordinates2, " + ...
+    "ycoordinates2 FROM live_table WHERE referencetime LIKE '%%%s%%' AND " + ...
+    "tasktypedone = '%s'", currentDate, string(taskTypeDone.tasktypedone));
 dataOnDate = fetch(conn,dataOnDateQuery);
 close(conn);
 
