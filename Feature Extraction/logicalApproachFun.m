@@ -60,9 +60,9 @@ try
     mazeIndex = find(ismember(maze,subject_data.mazenumber));
 
     % invoke coordinateNormalization function to normalize the coordinates
-%     [normX, normY] = coordinateNormalization(cleanedData.X, cleanedData.Y, id);
-    [normX, normY] = coordinateNormalization_hard_coded(cleanedData.X, ...
-        cleanedData.Y, mazeIndex);
+    [normX, normY] = coordinateNormalization(cleanedData.X, cleanedData.Y, id);
+%     [normX, normY] = coordinateNormalization_hard_coded(cleanedData.X, ...
+%         cleanedData.Y, mazeIndex);
     cleanedDataWithTone = table(cleanedData.t, normX, normY, ...
         'VariableNames',{'t','X','Y'});
 
