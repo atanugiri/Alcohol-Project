@@ -1,8 +1,7 @@
 % Author: Atanu Giri
 % Date: 11/22/2023
 
-function [entryTime,logicalApproach,logicalApproach1_5s,logicalApproach2s] = ...
-logicalApproachFun(id)
+function [entryTime,logicalApproach,logicalApproach3s] = logicalApproachFun(id)
 
 % id = 266767;
 % make connection with database
@@ -69,7 +68,7 @@ try
 
     [~, ~, xEdgeReward, yEdgeReward] = centralZoneEdges(mazeIndex,0.4,feeder,0.20);
 
-    %% entrytime, logicalApproach
+    %% logicalApproach
     pcFilter = cleanedDataWithTone.t >= 2 & cleanedDataWithTone.t <= 15;
     xPCrange = cleanedDataWithTone.X(pcFilter); % pc = present cost
     yPCrange = cleanedDataWithTone.Y(pcFilter);
@@ -83,35 +82,20 @@ try
         logicalApproach = 0;
     end
 
+
     %% logicalApproach3s
     if ~isequal(logicalApproach,1)
-        logicalApproach1_5s = 0;
+        logicalApproach3s = 0;
     else
         xFeederFilter = xPCrange >= xEdgeReward(1) & xPCrange <= xEdgeReward(2);
         yFeederFilter = yPCrange >= yEdgeReward(1) & yPCrange <= yEdgeReward(2);
         timeInFeeder = tPCrange(xFeederFilter & yFeederFilter);
         timeInFeeder = length(timeInFeeder)*0.1;
 
-        if timeInFeeder >= 1.5
-            logicalApproach1_5s = 1;
+        if timeInFeeder >= 3
+            logicalApproach3s = 1;
         else
-            logicalApproach1_5s = 0;
-        end
-    end
-
-    %% logicalApproach5s
-    if ~isequal(logicalApproach,1)
-        logicalApproach2s = 0;
-    else
-        xFeederFilter = xPCrange >= xEdgeReward(1) & xPCrange <= xEdgeReward(2);
-        yFeederFilter = yPCrange >= yEdgeReward(1) & yPCrange <= yEdgeReward(2);
-        timeInFeeder = tPCrange(xFeederFilter & yFeederFilter);
-        timeInFeeder = length(timeInFeeder)*0.1;
-
-        if timeInFeeder >= 2
-            logicalApproach2s = 1;
-        else
-            logicalApproach2s = 0;
+            logicalApproach3s = 0;
         end
     end
 
