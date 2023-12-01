@@ -23,17 +23,18 @@ taskTypeDone = fetch(conn,taskTypeDoneQuery);
 referencetime = char(subjectData.referencetime);
 currentDate = referencetime(1:10);
 
-% Select data of same date
-dataOnDateQuery = sprintf("SELECT id, mazenumber, xcoordinates2, " + ...
+% Select data of same date and tasktypedone
+dataOnDateQuery = sprintf("SELECT id, mazenumber, tasktypedone, xcoordinates2, " + ...
     "ycoordinates2 FROM live_table WHERE referencetime LIKE '%%%s%%' AND " + ...
-    "tasktypedone = '%s'", currentDate, string(taskTypeDone.tasktypedone));
+    "REPLACE(tasktypedone, ' ', '') ILIKE REPLACE('%s', ' ', '')", ...
+    currentDate, string(taskTypeDone.tasktypedone));
 dataOnDate = fetch(conn,dataOnDateQuery);
 close(conn);
 
 
 % Accessing PGArray data as double
-dataOnDate.(3) = transformPgarray(dataOnDate.(3));
-dataOnDate.(4) = transformPgarray(dataOnDate.(4));
+dataOnDate.xcoordinates2 = transformPgarray(dataOnDate.xcoordinates2);
+dataOnDate.ycoordinates2 = transformPgarray(dataOnDate.ycoordinates2);
 dataOnDate.mazenumber = string(dataOnDate.mazenumber);
 
 mazeLabel = {'maze 2','maze 1','maze 3','maze 4'};
@@ -47,8 +48,8 @@ xInMaze = cell(1,4);
 yInMaze = cell(1,4);
 
 for mazeId = 1:4
-    xInMaze{mazeId} = vertcat(mazeData{mazeId}.(3){:});
-    yInMaze{mazeId} = vertcat(mazeData{mazeId}.(4){:});
+    xInMaze{mazeId} = vertcat(mazeData{mazeId}.xcoordinates2{:});
+    yInMaze{mazeId} = vertcat(mazeData{mazeId}.ycoordinates2{:});
 end
 
 clear mazeData;
