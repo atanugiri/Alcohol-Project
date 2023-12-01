@@ -4,8 +4,8 @@ conn = database(datasource,'postgres','1234');
 dateQuery = "SELECT id, referencetime FROM live_table ORDER BY id";
 allDates = fetch(conn, dateQuery);
 allDates.referencetime = datetime(allDates.referencetime, 'Format', 'MM/dd/yyyy');
-startDate = datetime('06/29/2022', 'InputFormat', 'MM/dd/yyyy');
-endDate = datetime('06/29/2022', 'InputFormat', 'MM/dd/yyyy');
+startDate = datetime('06/30/2022', 'InputFormat', 'MM/dd/yyyy');
+endDate = datetime('07/29/2022', 'InputFormat', 'MM/dd/yyyy');
 endDate = endDate + days(1);
 
 dataInRange = allDates(allDates.referencetime >= startDate & allDates.referencetime <= endDate, :);
