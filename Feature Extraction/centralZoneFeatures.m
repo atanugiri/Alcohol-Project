@@ -4,9 +4,9 @@
 % whether the subject passes through the central zone. It outputs nan if
 % the subject is already present in the zone initially.
 
-function [passingCenter, timeInCenter] = centralZoneFeatures(id,zoneSize)
+function [passingCenter, timeInCenter, alreadyInCenter] = centralZoneFeatures(id,zoneSize)
 
-% id = 266661; zoneSize = 0.4;
+% id = 266670; zoneSize = 0.4;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
@@ -62,7 +62,7 @@ try
         'VariableNames',{'t','X','Y'});
 
     % set playstarttrialtone and exclude the data before playstarttrialtone
-    startingCoordinatetimes = subject_data.playstarttrialtone;
+    startingCoordinatetimes = cleanedDataWithTone.t(1); %subject_data.playstarttrialtone;
     toneFilter = cleanedDataWithTone.t >= startingCoordinatetimes;
     xAfterTone = cleanedDataWithTone.X(toneFilter);
     yAfterTone = cleanedDataWithTone.Y(toneFilter);
@@ -73,37 +73,27 @@ try
     mazeIndex = find(ismember(maze,subject_data.mazenumber));
     [xEdge, yEdge, ~, ~] = centralZoneEdges(mazeIndex,zoneSize,feeder);
 
-    passingCenter = 0;
-    timeInCenter = nan;
 
-    % return nan if the subject already present in the central zone
-    if (xAfterTone(1) >= xEdge(1) && xAfterTone(1) <= xEdge(2)) && ...
-            (yAfterTone(1) >= yEdge(1) && yAfterTone(1) <= yEdge(2))
-        passingCenter = nan;
-        xCenterFilter = xAfterTone >= xEdge(1) & xAfterTone <= xEdge(2);
-        yCenterFilter = yAfterTone >= yEdge(1) & yAfterTone <= yEdge(2);
-        tCenter = xAfterTone(xCenterFilter & yCenterFilter);
-        timeInCenter = length(tCenter)*0.1;
-
-        % check if trajectory goes through central zone
-    else
-        for i = 1:length(xAfterTone)
-            if (xAfterTone(i) > xEdge(1) && xAfterTone(i) < xEdge(2)) && ...
-                    (yAfterTone(i) > yEdge(1) && yAfterTone(i) < yEdge(2))
-                passingCenter = 1;
-            end
-        end
-    end
-
-    % Calculate time spent in center
-    if isequal(passingCenter,1)
+    % passingCenter, timeInCenter
+    if any(xAfterTone >= xEdge(1) & xAfterTone <= xEdge(2) & ...
+            yAfterTone >= yEdge(1) & yAfterTone <= yEdge(2))
+        passingCenter = 1;
         xCenterFilter = xAfterTone >= xEdge(1) & xAfterTone <= xEdge(2);
         yCenterFilter = yAfterTone >= yEdge(1) & yAfterTone <= yEdge(2);
         tCenter = tAfterTone(xCenterFilter & yCenterFilter);
-        timeInCenter = length(tCenter)*0.1;
+        timeInCenter = tCenter(end) - tCenter(1);
 
-        %         yCenter = Y(xCenterFilter & yCenterFilter);
-        %         trajectoryPlot(id); hold on; plot(xCenter, yCenter, 'b.', 'MarkerSize',10);
+    else
+        passingCenter = 0;
+        timeInCenter = 0;
+    end
+
+    % alreadyInCenter
+    if (xAfterTone(1) >= xEdge(1) && xAfterTone(1) <= xEdge(2)) && ...
+            (yAfterTone(1) >= yEdge(1) && yAfterTone(1) <= yEdge(2))
+        alreadyInCenter = 1;
+    else
+        alreadyInCenter = 0;
     end
 
 catch
