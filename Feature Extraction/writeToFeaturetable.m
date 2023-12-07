@@ -26,19 +26,19 @@ for index = 1:length(idList)
         [logicalApproach, timeInFeeder, entryTime] = logicalApproachFun(id);
 
         % Convert NaN values to NULL
-        entryTime = handleNaN(entryTime);
         logicalApproach = handleNaN(logicalApproach);
         timeInFeeder = handleNaN(timeInFeeder);
+        entryTime = handleNaN(entryTime);
 
         % Handle empty values
-        entryTime = handleEmpty(entryTime);
         logicalApproach = handleEmpty(logicalApproach);
         timeInFeeder = handleEmpty(timeInFeeder);
+        entryTime = handleEmpty(entryTime);
 
         % Convert NaN values to 'NULL' for text columns
-        entryTime = convertToString(entryTime);
         logicalApproach = convertToString(logicalApproach);
         timeInFeeder = convertToString(timeInFeeder);
+        entryTime = convertToString(entryTime);
 
         updateQuery = sprintf("UPDATE %s SET logical_approach_20=%s, " + ...
             "time_in_feeder_20=%s, entry_time_20=%s WHERE id=%d", tableName, ...
