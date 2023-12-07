@@ -4,8 +4,8 @@ conn = database(datasource,'postgres','1234');
 dateQuery = "SELECT id, referencetime FROM live_table ORDER BY id";
 allDates = fetch(conn, dateQuery);
 allDates.referencetime = datetime(allDates.referencetime, 'Format', 'MM/dd/yyyy');
-startDate = datetime('08/04/2022', 'InputFormat', 'MM/dd/yyyy');
-endDate = datetime('08/04/2022', 'InputFormat', 'MM/dd/yyyy');
+startDate = datetime('09/12/2023', 'InputFormat', 'MM/dd/yyyy');
+endDate = datetime('10/31/2023', 'InputFormat', 'MM/dd/yyyy');
 endDate = endDate + days(1);
 
 dataInRange = allDates(allDates.referencetime >= startDate & allDates.referencetime <= endDate, :);
@@ -23,26 +23,26 @@ tableName = 'ghrelin_featuretable';
 for index = 1:length(idList)
     id = idList(index);
     try
-        [entryTime,logicalApproach,logicalApproach3s] = logicalApproachFun(id);
+        [logicalApproach, timeInFeeder, entryTime] = logicalApproachFun(id);
 
         % Convert NaN values to NULL
         entryTime = handleNaN(entryTime);
         logicalApproach = handleNaN(logicalApproach);
-        logicalApproach3s = handleNaN(logicalApproach3s);
+        timeInFeeder = handleNaN(timeInFeeder);
 
         % Handle empty values
         entryTime = handleEmpty(entryTime);
         logicalApproach = handleEmpty(logicalApproach);
-        logicalApproach3s = handleEmpty(logicalApproach3s);
+        timeInFeeder = handleEmpty(timeInFeeder);
 
         % Convert NaN values to 'NULL' for text columns
         entryTime = convertToString(entryTime);
         logicalApproach = convertToString(logicalApproach);
-        logicalApproach3s = convertToString(logicalApproach3s);
+        timeInFeeder = convertToString(timeInFeeder);
 
-        updateQuery = sprintf("UPDATE %s SET entry_time=%s, " + ...
-            "logical_approach=%s, logical_approach_3s=%s WHERE id=%d", tableName, ...
-            entryTime, logicalApproach, logicalApproach3s, id);
+        updateQuery = sprintf("UPDATE %s SET logical_approach_20=%s, " + ...
+            "time_in_feeder_20=%s, entry_time_20=%s WHERE id=%d", tableName, ...
+            logicalApproach, timeInFeeder, entryTime, id);
 
         exec(conn, updateQuery);
 
