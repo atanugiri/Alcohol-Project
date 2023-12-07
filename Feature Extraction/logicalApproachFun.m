@@ -1,9 +1,9 @@
 % Author: Atanu Giri
 % Date: 11/22/2023
 
-function [entryTime,logicalApproach,logicalApproach3s] = logicalApproachFun(id)
+function [logicalApproach, timeInFeeder, entryTime] = logicalApproachFun(id)
 
-% id = 266767;
+% id = 105841;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
@@ -48,8 +48,8 @@ try
     end
 
     % includes the data before playstarttrialtone
-    rawData = table(subject_data.coordinatetimes2{1}, subject_data.xcoordinates2{1}, ...
-        subject_data.ycoordinates2{1}, 'VariableNames',{'t','X','Y'});
+    rawData = table(subject_data.(size(subject_data,2) - 2){1}, subject_data.(size(subject_data,2) - 1){1}, ...
+        subject_data.(size(subject_data,2)){1}, 'VariableNames',{'t','X','Y'});
 
     % remove nan entries
     validIdx = all(isfinite(rawData{:,:}),2);
@@ -66,6 +66,7 @@ try
     cleanedDataWithTone = table(cleanedData.t, normX, normY, ...
         'VariableNames',{'t','X','Y'});
 
+    % Choose 
     [~, ~, xEdgeReward, yEdgeReward] = centralZoneEdges(mazeIndex,0.4,feeder,0.20);
 
     %% logicalApproach
@@ -83,20 +84,14 @@ try
     end
 
 
-    %% logicalApproach3s
+    %% timeInFeeder
     if ~isequal(logicalApproach,1)
-        logicalApproach3s = 0;
+        timeInFeeder = 0;
     else
         xFeederFilter = xPCrange >= xEdgeReward(1) & xPCrange <= xEdgeReward(2);
         yFeederFilter = yPCrange >= yEdgeReward(1) & yPCrange <= yEdgeReward(2);
         timeInFeeder = tPCrange(xFeederFilter & yFeederFilter);
         timeInFeeder = length(timeInFeeder)*0.1;
-
-        if timeInFeeder >= 3
-            logicalApproach3s = 1;
-        else
-            logicalApproach3s = 0;
-        end
     end
 
     %% Entrytime
