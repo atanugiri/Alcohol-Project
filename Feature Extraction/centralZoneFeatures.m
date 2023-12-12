@@ -1,5 +1,6 @@
 % Author: Atanu Giri
 % Date: 11/07/2023
+
 % This function analyzes the trajectory of the subject and determines
 % whether the subject passes through the central zone. It outputs nan if
 % the subject is already present in the zone initially.
