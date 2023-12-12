@@ -1,6 +1,6 @@
 function [distanceUntilLimitingTimeStamp,velocityUntilLimitingTimeStamp] = distanceVelocityFun(id)
 
-% id = 265215;
+id = 265218;
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
 
