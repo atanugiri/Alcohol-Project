@@ -1,6 +1,11 @@
 % Author: Atanu Giri
 % Date: 11/15/2023
 
+%
+% This function gives normalized scatter plot for all animal trajectories
+% for the session
+%
+
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
 dateQuery = "SELECT id, referencetime FROM live_table ORDER BY id";
