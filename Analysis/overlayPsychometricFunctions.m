@@ -7,8 +7,9 @@ function overlayPsychometricFunctions(varargin)
 % input plots.
 %
 
-varargin = {'ghr_toyrat.fig', 'sal_toyrat.fig', ...
-    'ghr_toystick.fig', 'sal_toystick.fig'};
+varargin = {'Sal toyrat_time_in_feeder_20', 'Ghr toyrat_time_in_feeder_20.fig', ...
+    'Sal toystick_time_in_feeder_20.fig', 'Ghr toystick_time_in_feeder_20.fig', ...
+    'Sal skewer_time_in_feeder_20.fig', 'Ghr skewer_time_in_feeder_20.fig'};
 
 % Create a new figure for the combined plot
 figFinal = figure();
@@ -16,7 +17,9 @@ set(gcf, 'Windowstyle', 'docked');
 ax = axes(figFinal);
 
 % Define a set of unique colors
-colors = lines(numel(varargin));
+% colors = lines(numel(varargin));
+colors = parula(numel(varargin));
+
 
 legendEntries = {}; % Initialize legend entries
 
@@ -64,5 +67,5 @@ ylabel(ax, yLabel, 'Interpreter','none')
 close(fig);
 
 myPath = "/Users/atanugiri/Downloads/Saline Ghrelin Project/Analysis/Fig files";
-savefig(figFinal, fullfile(myPath, 'overlaidPlot.fig'));
+savefig(figFinal, fullfile(myPath, 'overlaidPlot_logical_approach_20.fig'));
 end

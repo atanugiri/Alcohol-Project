@@ -6,31 +6,34 @@ function featureForEachSubjectId = masterPsychometricFunctionPlot_Ver2(feature)
 % This function takes 'feature' as input from 'ghrelin_featuretable' and
 % returns psychometric plot for that feature as an average of all animals
 %
-feature = 'distance_until_limiting_time_stamp';
+% feature = 'entry_time_20';
 close all;
 
-data = fetchGhrelinData(feature);
-data(data.subjectid == "none",:) = [];
+fprintf("Health types:\n");
+fprintf("Sal toyrat, Ghr toyrat, Sal toystick, Ghr toystick, Sal skewer, Ghr skewer\n");
+health = input("Which health type do you want to analyze? ","s");
+
+if strcmpi(health, "Sal toyrat")
+    [id, ~, ~, ~, ~, ~] = extract_health_ids;
+elseif strcmpi(health, "Ghr toyrat")
+    [~, id, ~, ~, ~, ~] = extract_health_ids;
+elseif strcmpi(health, "Sal toystick")
+    [~, ~, id, ~, ~, ~] = extract_health_ids;
+elseif strcmpi(health, "Ghr toystick")
+    [~, ~, ~, id, ~, ~] = extract_health_ids;
+elseif strcmpi(health, "Sal skewer")
+    [~, ~, ~, ~, id, ~] = extract_health_ids;
+elseif strcmpi(health, "Ghr skewer")
+    [~, ~, ~, ~, ~, id] = extract_health_ids;
+end
+
+% Generate the idList from the filtered data
+idList = strjoin(arrayfun(@num2str, id, 'UniformOutput', false), ',');
+
+% Extract table corresponding to idList
+data = fetchHealthDataTable(feature, idList);
 data(isoutlier(data.distance_until_limiting_time_stamp),:) = [];
 
-data(data.subjectid == "bob" & data.referencetime == ...
-    "09/12/2023",:) = []; % For toyrat experiment
-
-otherFilter = input("Do you want to apply other filter? 'y' or 'n': ","s");
-
-if strcmpi(otherFilter,'y')
-    filterType = input("'health' or 'tasktypedone'? ","s");
-    if strcmpi(filterType, 'tasktypedone')
-        tasktypedoneList = unique(data.tasktypedone);
-        fprintf('Unique tasktypedone:\n');
-        fprintf('%s, ',tasktypedoneList);
-        fprintf('\n');
-        tasktypedone = input('Enter tasktypedone: ','s');
-        data = data(data.tasktypedone == tasktypedone, :); % For ghr toyrat experiment
-
-    end
-
-end
 femaleData = data(strcmpi(data.gender,"female"),:);
 maleData = data(strcmpi(data.gender,"male"),:);
 
@@ -46,7 +49,7 @@ if strcmpi(splitByGender, 'n')
     plot(x, avFeature, 'LineWidth', 2, 'Color', 'k');
     errorbar(x,avFeature,stdErr,'LineStyle', 'none', 'LineWidth', 1.5, ...
         'CapSize', 0, 'Color','k');
-    legend(sprintf('%s', tasktypedone));
+    legend(sprintf('%s', health));
 
 elseif strcmpi(splitByGender, 'y')
     [~, avFeatureF, stdErrF] = psychometricFunValues(femaleData, feature);
@@ -59,15 +62,18 @@ elseif strcmpi(splitByGender, 'y')
         errorbar(x, avFeature(gender,:), stdErr(gender,:),'LineStyle', ...
             'none', 'LineWidth', 1.5, 'CapSize', 0, 'Color','k');
     end
-    legend(["Female", "", "Male", ""]);
+    legend([sprintf("%s Female", "", "%s Male", "", health, health)]);
 end
 
 ylabel(sprintf('%s', feature), 'Interpreter','none');
 xticks(1:4);
 label = {'0.5','2','5','9'};
 set(gca,'xticklabel',label,'FontSize',15);
-% ylim([0,1]);
 
+% Save figure
+figname = sprintf('%s_%s',health,string(feature));
+myPath = "/Users/atanugiri/Downloads/Saline Ghrelin Project/Analysis/Fig files";
+savefig(gcf, fullfile(myPath, figname));
 
 
 
