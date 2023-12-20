@@ -1,21 +1,29 @@
 % Author: Atanu Giri
 % Date: 11/07/2023
 
+function [passingCenter, timeInCenter, alreadyInCenter] = centralZoneFeatures(id,zoneSize)
+%
 % This function analyzes the trajectory of the subject and determines
 % whether the subject passes through the central zone. It outputs nan if
 % the subject is already present in the zone initially.
+%
+% id = 265219; zoneSize = 0.4;
 
-function [passingCenter, timeInCenter, alreadyInCenter] = centralZoneFeatures(id,zoneSize)
-
-% id = 266670; zoneSize = 0.4;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
+
 % write query
-query = sprintf("SELECT id, subjectid, trialname, referencetime, " + ...
-    "playstarttrialtone, mazenumber, feeder, trialcontrolsettings, coordinatetimes2, " + ...
-    "xcoordinates2, ycoordinates2 FROM live_table WHERE id = %d", id);
-subject_data = fetch(conn,query);
+liveTableQuery = sprintf("SELECT id, subjectid, trialname, referencetime, " + ...
+    "playstarttrialtone, mazenumber, feeder, trialcontrolsettings " + ...
+    "FROM live_table WHERE id = %d", id);
+liveTableData = fetch(conn, liveTableQuery);
+
+featureTableQuery = sprintf("SELECT id, norm_t, norm_x, norm_y FROM " + ...
+    "ghrelin_featuretable WHERE id = %d", id);
+featureTableData = fetch(conn, featureTableQuery);
+
+subject_data = innerjoin(liveTableData, featureTableData, 'Keys', 'id');
 
 try
     % convert all table entries from string to usable format
@@ -49,31 +57,22 @@ try
         subject_data.(column){1} = doubleData;
     end
 
-    % includes the data before playstarttrialtone
-    rawData = table(subject_data.(size(subject_data,2) - 2){1}, subject_data.(size(subject_data,2) - 1){1}, ...
-        subject_data.(size(subject_data,2)){1}, 'VariableNames',{'t','X','Y'});
-
-    % remove nan entries
-    validIdx = all(isfinite(rawData{:,:}),2);
-    cleanedData = rawData(validIdx,:);
-
-    % invoke coordinateNormalization function to normalize the coordinates
-    [normX, normY] = coordinateNormalization(cleanedData.X, cleanedData.Y, id);
-    cleanedDataWithTone = table(cleanedData.t, normX, normY, ...
-        'VariableNames',{'t','X','Y'});
-
-    % set playstarttrialtone and exclude the data before playstarttrialtone
-    startingCoordinatetimes = cleanedDataWithTone.t(1); %subject_data.playstarttrialtone;
-    toneFilter = cleanedDataWithTone.t >= startingCoordinatetimes;
-    xAfterTone = cleanedDataWithTone.X(toneFilter);
-    yAfterTone = cleanedDataWithTone.Y(toneFilter);
-    tAfterTone = cleanedDataWithTone.t(toneFilter);
+    t = subject_data.norm_t{1};
+    X = subject_data.norm_x{1};
+    Y = subject_data.norm_y{1};
 
     % get the index in maze array
     maze = {'maze2','maze1','maze3','maze4'};
     mazeIndex = find(ismember(maze,subject_data.mazenumber));
+
     [xEdge, yEdge, ~, ~] = centralZoneEdges(mazeIndex,zoneSize,feeder);
 
+    % set playstarttrialtone and exclude the data before playstarttrialtone
+    startingCoordinatetimes = t(1); %subject_data.playstarttrialtone;
+    toneFilter = t >= startingCoordinatetimes;
+    xAfterTone = X(toneFilter);
+    yAfterTone = Y(toneFilter);
+    tAfterTone = t(toneFilter);
 
     % passingCenter, timeInCenter
     if any(xAfterTone >= xEdge(1) & xAfterTone <= xEdge(2) & ...

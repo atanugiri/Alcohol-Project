@@ -3,16 +3,22 @@
 
 function [logicalApproach, timeInFeeder, entryTime] = logicalApproachFun(id)
 
-% id = 105841;
+% id = 265227;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
 
 % write query
-query = sprintf("SELECT id, subjectid, trialname, referencetime, " + ...
-    "playstarttrialtone, mazenumber, feeder, trialcontrolsettings, coordinatetimes2, " + ...
-    "xcoordinates2, ycoordinates2 FROM live_table WHERE id = %d", id);
-subject_data = fetch(conn,query);
+liveTableQuery = sprintf("SELECT id, subjectid, trialname, referencetime, " + ...
+    "playstarttrialtone, mazenumber, feeder, trialcontrolsettings " + ...
+    "FROM live_table WHERE id = %d", id);
+liveTableData = fetch(conn, liveTableQuery);
+
+featureTableQuery = sprintf("SELECT id, norm_t, norm_x, norm_y FROM " + ...
+    "ghrelin_featuretable WHERE id = %d", id);
+featureTableData = fetch(conn, featureTableQuery);
+
+subject_data = innerjoin(liveTableData, featureTableData, 'Keys', 'id');
 
 try
     % convert all table entries from string to usable format
@@ -47,34 +53,21 @@ try
         subject_data.(column){1} = doubleData;
     end
 
-    % includes the data before playstarttrialtone
-    rawData = table(subject_data.(size(subject_data,2) - 2){1}, subject_data.(size(subject_data,2) - 1){1}, ...
-        subject_data.(size(subject_data,2)){1}, 'VariableNames',{'t','X','Y'});
-
-    % remove nan entries
-    validIdx = all(isfinite(rawData{:,:}),2);
-    cleanedData = rawData(validIdx,:);
+    t = subject_data.norm_t{1};
+    X = subject_data.norm_x{1};
+    Y = subject_data.norm_y{1};
 
     maze = {'maze2','maze1','maze3','maze4'};
     % get the index in maze array
-    mazeIndex = find(ismember(maze,subject_data.mazenumber));
+    mazeIndex = find(ismember(maze, subject_data.mazenumber));
 
-    % invoke coordinateNormalization function to normalize the coordinates
-    [normX, normY] = coordinateNormalization(cleanedData.X, cleanedData.Y, id);
-%     [normX, normY] = coordinateNormalization_hard_coded(cleanedData.X, ...
-%         cleanedData.Y, mazeIndex);
-    cleanedDataWithTone = table(cleanedData.t, normX, normY, ...
-        'VariableNames',{'t','X','Y'});
-
-    % Choose 
     [~, ~, xEdgeReward, yEdgeReward] = centralZoneEdges(mazeIndex,0.4,feeder,0.20);
 
     %% logicalApproach
-    pcFilter = cleanedDataWithTone.t >= 2 & cleanedDataWithTone.t <= 15;
-    xPCrange = cleanedDataWithTone.X(pcFilter); % pc = present cost
-    yPCrange = cleanedDataWithTone.Y(pcFilter);
-    tPCrange = cleanedDataWithTone.t(pcFilter);
-
+    pcFilter = t >= 2 & t <= 15; % pc = present cost
+    xPCrange = X(pcFilter); 
+    yPCrange = Y(pcFilter);
+    tPCrange = t(pcFilter);
 
     if any(xPCrange >= xEdgeReward(1) & xPCrange <= xEdgeReward(2) & ...
             yPCrange >= yEdgeReward(1) & yPCrange <= yEdgeReward(2))

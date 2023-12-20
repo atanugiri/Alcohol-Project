@@ -4,7 +4,7 @@
 datasource = 'live_database';
 conn = database(datasource, 'postgres', '1234');
 subjectDataQ = "SELECT id, subjectid, referencetime, trialname FROM live_table WHERE " + ...
-    "referencetime LIKE '%09/25/2023%' AND subjectid = 'joey' ORDER BY id";
+    "referencetime LIKE '%09/25/2023%' AND subjectid = 'teddy' ORDER BY id";
 subjectData = fetch(conn, subjectDataQ);
 
 for index = 1:height(subjectData)

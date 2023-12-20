@@ -6,7 +6,7 @@
 %% This function call coordinateNormalization and mazeMethods functions.
 
 function h = trajectoryPlot(id)
-% id = 265942;
+% id = 265417;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');

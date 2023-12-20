@@ -1,12 +1,12 @@
 function [distanceUntilLimitingTimeStamp,velocityUntilLimitingTimeStamp] = distanceVelocityFun(id)
 
-id = 265218;
+% id = 265302;
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
 
 % write query
-query = sprintf("SELECT id, coordinatetimes2, " + ...
-    "xcoordinates2, ycoordinates2 FROM live_table WHERE id = %d", id);
+query = sprintf("SELECT id, norm_t, " + ...
+    "norm_x, norm_y FROM ghrelin_featuretable WHERE id = %d", id);
 subject_data = fetch(conn,query);
 
 try
@@ -19,17 +19,9 @@ try
         subject_data.(column){1} = doubleData;
     end
 
-    % includes the data before playstarttrialtone
-    rawData = table(subject_data.(size(subject_data,2) - 2){1}, subject_data.(size(subject_data,2) - 1){1}, ...
-        subject_data.(size(subject_data,2)){1}, 'VariableNames',{'t','X','Y'});
-
-    % remove nan entries
-    validIdx = all(isfinite(rawData{:,:}),2);
-    cleanedData = rawData(validIdx,:);
-
-    % invoke coordinateNormalization function to normalize the coordinates
-    [X, Y] = coordinateNormalization(cleanedData.X, cleanedData.Y, id);
-    t = cleanedData.t;
+    X = subject_data.norm_x{1};
+    Y = subject_data.norm_y{1};
+    t = subject_data.norm_t{1};
 
     limitingTimeIndex = find(t == 15);
 
