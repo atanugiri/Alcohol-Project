@@ -1,9 +1,8 @@
 % Author: Atanu Giri
-% Date: 02/02/2023
+% Date: 12/26/2023
 % This function returns the total total number of rotation pts in trajectory
 
 function rotationPts = rotationPtFun(id)
-close all; clc;
 % id = 206523;
 % make connection with database
 datasource = 'live_database';
