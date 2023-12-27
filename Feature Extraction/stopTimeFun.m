@@ -4,7 +4,7 @@
 function stoppingPts = stopTimeFun(id)
 % This function returns the total stoptime in trajectory
 
-% id = 265305;
+% id = 265215;
 % make connection with database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
