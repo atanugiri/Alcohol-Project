@@ -16,19 +16,42 @@ tableName = 'ghrelin_featuretable';
 for index = 1:length(idList)
     id = idList(index);
     try
-        stoppingPts = stopTimeFun(id);
+        [stoppingPts_method1, stoppingPts_method2, stoppingPts_method3, stoppingPts_method4, ...
+            stoppingPts_method5, stoppingPts_method6] = stoppingPtsFun(id);
 
         % Convert NaN values to NULL
-        stoppingPts = handleNaN(stoppingPts);
+        stoppingPts_method1 = handleNaN(stoppingPts_method1);
+        stoppingPts_method2 = handleNaN(stoppingPts_method2);
+        stoppingPts_method3 = handleNaN(stoppingPts_method3);
+        stoppingPts_method4 = handleNaN(stoppingPts_method4);
+        stoppingPts_method5 = handleNaN(stoppingPts_method5);
+        stoppingPts_method6 = handleNaN(stoppingPts_method6);
+
 
         % Handle empty values
-        stoppingPts = handleEmpty(stoppingPts);
+        stoppingPts_method1 = handleEmpty(stoppingPts_method1);
+        stoppingPts_method2 = handleEmpty(stoppingPts_method2);
+        stoppingPts_method3 = handleEmpty(stoppingPts_method3);
+        stoppingPts_method4 = handleEmpty(stoppingPts_method4);
+        stoppingPts_method5 = handleEmpty(stoppingPts_method5);
+        stoppingPts_method6 = handleEmpty(stoppingPts_method6);
+
 
         % Convert NaN values to 'NULL' for text columns
-        stoppingPts = convertToString(stoppingPts);
+        stoppingPts_method1 = convertToString(stoppingPts_method1);
+        stoppingPts_method2 = convertToString(stoppingPts_method2);
+        stoppingPts_method3 = convertToString(stoppingPts_method3);
+        stoppingPts_method4 = convertToString(stoppingPts_method4);
+        stoppingPts_method5 = convertToString(stoppingPts_method5);
+        stoppingPts_method6 = convertToString(stoppingPts_method6);
 
-        updateQuery = sprintf("UPDATE %s SET stopping_pts=%s WHERE id=%d", ...
-            tableName, stoppingPts, id);
+
+        updateQuery = sprintf("UPDATE %s SET stoppingpts_per_unittravel_method1=%s, " + ...
+            "stoppingpts_per_unittravel_method2=%s, stoppingpts_per_unittravel_method3=%s, " + ...
+            "stoppingpts_per_unittravel_method4=%s, stoppingpts_per_unittravel_method5=%5, " + ...
+            "stoppingpts_per_unittravel_method6=%s WHERE id=%d", ...
+            tableName, stoppingPts_method1, stoppingPts_method2, stoppingPts_method3, ...
+            stoppingPts_method4, stoppingPts_method5, stoppingPts_method6, id);
 
         exec(conn, updateQuery);
 
