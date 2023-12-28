@@ -2,6 +2,6 @@
 *.mat
 *.png
 *.fig
-"Analysis\Fig files\"
+"Analysis/Fig files\"
 "Ghrelin Plots\"
 "Saline Plots\"
