@@ -13,6 +13,9 @@ idList = dataInRange.id;
 
 tableName = 'ghrelin_featuretable';
 
+% idList = strjoin(arrayfun(@num2str, idList, 'UniformOutput', false), ',');
+% ftq = sprintf("SELECT * FROM ghrelin_featuretable WHERE id IN (%s) ORDER BY id;", idList);
+
 %% Add new columns example
 % alterQuery = "ALTER TABLE ghrelin_featuretable " + ...
 %     "ADD COLUMN entry_time text, " + ...
