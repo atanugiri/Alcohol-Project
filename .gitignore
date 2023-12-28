@@ -1,6 +1,7 @@
 *.asv
 *.mat
-*.fig
 *.png
+*.fig
+"Fig files\"
 "Ghrelin Plots\"
 "Saline Plots\"
