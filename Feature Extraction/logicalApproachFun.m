@@ -61,10 +61,10 @@ try
     % get the index in maze array
     mazeIndex = find(ismember(maze, subject_data.mazenumber));
 
-    [~, ~, xEdgeReward, yEdgeReward] = centralZoneEdges(mazeIndex,0.4,feeder,0.20);
+    [~, ~, xEdgeReward, yEdgeReward] = centralZoneEdges(mazeIndex,0.5,feeder,0.25);
 
     %% logicalApproach
-    pcFilter = t >= 2 & t <= 15; % pc = present cost
+    pcFilter = t >= subject_data.playstarttrialtone & t <= 15; % pc = present cost
     xPCrange = X(pcFilter); 
     yPCrange = Y(pcFilter);
     tPCrange = t(pcFilter);

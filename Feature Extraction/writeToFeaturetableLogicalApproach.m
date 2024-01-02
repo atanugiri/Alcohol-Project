@@ -5,7 +5,7 @@ dateQuery = "SELECT id, referencetime FROM live_table ORDER BY id";
 allDates = fetch(conn, dateQuery);
 allDates.referencetime = datetime(allDates.referencetime, 'Format', 'MM/dd/yyyy');
 startDate = datetime('09/12/2023', 'InputFormat', 'MM/dd/yyyy');
-endDate = datetime('10/31/2023', 'InputFormat', 'MM/dd/yyyy');
+endDate = datetime('12/11/2023', 'InputFormat', 'MM/dd/yyyy');
 endDate = endDate + days(1);
 
 dataInRange = allDates(allDates.referencetime >= startDate & allDates.referencetime <= endDate, :);
@@ -43,8 +43,8 @@ for index = 1:length(idList)
         timeInFeeder = convertToString(timeInFeeder);
         entryTime = convertToString(entryTime);
 
-        updateQuery = sprintf("UPDATE %s SET logical_approach_20=%s, " + ...
-            "time_in_feeder_20=%s, entry_time_20=%s WHERE id=%d", tableName, ...
+        updateQuery = sprintf("UPDATE %s SET logical_approach_25=%s, " + ...
+            "time_in_feeder_25=%s, entry_time_25=%s WHERE id=%d", tableName, ...
             logicalApproach, timeInFeeder, entryTime, id);
 
         exec(conn, updateQuery);
