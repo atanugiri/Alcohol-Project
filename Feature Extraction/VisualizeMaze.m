@@ -78,9 +78,6 @@ if strcmpi(plotType, 'session')
             %             else
 
             id = currentData.id(1);
-
-            %             [xNormalized, yNormalized] = ...
-            %                 coordinateNormalization_hard_coded(x, y, maze);
             [xNormalized, yNormalized] = coordinateNormalization(x, y, id);
 
             plot(xNormalized,yNormalized,'k.');
