@@ -3,6 +3,8 @@
 
 function [normT, normX, normY] = extractNormalizedCoordinate(id)
 
+% id = 18343;
+
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
 
