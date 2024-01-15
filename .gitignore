@@ -2,6 +2,8 @@
 *.mat
 *.png
 *.fig
-Analysis/Fig\ files/
+.DS_Store
 "Ghrelin Plots\"
 "Saline Plots\"
+Analysis/.DS_Store
+Analysis/Fig\ files/
