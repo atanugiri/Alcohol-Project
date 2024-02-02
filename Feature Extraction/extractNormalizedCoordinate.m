@@ -17,12 +17,6 @@ subject_data = fetch(conn,query);
 try
     % Accessing PGArray data as double
     for column = size(subject_data,2) - 2:size(subject_data,2)
-        %         stringAllRows = string(subject_data.(column));
-        %         regAllRows = regexprep(stringAllRows,'{|}','');
-        %         splitAllRows = split(regAllRows,',');
-        %         doubleData = str2double(splitAllRows);
-        %         subject_data.(column){1} = doubleData;
-
         % vectorization approach
         strData = cellfun(@(x) string(x), subject_data.(column));
         regData = arrayfun(@(x) regexprep(x,'{|}',''), strData);
