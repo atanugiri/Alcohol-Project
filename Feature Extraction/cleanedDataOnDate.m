@@ -9,7 +9,7 @@ function [xCleaned,yCleaned] = cleanedDataOnDate(id)
 % id = 94461;
 
 datasource = 'live_database';
-conn = database(datasource,'postgres','1234');
+conn = database(datasource,'postgres','1234'); % Comment out for using this function in loop
 dateQuery = sprintf("SELECT referencetime FROM live_table WHERE id = %d;", id);
 subjectData = fetch(conn,dateQuery);
 
@@ -29,7 +29,7 @@ dataOnDateQuery = sprintf("SELECT id, mazenumber, tasktypedone, xcoordinates2, "
     "REPLACE(tasktypedone, ' ', '') ILIKE REPLACE('%s', ' ', '')", ...
     currentDate, string(taskTypeDone.tasktypedone));
 dataOnDate = fetch(conn,dataOnDateQuery);
-close(conn);
+% close(conn); % Comment out for using in loop
 
 
 % Accessing PGArray data as double
@@ -92,20 +92,26 @@ for maze = 1:4
 %     plot(xCleaned{maze}, yCleaned{maze}, '.');
 
 end
-
 end
 
 
 %% Description of transformPgarray
 function transformedData = transformPgarray(pgarrayData)
-transformedData = cell(length(pgarrayData),1);
-for idx = 1:length(pgarrayData)
-    string_all_xcoordinates = string(pgarrayData(idx,1));
-    reg_all_xcoordinates = regexprep(string_all_xcoordinates,'{|}','');
-    split_all_xcoordinates = split(reg_all_xcoordinates,',');
-    transformedData{idx,1} = str2double(split_all_xcoordinates);
-end
+% transformedData = cell(length(pgarrayData),1);
+% for idx = 1:length(pgarrayData)
+%     string_all_xcoordinates = string(pgarrayData(idx,1));
+%     reg_all_xcoordinates = regexprep(string_all_xcoordinates,'{|}','');
+%     split_all_xcoordinates = split(reg_all_xcoordinates,',');
+%     transformedData{idx,1} = str2double(split_all_xcoordinates);
+% end
 
+% Vectorization approach
+strData = cellfun(@(x) string(x), pgarrayData);
+regData = arrayfun(@(x) regexprep(x,'{|}',''), strData);
+splitData = arrayfun(@(x) split(x, ','), regData, 'UniformOutput', false);
+
+% This step takes most time
+transformedData = cellfun(@(x) str2double(x), splitData, 'UniformOutput', false);
 end
 
 %% Description of indexesToKeepFun
