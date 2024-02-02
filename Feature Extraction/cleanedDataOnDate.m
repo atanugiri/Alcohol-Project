@@ -97,14 +97,6 @@ end
 
 %% Description of transformPgarray
 function transformedData = transformPgarray(pgarrayData)
-% transformedData = cell(length(pgarrayData),1);
-% for idx = 1:length(pgarrayData)
-%     string_all_xcoordinates = string(pgarrayData(idx,1));
-%     reg_all_xcoordinates = regexprep(string_all_xcoordinates,'{|}','');
-%     split_all_xcoordinates = split(reg_all_xcoordinates,',');
-%     transformedData{idx,1} = str2double(split_all_xcoordinates);
-% end
-
 % Vectorization approach
 strData = cellfun(@(x) string(x), pgarrayData);
 regData = arrayfun(@(x) regexprep(x,'{|}',''), strData);
