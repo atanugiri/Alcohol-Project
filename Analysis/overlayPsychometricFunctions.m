@@ -7,9 +7,9 @@ function overlayPsychometricFunctions(varargin)
 % input plots.
 %
 
-varargin = {'Sal toyrat_acc_outlier_move_median.fig', 'Ghr toyrat_acc_outlier_move_median.fig', ...
-    'Sal toystick_acc_outlier_move_median.fig', 'Ghr toystick_acc_outlier_move_median.fig', ...
-    'Sal skewer_acc_outlier_move_median.fig', 'Ghr skewer_acc_outlier_move_median.fig'};
+% varargin = {'Sal toyrat_acc_outlier_move_median.fig', 'Ghr toyrat_acc_outlier_move_median.fig', ...
+%     'Sal toystick_acc_outlier_move_median.fig', 'Ghr toystick_acc_outlier_move_median.fig', ...
+%     'Sal skewer_acc_outlier_move_median.fig', 'Ghr skewer_acc_outlier_move_median.fig'};
 
 % Create a new figure for the combined plot
 figFinal = figure();
@@ -17,7 +17,7 @@ set(gcf, 'Windowstyle', 'docked');
 ax = axes(figFinal);
 
 % Define a set of unique colors
-colors = parula(numel(varargin));
+colors = flag(numel(varargin));
 
 legendEntries = {}; % Initialize legend entries
 
@@ -59,7 +59,7 @@ xLabel = get(figAx.XLabel, 'String');
 yLabel = get(figAx.YLabel, 'String');
 
 xlabel(ax, xLabel);
-ylabel(ax, yLabel, 'Interpreter','none')
+ylabel(ax, yLabel, 'Interpreter','none');
 
 % Close the temporary figure
 close(fig);

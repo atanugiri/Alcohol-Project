@@ -2,6 +2,8 @@
 % Date: 01/02/2024
 
 function [Sal_P2L1_id, Ghr_P2L1_id, Sal_P2L1L3_id, Ghr_P2L1L3_id] = extract_sal_ghr_ids
+% This function extracts P2L1 Saline, P2L1 Ghrelin, P2L1L3 Saline, P2L1L3
+% Ghrelin ids
 
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
@@ -24,8 +26,7 @@ dataInRange = allData(allData.referencetime >= startDate & allData.referencetime
 % Sal P2L1 ids
 Sal_health_filter = contains(strrep(dataInRange.health, ' ',''), ...
     strrep("Hour Saline",' ',''), "IgnoreCase", true);
-P2L1_task_filter = contains(strrep(dataInRange.tasktypedone, ' ',''), ...
-    strrep("P2L1",' ',''), "IgnoreCase", true);
+P2L1_task_filter = strcmpi(strrep(dataInRange.tasktypedone, ' ',''), "P2L1");
 
 Sal_P2L1_data = dataInRange(Sal_health_filter & P2L1_task_filter, :);
 Sal_P2L1_id = Sal_P2L1_data.id;
@@ -40,8 +41,7 @@ Ghr_P2L1_data = dataInRange(Ghr_health_filter & P2L1_task_filter, :);
 Ghr_P2L1_id = Ghr_P2L1_data.id;
 
 % Sal P2L1L3 ids
-P2L1L3_task_filter = contains(strrep(dataInRange.tasktypedone, ' ',''), ...
-    strrep("P2L1L3",' ',''), "IgnoreCase", true);
+P2L1L3_task_filter = strcmpi(strrep(dataInRange.tasktypedone, ' ',''), "P2L1L3");
 
 Sal_P2L1L3_data = dataInRange(Sal_health_filter & P2L1L3_task_filter, :);
 Sal_P2L1L3_id = Sal_P2L1L3_data.id;

@@ -2,7 +2,7 @@
 % Date: 12/20/2023
 
 function [Sal_toyrat_id, Ghr_toyrat_id, Sal_toystick_id, Ghr_toystick_id, ...
-    Sal_skewer_id, Ghr_skewer_id] = extract_health_ids
+    Sal_skewer_id, Ghr_skewer_id] = extract_toy_expt_ids
 
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
@@ -13,7 +13,7 @@ allData.referencetime = datetime(allData.referencetime, 'Format', 'MM/dd/yyyy');
 allData.health = string(allData.health);
 allData.subjectid = string(allData.subjectid);
 
-allData(allData.subjectid == "none", :) = [];
+allData(ismember(allData.subjectid, ["emma", "stitch", "freya", "bastet", "none"]), :) = [];
 
 startDate = datetime('09/12/2023', 'InputFormat', 'MM/dd/yyyy');
 endDate = datetime('12/11/2023', 'InputFormat', 'MM/dd/yyyy');

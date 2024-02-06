@@ -6,7 +6,7 @@ function mergedTable = fetchHealthDataTable(feature, idList)
 % This function takes the dates as user input and returns a table of all 
 % id's and corresponding columns from live_table and featuretable
 %
-% feature = 'entry_time_20';
+% feature = 'approachavoid';
 
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
@@ -17,7 +17,8 @@ liveTableQuery = sprintf("SELECT id, subjectid, referencetime, gender, feeder, "
 liveTableData = fetch(conn, liveTableQuery);
 
 if ~strcmpi(feature,'approachavoid')
-    featureQuery = sprintf("SELECT id, distance_until_limiting_time_stamp, %s FROM ghrelin_featuretable ORDER BY id;", feature);
+    featureQuery = sprintf("SELECT id, distance_until_limiting_time_stamp_old, %s " + ...
+        "FROM ghrelin_featuretable WHERE id IN (%s) ORDER BY id", feature, idList);
     featureData = fetch(conn, featureQuery);
 end
 
@@ -28,6 +29,7 @@ else
 end
 
 mergedTable.referencetime = datetime(mergedTable.referencetime, 'Format', 'MM/dd/yyyy');
+mergedTable = sortrows(mergedTable, 'referencetime');
 mergedTable.referencetime = string(mergedTable.referencetime);
 mergedTable.subjectid = string(mergedTable.subjectid);
 mergedTable.gender = string(mergedTable.gender);
@@ -35,9 +37,12 @@ mergedTable.feeder = str2double(mergedTable.feeder);
 mergedTable.health = string(mergedTable.health);
 mergedTable.trialcontrolsettings = string(mergedTable.trialcontrolsettings);
 mergedTable.tasktypedone = string(mergedTable.tasktypedone);
-mergedTable.(feature) = str2double(mergedTable.(feature));
-mergedTable.distance_until_limiting_time_stamp = str2double(mergedTable.distance_until_limiting_time_stamp);
-
+if ~strcmpi(feature,'approachavoid')
+    mergedTable.distance_until_limiting_time_stamp_old = str2double(mergedTable.distance_until_limiting_time_stamp_old);
+end
+if ~strcmpi(feature, 'distance_until_limiting_time_stamp_old')
+    mergedTable.(feature) = str2double(mergedTable.(feature));
+end
 mergedTable.realFeederId = nan(height(mergedTable),1);
 
 for i = 1:height(mergedTable)

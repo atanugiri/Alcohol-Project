@@ -6,8 +6,8 @@
 % This function returns psychometric plot of a feature for each session and
 % animal
 %
-feature = 'logical_approach_3s_20';
-close all; clc;
+feature = 'passing_center_40';
+clc;
 mergedTable = fetchGhrelinData(feature);
 
 ghrToyratData = mergedTable(mergedTable.tasktypedone == 'ghr toyrat', :);

@@ -6,7 +6,7 @@
 % This function returns psychometric plot of a feature for each session as
 % an avergare of all animal in that day
 %
-feature = 'logical_approach_3s_20';
+feature = 'logical_approach_3s';
 mergedTable = fetchGhrelinData(feature);
 
 % Remove bad entries
@@ -27,9 +27,9 @@ function myPlot(dataTable, feature)
 % dataTable = ghrToyratData; % for testing
 
 sessionList = unique(dataTable.referencetime);
-legendLabels = cell(1, 3);
+% legendLabels = cell(1, 3);
 
-for session = 6:6 %length(sessionList)
+for session = 4:6 %length(sessionList)
     sessionData = dataTable(dataTable.referencetime == sessionList(session),:);
     if isequal(feature, 'passing_center_25')
         tf = isnan(sessionData.(feature));
