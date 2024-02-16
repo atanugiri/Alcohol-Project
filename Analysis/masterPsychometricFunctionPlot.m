@@ -1,52 +1,31 @@
 % Author: Atanu Giri
 % Date: 12/04/2023
 
-function featureForEachSubjectId = masterPsychometricFunctionPlot(feature)
+function featureForEachSubjectId = masterPsychometricFunctionPlot(feature, varargin)
 %
-% This function takes 'feature' as input from 'ghrelin_featuretable' and
-% returns psychometric plot for that feature as an average of all animals
-%
-feature = 'distance_until_limiting_time_stamp_old';
+% This function takes 'feature' and treatment type as input from 
+% 'ghrelin_featuretable' and returns psychometric plot for that feature as 
+% an average of all animals
+
+% Example usage
+% masterPsychometricFunctionPlot('distance_until_limiting_time_stamp_old', 'P2L1 Baseline')
+
 close all;
 
 fprintf("Health types:\n");
-fprintf("P2L1 Baseline, P2L1 Food deprivation, Initial task, Late task, P2L1 Saline, " + ...
-    "P2L1 Ghrelin, P2L1L3 Saline, P2L1L3 Ghrelin, Sal toyrat, " + ...
-    "Ghr toyrat, Sal toystick, Ghr toystick, Sal skewer, Ghr skewer\n");
-treatment = input("Which health type do you want to analyze? ","s");
+fprintf("P2L1 Baseline, P2L1 Food deprivation, Initial task, Late task, P2L1 Saline, \n" + ...
+    "P2L1 Ghrelin, P2L1L3 Saline, P2L1L3 Ghrelin, Sal toyrat, \n" + ...
+    "Ghr toyrat, Sal toystick, Ghr toystick, Sal skewer, Ghr skewer, \n" + ...
+    "Combined Sal toy, Combined Ghr toy, Alcohol bl, Boost, Alcohol, \n" + ...
+    "Sal alcohol, Ghr alcohol\n");
 
-
-if strcmpi(treatment, "P2L1 Baseline")
-    [id, ~, ~, ~] = extract_treatment_ids;
-elseif strcmpi(treatment, "P2L1 Food deprivation")
-    [~, id, ~, ~] = extract_treatment_ids;
-elseif strcmpi(treatment, "Initial task")
-    [~, ~, id, ~] = extract_treatment_ids;
-elseif strcmpi(treatment, "Late task")
-    [~, ~, ~, id] = extract_treatment_ids;
-
-elseif strcmpi(treatment, "P2L1 Saline")
-    [id, ~, ~, ~] = extract_sal_ghr_ids;
-elseif strcmpi(treatment, "P2L1 Ghrelin")
-    [~, id, ~, ~] = extract_sal_ghr_ids;
-elseif strcmpi(treatment, "P2L1L3 Saline")
-    [~, ~, id, ~] = extract_sal_ghr_ids;
-elseif strcmpi(treatment, "P2L1L3 Ghrelin")
-    [~, ~, ~, id] = extract_sal_ghr_ids;
-
-elseif strcmpi(treatment, "Sal toyrat")
-    [id, ~, ~, ~, ~, ~] = extract_toy_expt_ids;
-elseif strcmpi(treatment, "Ghr toyrat")
-    [~, id, ~, ~, ~, ~] = extract_toy_expt_ids;
-elseif strcmpi(treatment, "Sal toystick")
-    [~, ~, id, ~, ~, ~] = extract_toy_expt_ids;
-elseif strcmpi(treatment, "Ghr toystick")
-    [~, ~, ~, id, ~, ~] = extract_toy_expt_ids;
-elseif strcmpi(treatment, "Sal skewer")
-    [~, ~, ~, ~, id, ~] = extract_toy_expt_ids;
-elseif strcmpi(treatment, "Ghr skewer")
-    [~, ~, ~, ~, ~, id] = extract_toy_expt_ids;
+if numel(varargin) >= 1
+    treatment = varargin{1};
+else
+    treatment = input("Which health type do you want to analyze? ","s");
 end
+
+id = treatmentIDfun(treatment); % Get id list
 
 % Generate the idList from the filtered data
 idList = strjoin(arrayfun(@num2str, id, 'UniformOutput', false), ',');
@@ -54,11 +33,6 @@ idList = strjoin(arrayfun(@num2str, id, 'UniformOutput', false), ',');
 % Extract table corresponding to idList
 data = fetchHealthDataTable(feature, idList);
 % data(isoutlier(data.distance_until_limiting_time_stamp_old),:) = [];
-
-% Visualize histogram
-histogram(data.(feature));
-set(gcf,'Windowstyle', 'docked');
-close(gcf);
 
 % Plotting
 x = 1:4;
@@ -128,4 +102,4 @@ savefig(gcf, fullfile(myPath, figname));
 
     end % end of psychometricFunValues
 
-end % end of masterPsychometricFunctionPlot_Ver2
+end % end of masterPsychometricFunctionPlot
