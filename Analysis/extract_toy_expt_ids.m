@@ -2,10 +2,15 @@
 % Date: 12/20/2023
 
 function [Sal_toyrat_id, Ghr_toyrat_id, Sal_toystick_id, Ghr_toystick_id, ...
-    Sal_skewer_id, Ghr_skewer_id] = extract_toy_expt_ids
+    Sal_skewer_id, Ghr_skewer_id] = extract_toy_expt_ids(varargin)
 
-datasource = 'live_database';
-conn = database(datasource,'postgres','1234');
+if numel(varargin) < 1
+    datasource = 'live_database';
+    conn = database(datasource,'postgres','1234');
+else
+   conn =  varargin{1};
+end
+
 dateQuery = "SELECT id, referencetime, health, subjectid FROM live_table ORDER BY id";
 
 allData = fetch(conn, dateQuery);
@@ -55,5 +60,4 @@ Ghr_skewer_data = dataInRange(contains(strrep(dataInRange.health, ' ',''), ...
     strrep("Ghrelin ToySkewer",' ',''), 'IgnoreCase',true), :);
 Ghr_skewer_id = Ghr_skewer_data.id;
 
-close(conn);
 end

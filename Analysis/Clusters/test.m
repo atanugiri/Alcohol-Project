@@ -1,10 +1,12 @@
 % Author: Atanu Giri
 % Date: 02/15/2024
 
-
-
 % function test(varargin)
 % Example usage test("P2L1 Ghrelin", "approachavoid")
+
+datasource = 'live_database';
+conn = database(datasource,'postgres','1234');
+
 varargin = ["P2L1 Ghrelin", "approachavoid"];
 
 fprintf("Health types:\n");
@@ -20,7 +22,7 @@ else
     treatment = input("Which health type do you want for treatment? ","s");
 end
 
-treatmentID = treatmentIDfun(treatment);
+treatmentID = treatmentIDfun(treatment, conn);
 % Generate the idList from the filtered data
 treatmentID = strjoin(arrayfun(@num2str, treatmentID, 'UniformOutput', false), ',');
 
@@ -30,32 +32,10 @@ else
     feature = input("Which feature do you want? ","s");
 end
 
-treatment_data = fetchHealthDataTable(feature, treatmentID);
+treatment_data = fetchHealthDataTable(feature, treatmentID, conn);
 
 trtmntFitData = extractFitData(treatment_data, feature);
 
-fracOfSigTrmnt = caculateFractionOfSigmoid(trtmntFitData);
-
-
-
-%% Description of caculateFractionOfSigmoid
-function fractionOfSigmoid = caculateFractionOfSigmoid(fitData)
-
-fractionOfSigmoid = zeros(1, length(fitData));
-
-for animal = 1:length(fitData)
-    allGoodness = [];
-    for session = 1:length(fitData{animal})
-        allGoodness = [allGoodness, fitData{animal}(session).goodness];
-    end
-
-    % Check for minimum fit
-    minimumFit = 0.4;
-    noOfSigmoid = sum(allGoodness >= minimumFit & allGoodness <= 1);
-    fractionOfSigmoid(animal) = noOfSigmoid/length(allGoodness);
-
-end
-end
 
 
 %% Description of extractFitData
@@ -71,8 +51,12 @@ for animal = 1:length(animalList)
     sessionList = unique(animalData.referencetime);
 
     % Create a structure to store data for each animal
-    animalFitData = struct('a', cell(1, length(sessionList)), ...
+    animalFitData = struct('animal', cell(1, length(sessionList)), ...
+        'date', cell(1, length(sessionList)), ...
+        'fitIndex', cell(1, length(sessionList)), ...
+        'a', cell(1, length(sessionList)), ...
         'b', cell(1, length(sessionList)), ...
+        'c', cell(1, length(sessionList)), ...
         'goodness', cell(1, length(sessionList)));
 
     for session = 1:length(sessionList)
@@ -83,11 +67,17 @@ for animal = 1:length(animalList)
             disp('Skipping iteration due to NaN values in y.');
             continue; % Skip the current iteration
         end
-        [a, b, goodness] = sigmoid_fit(featureList);
+
+        % Fitting
+        [fitIndex, a, b, c, goodness] = sigmoid_fit_for_cluster(featureList);
 
         % Store the values in the structure
+        animalFitData(session).animal = animalList(animal);
+        animalFitData(session).date = sessionList(session);
+        animalFitData(session).fitIndex = fitIndex;
         animalFitData(session).a = a;
         animalFitData(session).b = b;
+        animalFitData(session).c = c;
         animalFitData(session).goodness = goodness;
     end % end of 1st session
 
@@ -95,31 +85,4 @@ for animal = 1:length(animalList)
     fitData{animal} = animalFitData;
 end % end of 1st animal
 end
-
-
-%% Description of psychometricFunValues
-function [featureForEach, avFeature, stdErr] = psychometricFunValues(dataTable, feature)
-uniqueSubjectid = unique(dataTable.subjectid);
-featureForEach = zeros(length(uniqueSubjectid), 4);
-stdErr = zeros(1,4);
-
-for subject = 1:length(uniqueSubjectid)
-    for conc = 1:4
-        feederToFetch = 5 - conc;
-        dataFilter = dataTable.subjectid == uniqueSubjectid(subject) ...
-            & dataTable.realFeederId == feederToFetch;
-        featureArray = dataTable.(feature)(dataFilter, :);
-        featureArray = featureArray(isfinite(featureArray));
-        featureForEach(subject, conc) = sum(featureArray)/length(featureArray);
-    end
-end
-
-avFeature = mean(featureForEach);
-
-for conc = 1:4
-    stdErr(conc) = std(featureForEach(:,conc))/sqrt(length(featureForEach(:,conc)));
-end
-
-end % end of psychometricFunValues
-
 % end

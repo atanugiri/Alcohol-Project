@@ -1,15 +1,19 @@
 % Author: Atanu Giri
 % Date: 11/14/2023
 
-function mergedTable = fetchHealthDataTable(feature, idList)
+function mergedTable = fetchHealthDataTable(feature, idList, varargin)
 %
 % This function takes the dates as user input and returns a table of all 
 % id's and corresponding columns from live_table and featuretable
 %
 % feature = 'approachavoid';
 
-datasource = 'live_database';
-conn = database(datasource,'postgres','1234');
+if numel(varargin) < 1
+    datasource = 'live_database';
+    conn = database(datasource,'postgres','1234');
+else
+   conn =  varargin{1};
+end
 
 liveTableQuery = sprintf("SELECT id, subjectid, referencetime, gender, feeder, " + ...
     "health, trialcontrolsettings, tasktypedone, approachavoid FROM live_table " + ...
@@ -59,5 +63,4 @@ for i = 1:height(mergedTable)
     end
 end
 
-close(conn);
 end

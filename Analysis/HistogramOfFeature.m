@@ -1,26 +1,34 @@
-    % Author: Atanu Giri
+% Author: Atanu Giri
 % Date: 02/11/2024
 
-function HistogramOfFeature(feature, varargin)
+function [h, figname] = HistogramOfFeature(feature, varargin)
 
 % Example usage
-% HistogramOfFeature('stoppingpts_per_unittravel_method6','t1','t2','t3');
-
-% feature = 'entry_time_25'; varargin = {'t1','t2','t3'};
+% HistogramOfFeature('stoppingpts_per_unittravel_method6','P2L1 Saline','P2L1 Ghrelin','Sal alcohol');
 
 fprintf("Health types:\n");
-fprintf("P2L1 Baseline, P2L1 Food deprivation, Initial task, Late task, P2L1 Saline, \n" + ...
+fprintf("P2L1 Baseline, P2L1 Food deprivation, Oxy, Incubation, \n" + ...
+    "Initial task, Late task, P2L1 Saline, \n" + ...
     "P2L1 Ghrelin, P2L1L3 Saline, P2L1L3 Ghrelin, Sal toyrat, \n" + ...
     "Ghr toyrat, Sal toystick, Ghr toystick, Sal skewer, Ghr skewer, \n" + ...
-    "Combined Sal toy, Combined Ghr toy, Sal alcohol, Ghr alcohol\n");
+    "Combined Sal toy, Combined Ghr toy, Alcohol bl, Boost, Alcohol, \n" + ...
+    "Sal alcohol, Ghr alcohol\n");
 
-control = input("Which health type do you want for control? ","s");
+if numel(varargin) >= 1
+    control = varargin{1};
+else
+    control = input("Which health type do you want for control? ","s");
+end
+
 controlID = treatmentIDfun(control);
 
-% Prompt for each treatment group
 treatmentGroups = {};
-for i = 1:numel(varargin)
-    treatmentGroups{i} = input("Which health type do you want for treatment? ","s");
+if numel(varargin) >= 2
+    for i = 2:numel(varargin)
+        treatmentGroups{i-1} = varargin{i};
+    end
+else
+    treatmentGroups = input("Which health type do you want for treatment? ","s");
 end
 
 treatmentIDs = cell(1, numel(treatmentGroups));
@@ -51,6 +59,7 @@ for i = 1:numel(treatment_data)
 end
 
 %% Plotting histogram
+h = figure;
 all_data = [{control_data}, treatment_data];
 Colors = lines(length(all_data));
 for i = 1:length(all_data)
@@ -62,6 +71,7 @@ end
 ylabel(sprintf('%s', feature), "Interpreter","none",'FontSize',25);
 treatment_names = strjoin(treatmentGroups, ', ');
 title(sprintf("%s vs % s", control, treatment_names));
+figname = sprintf("%s_%s vs % s", feature, control, treatment_names);
 
 % Add legend
 legend_labels = [control, treatmentGroups];

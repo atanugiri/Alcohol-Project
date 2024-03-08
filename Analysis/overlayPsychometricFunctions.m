@@ -7,9 +7,12 @@ function overlayPsychometricFunctions(varargin)
 % input plots.
 %
 
-% varargin = {'Sal toyrat_acc_outlier_move_median.fig', 'Ghr toyrat_acc_outlier_move_median.fig', ...
-%     'Sal toystick_acc_outlier_move_median.fig', 'Ghr toystick_acc_outlier_move_median.fig', ...
-%     'Sal skewer_acc_outlier_move_median.fig', 'Ghr skewer_acc_outlier_move_median.fig'};
+varargin = {'P2L1 Saline_distance_until_limiting_time_stamp_old.fig', ...
+    'P2L1 Ghrelin_distance_until_limiting_time_stamp_old.fig', ...
+    'Sal toyrat_distance_until_limiting_time_stamp_old.fig', ...
+    'Ghr toyrat_distance_until_limiting_time_stamp_old.fig', ...
+    'Sal toystick_distance_until_limiting_time_stamp_old', ...
+    'Ghr toystick_distance_until_limiting_time_stamp_old'};
 
 % Create a new figure for the combined plot
 figFinal = figure();
@@ -17,7 +20,7 @@ set(gcf, 'Windowstyle', 'docked');
 ax = axes(figFinal);
 
 % Define a set of unique colors
-colors = flag(numel(varargin));
+colors = lines(numel(varargin));
 
 legendEntries = {}; % Initialize legend entries
 
@@ -68,5 +71,5 @@ myPath = "/Users/atanugiri/Downloads/Saline Ghrelin Project/Analysis/Fig files";
 str = varargin{1};
 startIndex = regexp(str, '_', 'once');
 filename = str(startIndex:end);
-savefig(figFinal, fullfile(myPath, sprintf('overlaidPlot%s',filename)));
+% savefig(figFinal, fullfile(myPath, sprintf('overlaidPlot%s',filename)));
 end

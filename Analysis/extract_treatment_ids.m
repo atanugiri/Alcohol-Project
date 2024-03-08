@@ -1,12 +1,16 @@
 % Author: Atanu Giri
 % Date: 01/02/2024
 
-function [BL_P2L1_id, FD_P2L1_id, initial_task_id, late_task_id] = extract_treatment_ids
+function [BL_P2L1_id, FD_P2L1_id, initial_task_id, late_task_id] = extract_treatment_ids(varargin)
 % This function extracts Baseline, Food deprivation, Initial task, and Late
 % task ids.
 
-datasource = 'live_database';
-conn = database(datasource,'postgres','1234');
+if numel(varargin) < 1
+    datasource = 'live_database';
+    conn = database(datasource,'postgres','1234');
+else
+   conn =  varargin{1};
+end
 
 dateQuery = "SELECT id, genotype, referencetime, health, tasktypedone, " + ...
     "subjectid FROM live_table ORDER BY id";

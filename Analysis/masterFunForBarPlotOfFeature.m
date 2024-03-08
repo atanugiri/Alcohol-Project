@@ -1,99 +1,170 @@
 % Author: Atanu Giri
 % Date: 12/01/2023
 
-function featureForEach = masterFunForBarPlotOfFeature(feature, varargin)
+% function featureForEach = masterFunForBarPlotOfFeature(feature, splitByGender, varargin)
 %
-% This function takes 'feature' and treatment type as input from 
-% 'ghrelin_featuretable' and returns bar plot for that feature as 
+% This function takes 'feature', splitByGender, and treatment group as input from
+% 'ghrelin_featuretable' and returns bar plot for that feature as
 % an average of all animals
 
 % Example usage
-% masterFunForBarPlotOfFeature('distance_until_limiting_time_stamp_old', 'P2L1 Baseline')
+% masterFunForBarPlotOfFeature('distance_until_limiting_time_stamp_old', ...
+% 'y', 'Alcohol bl', 'Alcohol')
 
-close all;
+feature = 'approachavoid';
+splitByGender = 'y';
+varargin = {'P2L1 Baseline','Oxy','Incubation'};
 
+% Connect to database
+datasource = 'live_database';
+conn = database(datasource,'postgres','1234');
+
+% Print all treatment groups
 fprintf("Health types:\n");
-fprintf("P2L1 Baseline, P2L1 Food deprivation, Initial task, Late task, P2L1 Saline, \n" + ...
+fprintf("P2L1 Baseline, P2L1 Food deprivation, Oxy, Incubation, \n" + ...
+    "Initial task, Late task, P2L1 Saline, \n" + ...
     "P2L1 Ghrelin, P2L1L3 Saline, P2L1L3 Ghrelin, Sal toyrat, \n" + ...
     "Ghr toyrat, Sal toystick, Ghr toystick, Sal skewer, Ghr skewer, \n" + ...
     "Combined Sal toy, Combined Ghr toy, Alcohol bl, Boost, Alcohol, \n" + ...
     "Sal alcohol, Ghr alcohol\n");
 
 if numel(varargin) >= 1
-    treatment = varargin{1};
+    treatmentGroups = cell(1, numel(varargin));
+    for i = 1:numel(varargin)
+        treatmentGroups{i} = varargin{i};
+    end
 else
-    treatment = input("Which health type do you want to analyze? ","s");
+    treatmentGroups = input("Which health type do you want for treatment? ","s");
 end
 
-id = treatmentIDfun(treatment); % Get id list
+treatmentIDs = cell(1, numel(treatmentGroups));
+for i = 1:numel(treatmentGroups)
+    treatmentIDs{i} = treatmentIDfun(treatmentGroups{i}, conn);
+end
 
 % Generate the idList from the filtered data
-idList = strjoin(arrayfun(@num2str, id, 'UniformOutput', false), ',');
-
-% Extract table corresponding to idList
-data = fetchHealthDataTable(feature, idList);
-data(isoutlier(data.distance_until_limiting_time_stamp_old),:) = [];
-
-splitByGender = input("Do you want to split by gender? ('y', 'n'): ","s");
-
-if strcmpi(splitByGender, 'n')
-    [featureForEach, avFeature, stdErr] = barPlotValues(data, feature);
-    % Plotting
-    bar(avFeature);
-    hold on;
-    errorbar(avFeature,stdErr,'LineStyle', 'none', 'LineWidth', 1.5, ...
-        'CapSize', 0, 'Color','k');
-    legend(sprintf('%s', treatment));
-
-
-elseif strcmpi(splitByGender, 'y')
-    femaleData = data(strcmpi(data.gender,"female"),:);
-    maleData = data(strcmpi(data.gender,"male"),:);
-    [featureForF, avFeatureF, stdErrF] = barPlotValues(femaleData, feature);
-    [featureForM, avFeatureM, stdErrM] = barPlotValues(maleData, feature);
-    % Plotting
-    x = [1,2];
-    figure;
-    hold on;
-    myData = [avFeatureF, avFeatureM];
-    color = ['r','b'];
-    for i = 1:length(myData)
-        h = bar(x(i), myData(i));
-        set(h,'FaceColor',color(i));
-    end
-
-    errorbar(x,[avFeatureF,avFeatureM],[stdErrF,stdErrM],'LineStyle', 'none', ...
-        'LineWidth', 1.5,'CapSize', 0, 'Color','k');
-    legend([sprintf("%s Female", "", "%s Male", "", treatment, treatment)]);
+treatmentIDs_str = cellfun(@(x) strjoin(arrayfun(@num2str, x, 'UniformOutput', ...
+    false), ','), treatmentIDs, 'UniformOutput', false);
+treatment_data = cell(1, numel(treatmentIDs_str));
+for i = 1:numel(treatmentIDs_str)
+    treatment_data{i} = fetchHealthDataTable(feature, treatmentIDs_str{i}, conn);
 end
 
-ylabel(sprintf('%s', feature), 'Interpreter','none', 'FontSize', 25);
+h = figure;
+hold on;
+
+%% Plot without splitting gender
+if strcmpi(splitByGender, 'n')
+    featureForEach = cell(1, numel(treatmentIDs));
+    avFeature = zeros(1, numel(treatmentIDs));
+    stdErr = zeros(1, numel(treatmentIDs));
+    hBars = zeros(1, numel(treatmentIDs));
+
+    for grp = 1:numel(treatmentIDs)
+        [featureForEach{grp}, avFeature(grp), stdErr(grp)] = ...
+            barPlotValues(treatment_data{grp}, feature);
+        hBars(grp) = bar(grp, avFeature(grp));
+    end
+
+    for grp = 1:numel(treatmentIDs)
+        errorbar(grp, avFeature(grp),stdErr(grp),'LineStyle', 'none', ...
+            'LineWidth', 1.5, 'CapSize', 0, 'Color','k');
+    end
+
+    legend_labels = treatmentGroups;
+    legend(hBars, legend_labels, 'Location', 'best');
+    ylabel(sprintf('%s', feature), 'Interpreter','none', 'FontSize', 25);
+
+    %% Statistics
+    if numel(varargin) >= 2
+        p_value = zeros(1, numel(treatmentIDs) - 1);
+        for grp = 2:numel(treatmentIDs)
+            [~, p_value(grp-1)] = ttest2(featureForEach{1}, featureForEach{grp});
+            text(grp, max(ylim), sprintf("p = %.4f", p_value(grp-1)));
+        end
+    end
+
+
+    %% Plot with splitting gender
+elseif strcmpi(splitByGender, 'y')
+    featureForEachMale = cell(1, numel(treatmentIDs));
+    avFeatureMale = zeros(1, numel(treatmentIDs));
+    stdErrMale = zeros(1, numel(treatmentIDs));
+    hBarsMale = zeros(1, numel(treatmentIDs));
+
+    featureForEachFemale = cell(1, numel(treatmentIDs));
+    avFeatureFemale = zeros(1, numel(treatmentIDs));
+    stdErrFemale = zeros(1, numel(treatmentIDs));
+    hBarsFemale = zeros(1, numel(treatmentIDs));
+
+    subplot(1,2,1); % For male data
+    hold on;
+    subplot(1,2,2); % For female data
+    hold on;
+
+    for grp = 1:numel(treatmentIDs)  % bar plot
+        maleData = treatment_data{grp}(strcmpi(treatment_data{grp}.gender,"male"),:);
+        [featureForEachMale{grp}, avFeatureMale(grp), stdErrMale(grp)] = ...
+            barPlotValues(maleData, feature);
+        subplot(1,2,1);
+        hBarsMale(grp) = bar(grp, avFeatureMale(grp));
+        title("Male", 'Interpreter','latex');
+        ylabel(sprintf('%s', feature), 'Interpreter','none', 'FontSize', 25);
+
+        femaleData = treatment_data{grp}(strcmpi(treatment_data{grp}.gender,"female"),:);
+        [featureForEachFemale{grp}, avFeatureFemale(grp), stdErrFemale(grp)] = ...
+            barPlotValues(femaleData, feature);
+        subplot(1,2,2);
+        hBarsFemale(grp) = bar(grp, avFeatureFemale(grp));
+        title("Female", 'Interpreter','latex');
+
+    end
+
+    for grp = 1:numel(treatmentIDs)  % errorbar plot
+        subplot(1,2,1);
+        errorbar(grp, avFeatureMale(grp),stdErrMale(grp),'LineStyle', 'none', ...
+            'LineWidth', 1.5, 'CapSize', 0, 'Color','k');
+
+        subplot(1,2,2);
+        errorbar(grp, avFeatureFemale(grp),stdErrFemale(grp),'LineStyle', 'none', ...
+            'LineWidth', 1.5, 'CapSize', 0, 'Color','k');
+    end
+
+    % Add legends
+    legend_labels = treatmentGroups;
+    legend(hBarsFemale, legend_labels, 'Location', 'best');
+
+    % Link axes to ensure the same scale
+    linkaxes([subplot(1,2,1), subplot(1,2,2)], 'y');
+
+    %% Statistics
+    if numel(varargin) >= 2
+        p_value_male = zeros(1, numel(treatmentIDs) - 1);
+        for grp = 2:numel(treatmentIDs)
+            [~, p_value_male(grp-1)] = ttest2(featureForEachMale{1}, featureForEachMale{grp});
+            subplot(1,2,1);
+            text(grp, max(ylim), sprintf("p = %.4f", p_value_male(grp-1)));
+        end
+
+        p_value_female = zeros(1, numel(treatmentIDs) - 1);
+        for grp = 2:numel(treatmentIDs)
+            [~, p_value_female(grp-1)] = ttest2(featureForEachFemale{1}, featureForEachFemale{grp});
+            subplot(1,2,2);
+            text(grp, max(ylim), sprintf("p = %.4f", p_value_female(grp-1)));
+        end
+    end
+end
+
 hold off;
 
 % Save figure
-figname = sprintf('%s_%s_bar',treatment,string(feature));
-myPath = "/Users/atanugiri/Downloads/Saline Ghrelin Project/Analysis/Fig files";
-savefig(gcf, fullfile(myPath, figname));
-
-% Save mat files for Statistics
-myStatPath = "/Users/atanugiri/Downloads/Saline Ghrelin Project/Analysis/Satistical analysis";
-% save(fullfile(myStatPath, figname), "featureForEach");
-
-
-%% Description of barPlotValues
-    function [featureForEach, avFeature, stdErr] = barPlotValues(dataTable, feature)
-        % dataTable = femaleData; % for testing
-        uniqueSubjectid = unique(dataTable.subjectid);
-        featureForEach = zeros(length(uniqueSubjectid),1);
-
-        for subject = 1:length(uniqueSubjectid)
-            featureArray = dataTable.(feature)(dataTable.subjectid == uniqueSubjectid(subject), :);
-            featureArray = featureArray(isfinite(featureArray));
-            featureForEach(subject) = sum(featureArray)/length(featureArray);
-        end
-
-        avFeature = mean(featureForEach);
-        stdErr = std(featureForEach)/sqrt(length(featureForEach));
-    end
-
+if strcmpi(splitByGender, 'n')
+    figname = sprintf('%s_%s_bar',[legend_labels{:}],string(feature));
+else
+    figname = sprintf('%s_%s_MvF_bar',[legend_labels{:}],string(feature));
 end
+
+myPath = "/Users/atanugiri/Downloads/Saline Ghrelin Project/Analysis/Fig files";
+% savefig(gcf, fullfile(myPath, figname));
+
+% end

@@ -13,7 +13,8 @@ function featureForEachSubjectId = masterPsychometricFunctionPlot(feature, varar
 close all;
 
 fprintf("Health types:\n");
-fprintf("P2L1 Baseline, P2L1 Food deprivation, Initial task, Late task, P2L1 Saline, \n" + ...
+fprintf("P2L1 Baseline, P2L1 Food deprivation, Oxy, Incubation, \n" + ...
+    "Initial task, Late task, P2L1 Saline, \n" + ...
     "P2L1 Ghrelin, P2L1L3 Saline, P2L1L3 Ghrelin, Sal toyrat, \n" + ...
     "Ghr toyrat, Sal toystick, Ghr toystick, Sal skewer, Ghr skewer, \n" + ...
     "Combined Sal toy, Combined Ghr toy, Alcohol bl, Boost, Alcohol, \n" + ...
@@ -73,33 +74,4 @@ set(gca,'xticklabel',label,'FontSize',15);
 figname = sprintf('%s_%s',treatment,string(feature));
 myPath = "/Users/atanugiri/Downloads/Saline Ghrelin Project/Analysis/Fig files";
 savefig(gcf, fullfile(myPath, figname));
-
-
-
-
-%% Description of psychometricFunValues
-    function [featureForEach, avFeature, stdErr] = psychometricFunValues(dataTable, feature)
-        uniqueSubjectid = unique(dataTable.subjectid);
-        featureForEach = zeros(length(uniqueSubjectid), 4);
-        stdErr = zeros(1,4);
-
-        for subject = 1:length(uniqueSubjectid)
-            for conc = 1:4
-                feederToFetch = 5 - conc;
-                dataFilter = dataTable.subjectid == uniqueSubjectid(subject) ...
-                    & dataTable.realFeederId == feederToFetch;
-                featureArray = dataTable.(feature)(dataFilter, :);
-                featureArray = featureArray(isfinite(featureArray));
-                featureForEach(subject, conc) = sum(featureArray)/length(featureArray);
-            end
-        end
-
-        avFeature = mean(featureForEach);
-
-        for conc = 1:4
-            stdErr(conc) = std(featureForEach(:,conc))/sqrt(length(featureForEach(:,conc)));
-        end
-
-    end % end of psychometricFunValues
-
 end % end of masterPsychometricFunctionPlot

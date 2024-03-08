@@ -6,8 +6,10 @@ function overlayBarPlots(varargin)
 % This plot combines the input bar plots.
 %
 
-varargin = {'Sal toyrat_acc_outlier_move_median.fig', 'Ghr toyrat_acc_outlier_move_median.fig', ...
-    'Sal toystick_acc_outlier_move_median.fig', 'Ghr toystick_acc_outlier_move_median.fig'};
+varargin = {'P2L1 Saline_distance_until_limiting_time_stamp_old_bar.fig', ...
+    'P2L1 Ghrelin_distance_until_limiting_time_stamp_old_bar.fig', ...
+    'Combined Sal toy_distance_until_limiting_time_stamp_old_bar.fig', ...
+    'Combined Ghr toy_distance_until_limiting_time_stamp_old_bar.fig'};
 % Check the number of input figures
 numFigures = numel(varargin);
 
@@ -30,7 +32,7 @@ barYPositiveDelta = zeros(1,numFigures);
 legendEntries = {};
 
 % Define colors for bars
-barColors = parula(numFigures);
+barColors = lines(numFigures);
 
 % Loop through each input figure
 for i = 1:numFigures
@@ -41,7 +43,7 @@ for i = 1:numFigures
     figAxChildren = get(figAx, 'Children');
 
     for j = 1:numel(figAxChildren)
-        if strcmp(figAxChildren(j).Type, 'bar')
+        if strcmpi(figAxChildren(j).Type, 'bar')
             barVal(i) = figAxChildren(j).YData(1);
 
             % Extract legend only for bars
@@ -50,7 +52,7 @@ for i = 1:numFigures
         % Plot bars with different colors
         bar(ax_combined, i, barVal(i), 'FaceColor', barColors(i, :));
 
-        if strcmp(figAxChildren(j).Type, 'errorbar')
+        if strcmpi(figAxChildren(j).Type, 'errorbar')
             barYNegativeDelta(i) = figAxChildren(j).YNegativeDelta(1);
             barYPositiveDelta(i) = figAxChildren(j).YPositiveDelta(1);
             legendEntries = [legendEntries, figAxChildren(j).DisplayName];

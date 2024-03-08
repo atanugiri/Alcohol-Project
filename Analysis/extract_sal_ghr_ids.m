@@ -1,12 +1,17 @@
 % Author: Atanu Giri
 % Date: 01/02/2024
 
-function [Sal_P2L1_id, Ghr_P2L1_id, Sal_P2L1L3_id, Ghr_P2L1L3_id] = extract_sal_ghr_ids
+function [Sal_P2L1_id, Ghr_P2L1_id, Sal_P2L1L3_id, Ghr_P2L1L3_id] = extract_sal_ghr_ids(varargin)
 % This function extracts P2L1 Saline, P2L1 Ghrelin, P2L1L3 Saline, P2L1L3
 % Ghrelin ids
 
-datasource = 'live_database';
-conn = database(datasource,'postgres','1234');
+if numel(varargin) < 1
+    datasource = 'live_database';
+    conn = database(datasource,'postgres','1234');
+else
+   conn =  varargin{1};
+end
+
 dateQuery = "SELECT id, referencetime, health, tasktypedone, subjectid FROM live_table " + ...
     "ORDER BY id";
 

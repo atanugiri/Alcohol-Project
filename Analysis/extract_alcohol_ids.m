@@ -1,8 +1,16 @@
-function [alcohol_bl_id, boost_id, alcohol_id, sal_alc_id, ghr_alc_id] = ...
-    extract_alcohol_ids
+% Author: Atanu Giri
+% Date: 02/16/2024
 
-datasource = 'live_database';
-conn = database(datasource,'postgres','1234');
+function [alcohol_bl_id, boost_id, alcohol_id, sal_alc_id, ghr_alc_id] = ...
+    extract_alcohol_ids(varargin)
+% This function extracts alcohol treatment id's
+
+if numel(varargin) < 1
+    datasource = 'live_database';
+    conn = database(datasource,'postgres','1234');
+else
+   conn =  varargin{1};
+end
 
 % Alcohol baseline
 dateQuery = "SELECT id, referencetime FROM live_table ORDER BY id";
