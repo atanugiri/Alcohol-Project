@@ -1,7 +1,7 @@
 % Author: Atanu Giri
 % date: 12/20/2023
 
-function [accOutlierMoveMedian,jerkOutlierMoveMedian] = accelerationAndJerkOulierFun(id)
+function [accOutlierMoveMedian,jerkOutlierMoveMedian, varargout] = accelerationAndJerkOulierFun(id)
 %
 % This algorithm calculates the number of outliers by analyzing subject's
 % acceleration and jerkness by movemedian method.
@@ -68,7 +68,8 @@ try
     A = sqrt(Ax.^2 + Ay.^2);
 
     % Calculate acceleration outlier
-    accOutlierMoveMedian = sum(isoutlier(A,"movmedian",5))/subject_data.distance_until_limiting_time_stamp_old;
+    accOutlierTF = isoutlier(A,"movmedian",5);
+    accOutlierMoveMedian = sum(accOutlierTF)/subject_data.distance_until_limiting_time_stamp_old;
 
     % Calculate Jerk
     Jx = diff(Ax) ./ diff(t);
@@ -80,6 +81,21 @@ try
     % Total acceleration magnitude
     J = sqrt(Jx.^2 + Jy.^2);
     jerkOutlierMoveMedian = sum(isoutlier(J,"movmedian",5))/subject_data.distance_until_limiting_time_stamp_old;
+
+    %% Plotting
+    h = figure;
+    plot(t,A,'b','LineWidth',2);
+    hold on;
+    accOutlierVal = A(accOutlierTF);
+    accOutlierTime = t(accOutlierTF);
+    scatter(accOutlierTime, accOutlierVal, 'filled','Color','r');
+    title(sprintf("id = %d", id), 'Interpreter','latex');
+    hold off;
+    xlabel('Time (s)', 'FontSize', 25, 'Interpreter', 'latex');
+    ylabel('Acceleration', 'FontSize', 25, 'Interpreter', 'latex');
+
+    varargout{1} = h;
+    varargout{2} = accOutlierTime;
 
 catch
     sprintf("An error occured for id = %d\n", id);
