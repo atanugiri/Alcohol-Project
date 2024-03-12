@@ -11,9 +11,9 @@
 % masterFunForBarPlotOfFeature('distance_until_limiting_time_stamp_old', ...
 % 'y', 'Alcohol bl', 'Alcohol')
 
-feature = 'approachavoid';
+feature = 'distance_until_limiting_time_stamp_old';
 splitByGender = 'y';
-varargin = {'P2L1 Baseline','Oxy','Incubation'};
+varargin = {'P2L1 Baseline', 'P2L1 Saline', 'P2L1L3 Saline', 'P2L1 Ghrelin','P2L1L3 Ghrelin'};
 
 % Connect to database
 datasource = 'live_database';
