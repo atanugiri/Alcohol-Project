@@ -1,6 +1,8 @@
 % Author: Atanu Giri
 % Date: 12/01/2023
 
+%% Invokes treatmentIDfun, fetchHealthDataTable, barPlotValues.
+
 % function featureForEach = masterFunForBarPlotOfFeature(feature, splitByGender, varargin)
 %
 % This function takes 'feature', splitByGender, and treatment group as input from
@@ -12,8 +14,8 @@
 % 'y', 'Alcohol bl', 'Alcohol')
 
 feature = 'distance_until_limiting_time_stamp_old';
-splitByGender = 'y';
-varargin = {'P2L1 Baseline', 'P2L1 Saline', 'P2L1L3 Saline', 'P2L1 Ghrelin','P2L1L3 Ghrelin'};
+splitByGender = 'n';
+varargin = {'P2L1 Saline', 'P2L1 Ghrelin'};
 
 % Connect to database
 datasource = 'live_database';
@@ -64,9 +66,6 @@ if strcmpi(splitByGender, 'n')
         [featureForEach{grp}, avFeature(grp), stdErr(grp)] = ...
             barPlotValues(treatment_data{grp}, feature);
         hBars(grp) = bar(grp, avFeature(grp));
-    end
-
-    for grp = 1:numel(treatmentIDs)
         errorbar(grp, avFeature(grp),stdErr(grp),'LineStyle', 'none', ...
             'LineWidth', 1.5, 'CapSize', 0, 'Color','k');
     end
@@ -102,12 +101,14 @@ elseif strcmpi(splitByGender, 'y')
     subplot(1,2,2); % For female data
     hold on;
 
-    for grp = 1:numel(treatmentIDs)  % bar plot
+    for grp = 1:numel(treatmentIDs)
         maleData = treatment_data{grp}(strcmpi(treatment_data{grp}.gender,"male"),:);
         [featureForEachMale{grp}, avFeatureMale(grp), stdErrMale(grp)] = ...
             barPlotValues(maleData, feature);
         subplot(1,2,1);
         hBarsMale(grp) = bar(grp, avFeatureMale(grp));
+        errorbar(grp, avFeatureMale(grp),stdErrMale(grp),'LineStyle', 'none', ...
+            'LineWidth', 1.5, 'CapSize', 0, 'Color','k');
         title("Male", 'Interpreter','latex');
         ylabel(sprintf('%s', feature), 'Interpreter','none', 'FontSize', 25);
 
@@ -116,18 +117,10 @@ elseif strcmpi(splitByGender, 'y')
             barPlotValues(femaleData, feature);
         subplot(1,2,2);
         hBarsFemale(grp) = bar(grp, avFeatureFemale(grp));
-        title("Female", 'Interpreter','latex');
-
-    end
-
-    for grp = 1:numel(treatmentIDs)  % errorbar plot
-        subplot(1,2,1);
-        errorbar(grp, avFeatureMale(grp),stdErrMale(grp),'LineStyle', 'none', ...
-            'LineWidth', 1.5, 'CapSize', 0, 'Color','k');
-
-        subplot(1,2,2);
         errorbar(grp, avFeatureFemale(grp),stdErrFemale(grp),'LineStyle', 'none', ...
             'LineWidth', 1.5, 'CapSize', 0, 'Color','k');
+        title("Female", 'Interpreter','latex');
+
     end
 
     % Add legends
