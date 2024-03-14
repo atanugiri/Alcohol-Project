@@ -3,7 +3,7 @@
 
 %% Invokes treatmentIDfun, fetchHealthDataTable, psychometricFunValues.
 
-% function featureForEachSubjectId = masterPsychometricFunctionPlot(feature, splitByGender, varargin)
+function featureForEach = masterPsychometricFunctionPlot(feature, splitByGender, varargin)
 %
 % This function takes 'feature' and treatment type as input from
 % 'ghrelin_featuretable' and returns psychometric plot for that feature as
@@ -12,9 +12,9 @@
 % Example usage
 % masterPsychometricFunctionPlot('distance_until_limiting_time_stamp_old','y','P2L1 Saline','P2L1 Ghrelin')
 
-feature = 'distance_until_limiting_time_stamp_old';
-splitByGender = 'y';
-varargin = {'P2L1 Saline','P2L1 Ghrelin'};
+% feature = 'distance_until_limiting_time_stamp_old';
+% splitByGender = 'y';
+% varargin = {'P2L1 Saline', 'P2L1 Ghrelin', 'P2L1L3 Saline', 'P2L1L3 Ghrelin'};
 
 % Connect to database
 datasource = 'live_database';
@@ -145,6 +145,6 @@ else
     figname = sprintf('%s_%s_MvF_psychometric',[legend_labels{:}],string(feature));
 end
 myPath = "/Users/atanugiri/Downloads/Saline Ghrelin Project/Analysis/Fig files";
-% savefig(gcf, fullfile(myPath, figname));
+savefig(gcf, fullfile(myPath, figname));
 
-% end
+end

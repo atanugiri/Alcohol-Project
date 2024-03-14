@@ -3,7 +3,7 @@
 
 %% Invokes treatmentIDfun, fetchHealthDataTable, barPlotValues.
 
-% function featureForEach = masterFunForBarPlotOfFeature(feature, splitByGender, varargin)
+function featureForEach = masterFunForBarPlotOfFeature(feature, splitByGender, varargin)
 %
 % This function takes 'feature', splitByGender, and treatment group as input from
 % 'ghrelin_featuretable' and returns bar plot for that feature as
@@ -13,9 +13,9 @@
 % masterFunForBarPlotOfFeature('distance_until_limiting_time_stamp_old', ...
 % 'y', 'Alcohol bl', 'Alcohol')
 
-feature = 'distance_until_limiting_time_stamp_old';
-splitByGender = 'n';
-varargin = {'P2L1 Saline', 'P2L1 Ghrelin'};
+% feature = 'distance_until_limiting_time_stamp_old';
+% splitByGender = 'n';
+% varargin = {'P2L1 Saline', 'P2L1 Ghrelin', 'P2L1L3 Saline', 'P2L1L3 Ghrelin'};
 
 % Connect to database
 datasource = 'live_database';
@@ -158,6 +158,6 @@ else
 end
 
 myPath = "/Users/atanugiri/Downloads/Saline Ghrelin Project/Analysis/Fig files";
-% savefig(gcf, fullfile(myPath, figname));
+savefig(gcf, fullfile(myPath, figname));
 
-% end
+end
