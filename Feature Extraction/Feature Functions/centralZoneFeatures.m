@@ -1,7 +1,7 @@
 % Author: Atanu Giri
 % Date: 11/07/2023
 
-function [passingCenter, timeInCenter, alreadyInCenter] = centralZoneFeatures(id,zoneSize)
+function [passingCenter, timeInCenter, alreadyInCenter] = centralZoneFeatures(id,zoneSize,varargin)
 %
 % This function analyzes the trajectory of the subject and determines
 % whether the subject passes through the central zone. It outputs nan if
@@ -9,9 +9,12 @@ function [passingCenter, timeInCenter, alreadyInCenter] = centralZoneFeatures(id
 %
 % id = 265219; zoneSize = 0.4;
 
-% make connection with database
-datasource = 'live_database';
-conn = database(datasource,'postgres','1234');
+if numel(varargin) < 1
+    datasource = 'live_database';
+    conn = database(datasource,'postgres','1234');
+else
+    conn =  varargin{1};
+end
 
 % write query
 liveTableQuery = sprintf("SELECT id, subjectid, trialname, referencetime, " + ...

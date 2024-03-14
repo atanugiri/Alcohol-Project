@@ -1,15 +1,19 @@
 % Author: Atanu Giri
 % date: 12/31/2023
 
-function reactionTime = reactionTimeFun(id)
+function reactionTime = reactionTimeFun(id, varargin)
 %
 % This algorithm calculates the reaction time by movemedian method.
 %
 
 % id = 265215;
 % make connection with database
-datasource = 'live_database';
-conn = database(datasource,'postgres','1234');
+if numel(varargin) < 1
+    datasource = 'live_database';
+    conn = database(datasource,'postgres','1234');
+else
+    conn =  varargin{1};
+end
 
 % write query
 query = sprintf("SELECT id, norm_t, norm_x, norm_y " + ...

@@ -1,12 +1,18 @@
 % Author: Atanu Giri
 % Date: 12/07/2023
 
-function [normT, normX, normY] = extractNormalizedCoordinate(id)
+%% Invokes coordinateNormalization
+
+function [normT, normX, normY] = extractNormalizedCoordinate(id, varargin)
 
 % id = 10988;
 
-datasource = 'live_database';
-conn = database(datasource,'postgres','1234');
+if numel(varargin) < 1
+    datasource = 'live_database';
+    conn = database(datasource,'postgres','1234');
+else
+    conn =  varargin{1};
+end
 
 % write query
 query = sprintf("SELECT id, coordinatetimes2, xcoordinates2, " + ...
@@ -33,7 +39,7 @@ try
     normT = cleanedData.t;
 
     % invoke coordinateNormalization function to normalize the coordinates
-    [normX, normY] = coordinateNormalization(cleanedData.X, cleanedData.Y, id);
+    [normX, normY] = coordinateNormalization(cleanedData.X, cleanedData.Y, id, conn);
 catch
     sprintf("An error occured for id = %d\n", id);
 end

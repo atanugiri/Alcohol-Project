@@ -1,12 +1,16 @@
 % Author: Atanu Giri
 % Date: 11/22/2023
 
-function [logicalApproach, timeInFeeder, entryTime] = logicalApproachFun(id)
+function [logicalApproach, timeInFeeder, entryTime] = logicalApproachFun(id, varargin)
 
 % id = 265227;
 % make connection with database
-datasource = 'live_database';
-conn = database(datasource,'postgres','1234');
+if numel(varargin) < 1
+    datasource = 'live_database';
+    conn = database(datasource,'postgres','1234');
+else
+    conn =  varargin{1};
+end
 
 % write query
 liveTableQuery = sprintf("SELECT id, subjectid, trialname, referencetime, " + ...

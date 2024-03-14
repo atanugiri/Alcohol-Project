@@ -22,7 +22,7 @@ tableName = 'ghrelin_featuretable';
 parfor index = 1:length(idList)
     id = idList(index);
     try
-        [normT, normX, normY] = extractNormalizedCoordinate(id);
+        [normT, normX, normY] = extractNormalizedCoordinate(id, conn);
 
         norm_t_string = sprintf('ARRAY[%s]', strjoin(cellstr(num2str(normT, '%.6f')), ','));
         norm_x_string = sprintf('ARRAY[%s]', strjoin(cellstr(num2str(normX, '%.6f')), ','));

@@ -18,7 +18,7 @@ tableName = 'ghrelin_featuretable';
 for i = 1:length(idList)
     try
         id = idList(i);
-        [distanceUntilLimitingTimeStamp,velocityUntilLimitingTimeStamp] = distanceVelocityFun(id);
+        [distanceUntilLimitingTimeStamp,velocityUntilLimitingTimeStamp] = distanceVelocityFun(id,conn);
 
         % Convert NaN values to NULL
         distanceUntilLimitingTimeStamp = handleNaN(distanceUntilLimitingTimeStamp);

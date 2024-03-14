@@ -17,7 +17,7 @@ for index = 1:length(idList)
     id = idList(index);
     try
         [rotationPts_method1, rotationPts_method2, rotationPts_method3, ...
-            rotationPts_method4] = rotationPtFun(id);
+            rotationPts_method4] = rotationPtFun(id, conn);
         % Convert NaN values to NULL
         rotationPts_method1 = handleNaN(rotationPts_method1);
         rotationPts_method2 = handleNaN(rotationPts_method2);

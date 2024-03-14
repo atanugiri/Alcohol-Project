@@ -10,7 +10,7 @@ centralZoneEdges(mazeIndex,zoneSize,feeder,feederSize)
 %
 % mazeIndex = 1; feeder = 4; zoneSize = 0.4;
 if nargin < 4
-        feederSize = 0.25; % Default value if not provided
+    feederSize = 0.25; % Default value if not provided
 end
 
 switch mazeIndex

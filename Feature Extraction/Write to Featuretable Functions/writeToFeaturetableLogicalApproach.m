@@ -26,7 +26,7 @@ tableName = 'ghrelin_featuretable';
 for index = 1:length(idList)
     id = idList(index);
     try
-        [logicalApproach, timeInFeeder, entryTime] = logicalApproachFun(id);
+        [logicalApproach, timeInFeeder, entryTime] = logicalApproachFun(id, conn);
 
         % Convert NaN values to NULL
         logicalApproach = handleNaN(logicalApproach);

@@ -5,11 +5,16 @@
 % to remove the outlier/bad data of all the trials on the date.
 % The clean data is used as reference to normalize the data for plotting trajectory
 
-function [xCleaned,yCleaned] = cleanedDataOnDate(id)
+function [xCleaned,yCleaned] = cleanedDataOnDate(id, varargin)
 % id = 94461;
 
-datasource = 'live_database';
-conn = database(datasource,'postgres','1234'); % Comment out for using this function in loop
+if numel(varargin) < 1
+    datasource = 'live_database';
+    conn = database(datasource,'postgres','1234');
+else
+    conn =  varargin{1};
+end
+
 dateQuery = sprintf("SELECT referencetime FROM live_table WHERE id = %d;", id);
 subjectData = fetch(conn,dateQuery);
 
@@ -29,8 +34,6 @@ dataOnDateQuery = sprintf("SELECT id, mazenumber, tasktypedone, xcoordinates2, "
     "REPLACE(tasktypedone, ' ', '') ILIKE REPLACE('%s', ' ', '')", ...
     currentDate, string(taskTypeDone.tasktypedone));
 dataOnDate = fetch(conn,dataOnDateQuery);
-% close(conn); % Comment out for using in loop
-
 
 % Accessing PGArray data as double
 dataOnDate.xcoordinates2 = transformPgarray(dataOnDate.xcoordinates2);
@@ -70,7 +73,7 @@ xInMaze{4} = xInMaze{4}(coordinate4Filter); yInMaze{4} = yInMaze{4}(coordinate4F
 xCleaned = cell(1,4);
 yCleaned = cell(1,4);
 
-% populate clean x and y ordiantes for each maze using loop
+% populate clean x and y coordiantes for each maze using loop
 for maze = 1:4
     xOriginal = xInMaze{maze};
     yOriginal = yInMaze{maze};

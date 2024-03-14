@@ -2,13 +2,17 @@
 % Date: 12/25/2023
 
 function [stoppingPts_method1, stoppingPts_method2, stoppingPts_method3, stoppingPts_method4, ...
-    stoppingPts_method5, stoppingPts_method6] = stoppingPtsFun(id)
+    stoppingPts_method5, stoppingPts_method6] = stoppingPtsFun(id, varargin)
 % This function returns the total stoptime in trajectory
 
 % id = 265215;
 % make connection with database
-datasource = 'live_database';
-conn = database(datasource,'postgres','1234');
+if numel(varargin) < 1
+    datasource = 'live_database';
+    conn = database(datasource,'postgres','1234');
+else
+    conn =  varargin{1};
+end
 
 % write query
 query = sprintf("SELECT id, distance_until_limiting_time_stamp_old, norm_t, norm_x, norm_y " + ...

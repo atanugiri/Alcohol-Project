@@ -3,10 +3,19 @@
 % This function takes raw x,y coordinates and id as input and
 % normalizes it with respect to the cleanedDataOnDate.
 
-function [xNormalized, yNormalized] = coordinateNormalization(xCoordinate, yCoordinate, id)
+%% Invokes cleanedDataOnDate
+
+function [xNormalized, yNormalized] = coordinateNormalization(xCoordinate, yCoordinate, id, varargin)
 % loadFile = load('xyData.mat');
 % xCoordinate = loadFile.x; yCoordinate = loadFile.y;
 % id = 265406;
+
+if numel(varargin) < 1
+    datasource = 'live_database';
+    conn = database(datasource,'postgres','1234');
+else
+    conn =  varargin{1};
+end
 
 % remove nan entries
 badDataWithTone = table(xCoordinate,yCoordinate,'VariableNames',{'X','Y'});
@@ -14,7 +23,7 @@ validIdx = all(isfinite(badDataWithTone{:,:}),2);
 cleanedData = badDataWithTone(validIdx,:);
 
 % call cleanedDataOnDate to normalize the data for plotting trajectory
-[xCleanedByYAxis,yCleanedByYAxis] = cleanedDataOnDate(id);
+[xCleanedByYAxis,yCleanedByYAxis] = cleanedDataOnDate(id, conn);
 
 % normalize the coordinates between 0 and 1
 quadrant1Flag = cleanedData.X >= 0 & cleanedData.Y >= 0;

@@ -16,7 +16,7 @@ tableName = 'ghrelin_featuretable';
 for index = 1:length(idList)
     id = idList(index);
     try
-        reactionTime = reactionTimeFun(id);
+        reactionTime = reactionTimeFun(id, conn);
         % Convert NaN values to NULL
         reactionTime = handleNaN(reactionTime);
 

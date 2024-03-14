@@ -3,11 +3,15 @@
 % This function returns the total total number of rotation pts in trajectory
 
 function [rotationPts_method1, rotationPts_method2, rotationPts_method3, ...
-    rotationPts_method4] = rotationPtFun(id)
+    rotationPts_method4] = rotationPtFun(id, varargin)
 % id = 265215;
 % make connection with database
-datasource = 'live_database';
-conn = database(datasource,'postgres','1234');
+if numel(varargin) < 1
+    datasource = 'live_database';
+    conn = database(datasource,'postgres','1234');
+else
+    conn =  varargin{1};
+end
 
 % write query
 query = sprintf("SELECT id, playstarttrialtone, coordinatetimes2, " + ...

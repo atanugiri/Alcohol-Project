@@ -16,7 +16,7 @@ tableName = 'ghrelin_featuretable';
 for index = 1:length(idList)
     id = idList(index);
     try
-        [accOutlierMoveMedian,jerkOutlierMoveMedian] = accelerationAndJerkOulierFun(id);
+        [accOutlierMoveMedian,jerkOutlierMoveMedian] = accelerationAndJerkOulierFun(id, conn);
 
         % Convert NaN values to NULL
         accOutlierMoveMedian = handleNaN(accOutlierMoveMedian);

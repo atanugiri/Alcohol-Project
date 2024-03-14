@@ -17,7 +17,7 @@ for index = 1:length(idList)
     id = idList(index);
     try
         [stoppingPts_method1, stoppingPts_method2, stoppingPts_method3, stoppingPts_method4, ...
-            stoppingPts_method5, stoppingPts_method6] = stoppingPtsFun(id);
+            stoppingPts_method5, stoppingPts_method6] = stoppingPtsFun(id, conn);
 
         % Convert NaN values to NULL
         stoppingPts_method1 = handleNaN(stoppingPts_method1);

@@ -24,7 +24,7 @@ tableName = 'ghrelin_featuretable';
 for i = 1:length(idList)
     try
         id = idList(i);
-        [passingCenter, timeInCenter, alreadyInCenter] = centralZoneFeatures(id,0.4);
+        [passingCenter, timeInCenter, alreadyInCenter] = centralZoneFeatures(id,0.4,conn);
 
         % Convert NaN values to NULL
         passingCenter = handleNaN(passingCenter);

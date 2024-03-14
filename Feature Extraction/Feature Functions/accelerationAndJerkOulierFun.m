@@ -1,7 +1,7 @@
 % Author: Atanu Giri
 % date: 12/20/2023
 
-function [accOutlierMoveMedian,jerkOutlierMoveMedian, varargout] = accelerationAndJerkOulierFun(id)
+function [accOutlierMoveMedian,jerkOutlierMoveMedian, varargout] = accelerationAndJerkOulierFun(id, varargin)
 %
 % This algorithm calculates the number of outliers by analyzing subject's
 % acceleration and jerkness by movemedian method.
@@ -9,9 +9,14 @@ function [accOutlierMoveMedian,jerkOutlierMoveMedian, varargout] = accelerationA
 close all; clc;
 
 % id = 265302;
-% make connection with database
-datasource = 'live_database';
-conn = database(datasource,'postgres','1234');
+
+if numel(varargin) < 1
+    datasource = 'live_database';
+    conn = database(datasource,'postgres','1234');
+else
+    conn =  varargin{1};
+end
+
 
 % write query
 query = sprintf("SELECT id, distance_until_limiting_time_stamp_old, norm_t, norm_x, norm_y " + ...
