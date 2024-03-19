@@ -18,7 +18,7 @@ query = sprintf("SELECT id, playstarttrialtone, coordinatetimes2, " + ...
     "truedirection FROM live_table WHERE id = %d;", id); %id
 subject_data = fetch(conn,query);
 
-featureTableQuery = sprintf("SELECT id, distance_until_limiting_time_stamp_old " + ...
+featureTableQuery = sprintf("SELECT id, distance_until_limiting_time_stamp " + ...
     "FROM ghrelin_featuretable WHERE id = %d", id);
 featureTableData = fetch(conn, featureTableQuery);
 
@@ -30,8 +30,8 @@ try
     if isnan(subject_data.playstarttrialtone)
         subject_data.playstarttrialtone = 2;
     end
-    subject_data.distance_until_limiting_time_stamp_old = str2double( ...
-    subject_data.distance_until_limiting_time_stamp_old);
+    subject_data.distance_until_limiting_time_stamp = str2double( ...
+    subject_data.distance_until_limiting_time_stamp);
 
     % Accessing PGArray data as double
     for column = size(subject_data,2) - 1:size(subject_data,2)
@@ -74,7 +74,7 @@ try
             end
         end
         [labeledBulb, rotationPt] = bwlabel(bulbIndexes{method});
-        rotationPts(method) = rotationPt/subject_data.distance_until_limiting_time_stamp_old;
+        rotationPts(method) = rotationPt/subject_data.distance_until_limiting_time_stamp;
     end
 
     rotationPts_method1 = rotationPts(1);

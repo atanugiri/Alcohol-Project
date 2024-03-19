@@ -3,7 +3,7 @@
 
 function [logicalApproach, timeInFeeder, entryTime] = logicalApproachFun(id, varargin)
 
-% id = 265227;
+% id = 281303;
 % make connection with database
 if numel(varargin) < 1
     datasource = 'live_database';

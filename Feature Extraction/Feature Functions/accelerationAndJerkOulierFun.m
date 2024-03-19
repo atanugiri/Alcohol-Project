@@ -19,7 +19,7 @@ end
 
 
 % write query
-query = sprintf("SELECT id, distance_until_limiting_time_stamp_old, norm_t, norm_x, norm_y " + ...
+query = sprintf("SELECT id, distance_until_limiting_time_stamp, norm_t, norm_x, norm_y " + ...
     "FROM ghrelin_featuretable WHERE id = %d", id);
 subject_data = fetch(conn,query);
 
@@ -34,7 +34,7 @@ try
     if isnan(subject_data.playstarttrialtone)
         subject_data.playstarttrialtone = 2;
     end
-    subject_data.distance_until_limiting_time_stamp_old = str2double(subject_data.distance_until_limiting_time_stamp_old);
+    subject_data.distance_until_limiting_time_stamp = str2double(subject_data.distance_until_limiting_time_stamp);
     % Accessing PGArray data as double
     for column = size(subject_data,2) - 2:size(subject_data,2)
         stringAllRows = string(subject_data.(column));
@@ -74,7 +74,7 @@ try
 
     % Calculate acceleration outlier
     accOutlierTF = isoutlier(A,"movmedian",5);
-    accOutlierMoveMedian = sum(accOutlierTF)/subject_data.distance_until_limiting_time_stamp_old;
+    accOutlierMoveMedian = sum(accOutlierTF)/subject_data.distance_until_limiting_time_stamp;
 
     % Calculate Jerk
     Jx = diff(Ax) ./ diff(t);
@@ -85,7 +85,7 @@ try
 
     % Total acceleration magnitude
     J = sqrt(Jx.^2 + Jy.^2);
-    jerkOutlierMoveMedian = sum(isoutlier(J,"movmedian",5))/subject_data.distance_until_limiting_time_stamp_old;
+    jerkOutlierMoveMedian = sum(isoutlier(J,"movmedian",5))/subject_data.distance_until_limiting_time_stamp;
 
     %% Plotting
     h = figure;
