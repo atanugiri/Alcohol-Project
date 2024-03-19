@@ -8,7 +8,7 @@ centralZoneEdges(mazeIndex,zoneSize,feeder,feederSize)
 % place. It returns the edges of the central zone and reaward feeder 
 % according to the input size.
 %
-% mazeIndex = 1; feeder = 4; zoneSize = 0.4;
+% mazeIndex = 4; zoneSize = 0.5; feeder = 1; feederSize = 0.25;
 if nargin < 4
     feederSize = 0.25; % Default value if not provided
 end
