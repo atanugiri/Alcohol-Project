@@ -3,19 +3,21 @@
 
 %% Invokes treatmentIDfun, fetchHealthDataTable, barPlotValues.
 
-function featureForEach = masterFunForBarPlotOfFeature(feature, splitByGender, varargin)
+function varargout = masterFunForBarPlotOfFeature(feature, splitByGender, varargin)
 %
 % This function takes 'feature', splitByGender, and treatment group as input from
 % 'ghrelin_featuretable' and returns bar plot for that feature as
 % an average of all animals
 
 % Example usage
-% masterFunForBarPlotOfFeature('distance_until_limiting_time_stamp_old', ...
+% masterFunForBarPlotOfFeature('distance_until_limiting_time_stamp', ...
 % 'y', 'Alcohol bl', 'Alcohol')
 
-% feature = 'distance_until_limiting_time_stamp_old';
-% splitByGender = 'n';
-% varargin = {'P2L1 Saline', 'P2L1 Ghrelin', 'P2L1L3 Saline', 'P2L1L3 Ghrelin'};
+feature = 'approachavoid';
+splitByGender = 'n';
+varargin = {'P2L1L3 Saline'};
+
+close all;
 
 % Connect to database
 datasource = 'live_database';
@@ -83,6 +85,9 @@ if strcmpi(splitByGender, 'n')
         end
     end
 
+    % Output for statistics
+    varargout{1} = featureForEach;
+
 
     %% Plot with splitting gender
 elseif strcmpi(splitByGender, 'y')
@@ -146,6 +151,10 @@ elseif strcmpi(splitByGender, 'y')
             text(grp, max(ylim), sprintf("p = %.4f", p_value_female(grp-1)));
         end
     end
+
+    % Output for statistics
+    varargout{1} = featureForEachMale;
+    varargout{2} = featureForEachFemale;
 end
 
 hold off;
@@ -157,7 +166,15 @@ else
     figname = sprintf('%s_%s_MvF_bar',[legend_labels{:}],string(feature));
 end
 
-myPath = "/Users/atanugiri/Downloads/Saline Ghrelin Project/Analysis/Fig files";
+% Figure name
+scriptDir = fileparts(mfilename('fullpath'));
+folderName = 'Fig files';
+myPath = fullfile(scriptDir, folderName);
+% Check if the folder exists, if not, create it
+if ~exist(myPath, 'dir')
+    mkdir(myPath);
+end
+
 savefig(gcf, fullfile(myPath, figname));
 
 end

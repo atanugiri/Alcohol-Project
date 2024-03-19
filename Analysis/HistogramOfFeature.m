@@ -43,7 +43,7 @@ treatmentIDs_str = cellfun(@(x) strjoin(arrayfun(@num2str, x, 'UniformOutput', .
 
 control_data = fetchHealthDataTable(feature, controlID);
 % if ~strcmpi(feature,'approachavoid')
-%     saline_toy_data(isoutlier(saline_toy_data.distance_until_limiting_time_stamp_old),:) = [];
+%     saline_toy_data(isoutlier(saline_toy_data.distance_until_limiting_time_stamp),:) = [];
 % end
 
 treatment_data = cell(1, numel(treatmentIDs_str));

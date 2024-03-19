@@ -21,7 +21,7 @@ liveTableQuery = sprintf("SELECT id, subjectid, referencetime, gender, feeder, "
 liveTableData = fetch(conn, liveTableQuery);
 
 if ~strcmpi(feature,'approachavoid')
-    featureQuery = sprintf("SELECT id, distance_until_limiting_time_stamp_old, %s " + ...
+    featureQuery = sprintf("SELECT id, distance_until_limiting_time_stamp, %s " + ...
         "FROM ghrelin_featuretable WHERE id IN (%s) ORDER BY id", feature, idList);
     featureData = fetch(conn, featureQuery);
 end
@@ -42,9 +42,9 @@ mergedTable.health = string(mergedTable.health);
 mergedTable.trialcontrolsettings = string(mergedTable.trialcontrolsettings);
 mergedTable.tasktypedone = string(mergedTable.tasktypedone);
 if ~strcmpi(feature,'approachavoid')
-    mergedTable.distance_until_limiting_time_stamp_old = str2double(mergedTable.distance_until_limiting_time_stamp_old);
+    mergedTable.distance_until_limiting_time_stamp = str2double(mergedTable.distance_until_limiting_time_stamp);
 end
-if ~strcmpi(feature, 'distance_until_limiting_time_stamp_old')
+if ~strcmpi(feature, 'distance_until_limiting_time_stamp')
     mergedTable.(feature) = str2double(mergedTable.(feature));
 end
 mergedTable.realFeederId = nan(height(mergedTable),1);

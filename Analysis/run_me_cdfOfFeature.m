@@ -4,7 +4,7 @@
 fig_directory = '/Users/atanugiri/Downloads/Saline Ghrelin Project/Analysis/Fig files/';
 
 %%
-[h, figname] = cdfOfFeature('distance_until_limiting_time_stamp_old', ...
+[h, figname] = cdfOfFeature('distance_until_limiting_time_stamp', ...
     'Alcohol BL', 'Alcohol', 'Boost');
 savefig(h, fullfile(fig_directory, sprintf('%s.fig',figname)));
 close(h);
@@ -30,7 +30,7 @@ savefig(h, fullfile(fig_directory, sprintf('%s.fig',figname)));
 close(h);
 
 %%
-[h, figname] = cdfOfFeature('distance_until_limiting_time_stamp_old', ...
+[h, figname] = cdfOfFeature('distance_until_limiting_time_stamp', ...
     'P2L1 Saline', 'P2L1 Ghrelin', 'Alcohol');
 savefig(h, fullfile(fig_directory, sprintf('%s.fig',figname)));
 close(h);
@@ -56,7 +56,7 @@ savefig(h, fullfile(fig_directory, sprintf('%s.fig',figname)));
 close(h);
 
 %% 
-[h, figname] = cdfOfFeature('distance_until_limiting_time_stamp_old', ...
+[h, figname] = cdfOfFeature('distance_until_limiting_time_stamp', ...
     'P2L1 Saline', 'Alcohol', 'Sal alcohol');
 savefig(h, fullfile(fig_directory, sprintf('%s.fig',figname)));
 close(h);
@@ -82,7 +82,7 @@ savefig(h, fullfile(fig_directory, sprintf('%s.fig',figname)));
 close(h);
 
 %% 
-[h, figname] = cdfOfFeature('distance_until_limiting_time_stamp_old', ...
+[h, figname] = cdfOfFeature('distance_until_limiting_time_stamp', ...
     'P2L1 Ghrelin', 'Alcohol', 'Ghr alcohol', 'Alcohol bl', 'Boost');
 savefig(h, fullfile(fig_directory, sprintf('%s.fig',figname)));
 close(h);
@@ -108,7 +108,7 @@ savefig(h, fullfile(fig_directory, sprintf('%s.fig',figname)));
 close(h);
 
 %% 
-[h, figname] = cdfOfFeatureByGender('distance_until_limiting_time_stamp_old', ...
+[h, figname] = cdfOfFeatureByGender('distance_until_limiting_time_stamp', ...
     'P2L1 Ghrelin', 'Alcohol', 'Ghr alcohol', 'Alcohol bl', 'Boost');
 savefig(h, fullfile(fig_directory, sprintf('%s.fig',figname)));
 close(h);

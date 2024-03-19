@@ -3,18 +3,20 @@
 
 %% Invokes treatmentIDfun, fetchHealthDataTable, psychometricFunValues.
 
-function featureForEach = masterPsychometricFunctionPlot(feature, splitByGender, varargin)
+function varargout = masterPsychometricFunctionPlot(feature, splitByGender, varargin)
 %
 % This function takes 'feature' and treatment type as input from
 % 'ghrelin_featuretable' and returns psychometric plot for that feature as
 % an average of all animals
 
 % Example usage
-% masterPsychometricFunctionPlot('distance_until_limiting_time_stamp_old','y','P2L1 Saline','P2L1 Ghrelin')
+% masterPsychometricFunctionPlot('distance_until_limiting_time_stamp','y','P2L1 Saline','P2L1 Ghrelin')
 
-% feature = 'distance_until_limiting_time_stamp_old';
+% feature = 'distance_until_limiting_time_stamp';
 % splitByGender = 'y';
-% varargin = {'P2L1 Saline', 'P2L1 Ghrelin', 'P2L1L3 Saline', 'P2L1L3 Ghrelin'};
+% varargin = {'Alcohol bl','P2L1 Ghrelin','Alcohol','Ghr alcohol'};
+
+close all;
 
 % Connect to database
 datasource = 'live_database';
@@ -54,6 +56,7 @@ end
 x = 1:4;
 figure;
 hold on;
+Colors = parula(numel(treatmentIDs));
 
 %% Plot without splitting gender
 if strcmpi(splitByGender, 'n')
@@ -65,10 +68,8 @@ if strcmpi(splitByGender, 'n')
     for grp = 1:numel(treatmentIDs)
         [featureForEach{grp}, avFeature{grp}, stdErr{grp}] = ...
             psychometricFunValues(treatment_data{grp}, feature);
-        hLines(grp) = plot(x, avFeature{grp}, 'LineWidth', 2);
-    end
+        hLines(grp) = plot(x, avFeature{grp}, 'LineWidth', 2, 'Color', Colors(grp,:));
 
-    for grp = 1:numel(treatmentIDs)
         errorbar(x, avFeature{grp},stdErr{grp},'LineStyle', 'none', ...
             'LineWidth', 1.5, 'Color','k');
     end
@@ -80,6 +81,9 @@ if strcmpi(splitByGender, 'n')
     xticks(1:4);
     label = {'0.5','2','5','9'};
     set(gca,'xticklabel',label,'FontSize',15);
+
+    % Output for statistics
+    varargout{1} = featureForEach;
 
     %% Plot with splitting gender
 elseif strcmpi(splitByGender, 'y')
@@ -103,7 +107,7 @@ elseif strcmpi(splitByGender, 'y')
         [featureForEachMale{grp}, avFeatureMale{grp}, stdErrMale{grp}] = ...
             psychometricFunValues(maleData, feature);
         subplot(1,2,1);
-        hLinesMale(grp) = plot(x, avFeatureMale{grp}, 'LineWidth', 2);
+        hLinesMale(grp) = plot(x, avFeatureMale{grp}, 'LineWidth', 2, 'Color', Colors(grp,:));
         errorbar(x, avFeatureMale{grp},stdErrMale{grp},'LineStyle', 'none', ...
             'LineWidth', 1.5, 'Color','k');
         title("Male", 'Interpreter','latex', 'FontSize', 25);
@@ -113,7 +117,7 @@ elseif strcmpi(splitByGender, 'y')
         [featureForEachFemale{grp}, avFeatureFemale{grp}, stdErrFemale{grp}] = ...
             psychometricFunValues(femaleData, feature);
         subplot(1,2,2);
-        hLinesFemale(grp) = plot(x, avFeatureFemale{grp}, 'LineWidth', 2);
+        hLinesFemale(grp) = plot(x, avFeatureFemale{grp}, 'LineWidth', 2, 'Color', Colors(grp,:));
         errorbar(x, avFeatureFemale{grp},stdErrFemale{grp},'LineStyle', 'none', ...
             'LineWidth', 1.5, 'Color','k');
         title("Female", 'Interpreter','latex','FontSize',25);
@@ -134,17 +138,30 @@ elseif strcmpi(splitByGender, 'y')
     % Link axes to ensure the same scale
     linkaxes([subplot(1,2,1), subplot(1,2,2)], 'y');
 
+    % Output for statistics
+    varargout{1} = featureForEachMale;
+    varargout{2} = featureForEachFemale;
+
 end
 
 hold off;
 
-% Save figure
+% Figure name
 if strcmpi(splitByGender, 'n')
     figname = sprintf('%s_%s_psychometric',[legend_labels{:}],string(feature));
 else
     figname = sprintf('%s_%s_MvF_psychometric',[legend_labels{:}],string(feature));
 end
-myPath = "/Users/atanugiri/Downloads/Saline Ghrelin Project/Analysis/Fig files";
+
+% Save figure
+scriptDir = fileparts(mfilename('fullpath'));
+folderName = 'Fig files';
+myPath = fullfile(scriptDir, folderName);
+% Check if the folder exists, if not, create it
+if ~exist(myPath, 'dir')
+    mkdir(myPath);
+end
+
 savefig(gcf, fullfile(myPath, figname));
 
 end
