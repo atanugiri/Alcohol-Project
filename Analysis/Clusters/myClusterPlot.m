@@ -38,7 +38,7 @@ for grp = 1:numel(varargin)
                 allRsq{grp} = [allRsq{grp}; currentAnimalData(session).goodness];
             end
         end % end of 1st session
-    end % end of 1st animal group
+    end % end of 1st animal
 
 end % end of 1st treatment group
 
@@ -47,7 +47,9 @@ figure(1);
 Colors = parula(numel(varargin));
 
 for grp = 1:numel(varargin)
-    plot3(allA{grp}, allB{grp}, allC{grp}, 'o', 'color', Colors(grp,:));
+    plot3(allA{grp}, allB{grp}, allC{grp}, 'o','MarkerFaceColor', Colors(grp,:), ...
+        'MarkerEdgeColor', Colors(grp,:));
+    legend(varargin, 'Interpreter','none');
     hold on;
 end
 
@@ -85,19 +87,17 @@ myBarPlot(allRsq, 'R^2');
 %% Description of histOfParam
     function histOfParam(paramArray, paramName, currentBW)
         for idx = 1:numel(varargin)
-            %             subplot(1,3,idx);
             h(idx) = histogram(paramArray{idx}, 'Normalization','pdf','FaceAlpha',0.7, ...
                 'BinWidth', currentBW, 'FaceColor', Colors(idx,:));
             hold on;
         end
 
         hold off;
-%         linkaxes([subplot(1,3,1), subplot(1,3,2), subplot(1,3,3)], 'y');
         title(sprintf('Histogram of %s', paramName), 'Interpreter','latex','FontSize',25);
         legend(h, varargin, 'Interpreter','none','Location','best');
         xlabel('value','Interpreter','latex');
         ylabel('probability density','Interpreter','latex');
-        figname = sprintf('param_%s_hist_%s', paramName, [varargin{:}]);
+        figname = sprintf('%s_hist_%s', paramName, [varargin{:}]);
         savefig(gcf, fullfile(myPath, figname));
         close(gcf);
     end
@@ -120,7 +120,7 @@ myBarPlot(allRsq, 'R^2');
         hold off;
         title(sprintf('Bar plot of %s', paramName), 'Interpreter','latex','FontSize',25);
         legend(h, varargin, 'Interpreter', 'none', 'Location', 'best');
-        figname = sprintf('param_%s_barplot_%s', paramName, [varargin{:}]);
+        figname = sprintf('%s_barplot_%s', paramName, [varargin{:}]);
         savefig(gcf, fullfile(myPath, figname));
         close(gcf);
     end

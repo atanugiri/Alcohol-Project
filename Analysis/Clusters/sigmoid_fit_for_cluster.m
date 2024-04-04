@@ -3,8 +3,7 @@
 
 function [h, fitIndex, varargout] = sigmoid_fit_for_cluster(y)
 
-% loadFile = load("featureList.mat");
-% y = loadFile.featureList;
+% y = [0, 0, 0, 0];
 
 % Define the sigmoid function
 fitobject1 = @(params, x) params(1)*x + params(2); % Line fit
@@ -54,7 +53,7 @@ for fitIdx = 1:length(fitobjects)
 end
 
 %% Extract output
-if gof(2) >= 0.4
+if 1 > 0 % gof(2) >= 0.4
     fitIndex = 2;
     a = fit_params{2}(1);
     b = fit_params{2}(2);
