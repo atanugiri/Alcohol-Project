@@ -13,24 +13,15 @@ function varargout = masterFunForBarPlotOfFeature(feature, splitByGender, vararg
 % masterFunForBarPlotOfFeature('distance_until_limiting_time_stamp', ...
 % 'y', 'Alcohol bl', 'Alcohol')
 
-feature = 'approachavoid';
-splitByGender = 'n';
-varargin = {'P2L1L3 Saline'};
+% feature = 'approachavoid';
+% splitByGender = 'n';
+% varargin = {'P2L1L3 Saline'};
 
 close all;
 
 % Connect to database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
-
-% Print all treatment groups
-fprintf("Health types:\n");
-fprintf("P2L1 Baseline, P2L1 Food deprivation, Oxy, Incubation, \n" + ...
-    "Initial task, Late task, P2L1 Saline, \n" + ...
-    "P2L1 Ghrelin, P2L1L3 Saline, P2L1L3 Ghrelin, Sal toyrat, \n" + ...
-    "Ghr toyrat, Sal toystick, Ghr toystick, Sal skewer, Ghr skewer, \n" + ...
-    "Combined Sal toy, Combined Ghr toy, Alcohol bl, Boost, Alcohol, \n" + ...
-    "Sal alcohol, Ghr alcohol\n");
 
 if numel(varargin) >= 1
     treatmentGroups = cell(1, numel(varargin));

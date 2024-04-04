@@ -34,6 +34,6 @@ concFemale = repelem(1:4, (size(controlFemale, 1) + size(controlFemale, 1)), 1);
 anovaTableFemale = cell2table(tbl_female);
 
 % Print text
-sprintf("Male control vs treatment = %.4e\n", p_male)
-sprintf("Male control vs treatment = %.4e\n", p_female)
+fprintf('Male control vs treatment = %.4e\n', p_male(1));
+fprintf('Female control vs treatment = %.4e\n', p_female(1));
 
