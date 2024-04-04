@@ -19,8 +19,6 @@ fitobject3 = @(params, x) params(1)*(x-params(2)).^2 + params(3); % Parabola fit
 fitobjects = cell(1,3);
 fitobjects{1} = fitobject1;
 fitobjects{2} = fitobject2;
-% fitobjects{3} = fitobject3;
-% fitobjects{4} = fitobject4;
 fitobjects{3} = fitobject3;
 
 % Create x data as equally spaced integers from 1 to the number of elements in y
@@ -44,15 +42,15 @@ for fitIdx = 1:length(fitobjects)
 
     fit_params{fitIdx} = lsqcurvefit(fitobjects{fitIdx}, initial_guess{fitIdx}, x, y, lb, ub);
 
-     % Compute the fitted values using the sigmoid function and the fitted parameters
-     y_fit = fitobjects{fitIdx}(fit_params{fitIdx}, x);
-     % Compute the total sum of squares (TSS) and residual sum of squares (RSS)
-     y_mean = mean(y);
-     TSS = sum((y - y_mean).^2);
-     RSS = sum((y - y_fit).^2);
-     R_squared = 1 - (RSS / TSS);
+    % Compute the fitted values using the sigmoid function and the fitted parameters
+    y_fit = fitobjects{fitIdx}(fit_params{fitIdx}, x);
+    % Compute the total sum of squares (TSS) and residual sum of squares (RSS)
+    y_mean = mean(y);
+    TSS = sum((y - y_mean).^2);
+    RSS = sum((y - y_fit).^2);
+    R_squared = 1 - (RSS / TSS);
 
-     gof(fitIdx) = R_squared;
+    gof(fitIdx) = R_squared;
 end
 
 %% Extract output
