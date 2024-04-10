@@ -2,6 +2,7 @@
 *.mat
 *.png
 *.fig
+*.pdf
 .DS_Store
 Literature/ search\
 Analysis/.DS_Store
