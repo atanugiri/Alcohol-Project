@@ -1,13 +1,15 @@
 % Author: Atanu Giri
 % Date: 03/24/2024
-
-%% Invokes treatmentIDfun, fetchHealthDataTable, psychometricFunValues,
-%% sigmoid_fit_for_cluster
-
-function individualPsychometricPlotOverlay(feature, splitByGender, varargin)
-
+%
+% This function takes feature, splitByGender, and treatment group name/s as
+% input and overlays the psychometric function plots per session.
+%
 % Example usage:
 % individualPsychometricPlotOverlay("approachavoid", 'n', "P2L1 Ghrelin")
+
+%% Invokes treatmentIDfun, fetchHealthDataTable, psychometricFunValues
+
+function individualPsychometricPlotOverlay(feature, splitByGender, varargin)
 
 % feature = 'approachavoid';
 % splitByGender = 'y';

@@ -1,14 +1,18 @@
 % Author: Atanu Giri
 % Date: 03/19/2024
+%
+% This function takes 'feature', splitByGender and treatment group/s as 
+% input from and returns CDF plot for that feature as an average 
+% of all animals
+%
+% Example usage
+% masterCDFplot('distance_until_limiting_time_stamp','y','P2L1 Saline','P2L1 Ghrelin')
 
 function masterCDFplot(feature, splitByGender, varargin)
 
 % feature = 'distance_until_limiting_time_stamp';
 % splitByGender = 'y';
 % varargin = {'Alcohol bl','P2L1 Ghrelin','Alcohol','Ghr alcohol'};
-
-% Example usage
-% masterCDFplot('distance_until_limiting_time_stamp','y','P2L1 Saline','P2L1 Ghrelin')
 
 % Connect to database
 datasource = 'live_database';

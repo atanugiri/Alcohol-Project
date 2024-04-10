@@ -1,16 +1,16 @@
 % Author: Atanu Giri
 % Date: 12/04/2023
+%
+% This function takes 'feature', splitByGender and treatment group/s as 
+% input from and returns psychometric plot for that feature as an average 
+% of all animals
+%
+% Example usage
+% masterPsychometricFunctionPlot('distance_until_limiting_time_stamp','y','P2L1 Saline','P2L1 Ghrelin')
 
 %% Invokes treatmentIDfun, fetchHealthDataTable, psychometricFunValues.
 
 function varargout = masterPsychometricFunctionPlot(feature, splitByGender, varargin)
-%
-% This function takes 'feature' and treatment type as input from
-% 'ghrelin_featuretable' and returns psychometric plot for that feature as
-% an average of all animals
-
-% Example usage
-% masterPsychometricFunctionPlot('distance_until_limiting_time_stamp','y','P2L1 Saline','P2L1 Ghrelin')
 
 % feature = 'distance_until_limiting_time_stamp';
 % splitByGender = 'y';

@@ -1,8 +1,11 @@
 % Author: Atanu Giri
 % Date: 03/17/2024
-
+%
 % This function makes bar plot of a feature at a user specified
 % concentration
+%
+% Example usage:
+% barPlotOfFeatureAtSpecificConcentration('approachavoid','y',4,'P2L1 Boost')
 
 %% Invokes masterPsychometricFunctionPlot
 
