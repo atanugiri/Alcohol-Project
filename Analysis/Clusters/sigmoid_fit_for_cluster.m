@@ -1,5 +1,9 @@
 % Author: Atanu Giri
 % Date: 02/16/2024
+%
+% This function fits the response data from a session with desired fit 
+% model and extracts fitting parameters.
+%
 
 function [h, fitIndex, varargout] = sigmoid_fit_for_cluster(y)
 
@@ -7,11 +11,7 @@ function [h, fitIndex, varargout] = sigmoid_fit_for_cluster(y)
 
 % Define the sigmoid function
 fitobject1 = @(params, x) params(1)*x + params(2); % Line fit
-% fitobject2 = @(b,c,x) 1./(1 + b*exp(-c*x)); % 2 param sigmoid fit
-% fitobject3 = @(a,b,c,x) a./(1 + b*exp(-c*x)); % Sigmoid fit
-% fitobject4 = @(a,b,c,d,x) a./(1 + b*(exp(-c*(x-d)))); % 4 param sigmoid fit
-
-fitobject2 = @(params, x) params(1) ./ (1 + exp(-params(2) * (x - params(3)))); % 3 param sigmoid fit
+fitobject2 = @(params, x) params(1) ./ (1 + exp(-params(2) * (x - params(3)))); % logistic fit
 fitobject3 = @(params, x) params(1)*(x-params(2)).^2 + params(3); % Parabola fit
 
 % Store fitobjects in an array
@@ -82,7 +82,7 @@ end
 
 %% Plot the psychometric curve and the fitted sigmoid function
 x_values = linspace(min(x), max(x), 1000);
-if gof(2) >= 0.4
+if 1 > 0 % gof(2) >= 0.4
     y_fit = fitobjects{2}(fit_params{2}, x_values);
 
 elseif gof(1) >= gof(3)
