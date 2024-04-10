@@ -1,7 +1,9 @@
 % Author: Atanu Giri
 % Date: 11/19/2022
+%
 % This function generates plots of trajectory when id is provided. The plot
 % is normalized for uniform representation of all trials.
+%
 
 %% This function call mazeMethods functions.
 
