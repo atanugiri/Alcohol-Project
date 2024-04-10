@@ -3,8 +3,7 @@
 *.png
 *.fig
 .DS_Store
-"Ghrelin Plots\"
-"Saline Plots\"
+Literature/ search\
 Analysis/.DS_Store
 Analysis/Fig\ files/
 "Literature search\"
