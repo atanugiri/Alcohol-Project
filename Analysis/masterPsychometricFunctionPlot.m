@@ -69,6 +69,7 @@ if strcmpi(splitByGender, 'n')
     legend_labels = treatmentGroups;
     legend(hLines, legend_labels, 'Location', 'best');
     ylabel(sprintf('%s', feature), 'Interpreter','none', 'FontSize', 25);
+    xlabel('Sucrose conc.', 'Interpreter','none', 'FontSize', 25);
 
     xticks(1:4);
     label = {'0.5','2','5','9'};
@@ -104,6 +105,7 @@ elseif strcmpi(splitByGender, 'y')
             'LineWidth', 1.5, 'Color','k');
         title("Male", 'Interpreter','latex', 'FontSize', 25);
         ylabel(sprintf('%s', feature), 'Interpreter','none');
+        xlabel('Sucrose conc.', 'Interpreter','none', 'FontSize', 25);
 
         femaleData = treatment_data{grp}(strcmpi(treatment_data{grp}.gender,"female"),:);
         [featureForEachFemale{grp}, avFeatureFemale{grp}, stdErrFemale{grp}] = ...
@@ -113,6 +115,7 @@ elseif strcmpi(splitByGender, 'y')
         errorbar(x, avFeatureFemale{grp},stdErrFemale{grp},'LineStyle', 'none', ...
             'LineWidth', 1.5, 'Color','k');
         title("Female", 'Interpreter','latex','FontSize',25);
+        xlabel('Sucrose conc.', 'Interpreter','none', 'FontSize', 25);
 
     end
 

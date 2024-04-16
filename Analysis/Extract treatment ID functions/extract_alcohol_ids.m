@@ -59,6 +59,13 @@ alcohol_L1_male_Q = "SELECT id, health, genotype, tasktypedone, referencetime, "
     "AND REPLACE(tasktypedone, ' ', '') = 'P2L1' ORDER BY id";
 alcohol_L1_male_Data = fetch(conn, alcohol_L1_male_Q);
 
+% Remove bad data based on video
+aladdinFilter = string(alcohol_L1_male_Data.subjectid) == 'aladdin' & ...
+    contains(string(alcohol_L1_male_Data.referencetime), '11/03/2022');
+jimiFilter = string(alcohol_L1_male_Data.subjectid) == 'jimi' & ...
+    contains(string(alcohol_L1_male_Data.referencetime), '11/03/2022');
+alcohol_L1_male_Data(aladdinFilter | jimiFilter,:) = [];
+
 alcohol_L1_female_Q = "SELECT id, health, genotype, tasktypedone, referencetime, " + ...
     "subjectid, gender, notes FROM live_table WHERE (referencetime " + ...
     "LIKE '%11/03/2022%' OR referencetime LIKE '%11/08/2022%' OR " + ...
@@ -70,6 +77,11 @@ alcohol_L1_female_Q = "SELECT id, health, genotype, tasktypedone, referencetime,
     "AND REPLACE(tasktypedone, ' ', '') = 'P2L1' ORDER BY id";
 
 alcohol_L1_female_Data = fetch(conn, alcohol_L1_female_Q);
+% Remove bad data based on video
+fionaFilter = string(alcohol_L1_female_Data.subjectid) == 'fiona' & ...
+    contains(string(alcohol_L1_female_Data.referencetime), '11/08/2022');
+alcohol_L1_female_Data(fionaFilter, :) = [];
+
 alcohol_L1_Data = vertcat(alcohol_L1_male_Data, alcohol_L1_female_Data);
 
 alcohol_L1_id = alcohol_L1_Data.id;
