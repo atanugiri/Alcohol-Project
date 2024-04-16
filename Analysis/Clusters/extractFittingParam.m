@@ -8,7 +8,7 @@ function extractFittingParam(treatment, feature, varargin)
 
 % Example usage extractFittingParam("P2L1 Ghrelin", "approachavoid")
 
-% treatment = 'P2L1 Ghrelin';
+% treatment = 'P2L1 Ghr Alcohol';
 % feature = 'approachavoid';
 
 % Connect to database
@@ -19,8 +19,14 @@ treatmentID = treatmentIDfun(treatment, conn);
 treatmentID = strjoin(arrayfun(@num2str, treatmentID, 'UniformOutput', false), ',');
 treatment_data = fetchHealthDataTable(feature, treatmentID, conn);
 
+fitType = 2; % Change fitType here
+
 % File where the fitting results (.mat) and fit plot (pdf) will be saved
-fileName = sprintf("%s_%s_fitting_param", treatment, feature);
+if fitType == 1
+    fileName = sprintf("%s_%s_logistic3_fitting_param", treatment, feature);
+elseif fitType == 2
+    fileName = sprintf("%s_%s_logistic4_fitting_param", treatment, feature);
+end
 
 scriptDir = fileparts(mfilename('fullpath'));
 folderName = 'Mat files';
@@ -50,26 +56,42 @@ for animal = 1:length(animalList)
     % Create a structure to store data for each animal
     animalFitData = struct('animal', cell(1, length(sessionList)), ...
         'date', cell(1, length(sessionList)), ...
-        'fitIndex', cell(1, length(sessionList)), ...
         'a', cell(1, length(sessionList)), ...
         'b', cell(1, length(sessionList)), ...
         'c', cell(1, length(sessionList)), ...
+        'd', cell(1, length(sessionList)), ...
         'goodness', cell(1, length(sessionList)));
 
     for session = 1:length(sessionList)
         sessionData = animalData(animalData.referencetime == sessionList(session),:);
         [featureList, ~, ~] = psychometricFunValues(sessionData, feature);
+%         fprintf('%.2f, ', featureList);
+%         fprintf('\n');
+
         % Check for NaN values in y
         if any(isnan(featureList))
             disp('Skipping iteration due to NaN values in y.');
             continue; % Skip the current iteration
+
+        elseif any(isempty(featureList))
+            disp('Skipping iteration due to empty values in y.');
+            continue;
         end
 
         % Fitting
-        [h, fitIndex, a, b, c, goodness] = sigmoid_fit_for_cluster(featureList);
-        title(sprintf(['Animal: %s, Session: %s, Fittype: %d\na = %.3f, ' ...
-            'b = %.3f, c = %.3f\nR^2 = %.3f'], ...
-            animalList(animal), sessionList(session), fitIndex, a, b, c, goodness));
+        if fitType == 1
+            [h, a, b, c, goodness] = sigmoid_fit_for_cluster(featureList, 1);
+            title(sprintf(['Animal: %s, Session: %s, Fittype: 3-param logistic\na = %.3f, ' ...
+                'b = %.3f, c = %.3f\nR^2 = %.3f'], ...
+                animalList(animal), sessionList(session), a, b, c, goodness));
+            d = NaN;
+        elseif fitType == 2
+            [h, a, b, c, d, goodness] = sigmoid_fit_for_cluster(featureList, 2);
+            title(sprintf(['Animal: %s, Session: %s, Fittype: 4-param logistic\na = %.3f, ' ...
+                'b = %.3f, c = %.3f, d = %.3f\nR^2 = %.3f'], ...
+                animalList(animal), sessionList(session), a, b, c, d, goodness));
+        end
+
 
         % Save plots
         figFolderName = "Fig files";
@@ -93,10 +115,10 @@ for animal = 1:length(animalList)
         % Store the values in the structure
         animalFitData(session).animal = animalList(animal);
         animalFitData(session).date = sessionList(session);
-        animalFitData(session).fitIndex = fitIndex;
         animalFitData(session).a = a;
         animalFitData(session).b = b;
         animalFitData(session).c = c;
+        animalFitData(session).d = d;
         animalFitData(session).goodness = goodness;
     end % end of 1st session
 
