@@ -1,15 +1,19 @@
 % Author: Atanu Giri
 % Date: 02/15/2024
+%
+% Example usage:
+% extractFittingParam("P2L1 Ghrelin", "approachavoid", 1)
+%
+% fitType 1 = 3-param logistic fit, fitType 2 = 4-param logistic fit
+% fitType 3 = Brain and Cousens fit, fitType 4 = linear combinations of
+% 3-param sigmoids
+%
+% Invokes treatmentIDfun, fetchHealthDataTable, psychometricFunValues,
+% sigmoid_fit_for_cluster
+%
+function extractFittingParam(treatment, feature, fitType)
 
-%% Invokes treatmentIDfun, fetchHealthDataTable, psychometricFunValues, 
-%% sigmoid_fit_for_cluster
-
-function extractFittingParam(treatment, feature, varargin)
-
-% Example usage extractFittingParam("P2L1 Ghrelin", "approachavoid")
-
-% treatment = 'P2L1 Ghr Alcohol';
-% feature = 'approachavoid';
+% treatment = 'P2L1 Boost'; feature = 'approachavoid'; fitType = 1;
 
 % Connect to database
 datasource = 'live_database';
@@ -19,13 +23,15 @@ treatmentID = treatmentIDfun(treatment, conn);
 treatmentID = strjoin(arrayfun(@num2str, treatmentID, 'UniformOutput', false), ',');
 treatment_data = fetchHealthDataTable(feature, treatmentID, conn);
 
-fitType = 2; % Change fitType here
-
 % File where the fitting results (.mat) and fit plot (pdf) will be saved
 if fitType == 1
     fileName = sprintf("%s_%s_logistic3_fitting_param", treatment, feature);
 elseif fitType == 2
     fileName = sprintf("%s_%s_logistic4_fitting_param", treatment, feature);
+elseif fitType == 3
+    fileName = sprintf("%s_%s_BC_fitting_param", treatment, feature);
+elseif fitType == 4
+    fileName = sprintf("%s_%s_LC_fitting_param", treatment, feature);
 end
 
 scriptDir = fileparts(mfilename('fullpath'));
@@ -36,37 +42,17 @@ if ~exist(myPath, 'dir')
     mkdir(myPath);
 end
 
-% Get fit values
-trtmntFitData = extractFitData(treatment_data, feature);
-
-% Save for further analysis
-save(fullfile(myPath, sprintf("%s.mat", fileName)), "trtmntFitData");
-
-
-%% Description of extractFitData
-function fitData = extractFitData(dataTable, feature, varargin)
-
-animalList = unique(dataTable.subjectid);
-fitData = cell(1, length(animalList));
+animalList = unique(treatment_data.subjectid);
 
 for animal = 1:length(animalList)
-    animalData = dataTable(dataTable.subjectid == animalList(animal),:);
+    animalData = treatment_data(treatment_data.subjectid == animalList(animal),:);
     sessionList = unique(animalData.referencetime);
-
-    % Create a structure to store data for each animal
-    animalFitData = struct('animal', cell(1, length(sessionList)), ...
-        'date', cell(1, length(sessionList)), ...
-        'a', cell(1, length(sessionList)), ...
-        'b', cell(1, length(sessionList)), ...
-        'c', cell(1, length(sessionList)), ...
-        'd', cell(1, length(sessionList)), ...
-        'goodness', cell(1, length(sessionList)));
 
     for session = 1:length(sessionList)
         sessionData = animalData(animalData.referencetime == sessionList(session),:);
         [featureList, ~, ~] = psychometricFunValues(sessionData, feature);
-%         fprintf('%.2f, ', featureList);
-%         fprintf('\n');
+        %         fprintf('%.2f, ', featureList);
+        %         fprintf('\n');
 
         % Check for NaN values in y
         if any(isnan(featureList))
@@ -79,18 +65,14 @@ for animal = 1:length(animalList)
         end
 
         % Fitting
-        if fitType == 1
-            [h, a, b, c, goodness] = sigmoid_fit_for_cluster(featureList, 1);
-            title(sprintf(['Animal: %s, Session: %s, Fittype: 3-param logistic\na = %.3f, ' ...
-                'b = %.3f, c = %.3f\nR^2 = %.3f'], ...
-                animalList(animal), sessionList(session), a, b, c, goodness));
-            d = NaN;
-        elseif fitType == 2
-            [h, a, b, c, d, goodness] = sigmoid_fit_for_cluster(featureList, 2);
-            title(sprintf(['Animal: %s, Session: %s, Fittype: 4-param logistic\na = %.3f, ' ...
-                'b = %.3f, c = %.3f, d = %.3f\nR^2 = %.3f'], ...
-                animalList(animal), sessionList(session), a, b, c, d, goodness));
-        end
+        [h, fit_params, R_squared] = sigmoid_fit_for_cluster(featureList, fitType);
+
+        title([sprintf('Animal: %s, Session: %s\nR^2 = %.3f\n', ...
+            animalList(animal), sessionList(session), R_squared), ...
+            sprintf('%.3f, ', fit_params)]);
+
+        trtmntFitData{animal, session} = struct('Animal', animalList(animal), ...
+            'Date', sessionList(session), 'fit_params', fit_params, 'R_squared', R_squared);
 
 
         % Save plots
@@ -102,7 +84,7 @@ for animal = 1:length(animalList)
         end
 
         pdf_file = fullfile(myPdfPath, sprintf("%s.pdf", fileName));
-        
+
         % Save the figure to a PDF file with a separate page for each figure
         if animal == 1 && session == 1
             exportgraphics(h, pdf_file, 'ContentType', 'vector');
@@ -111,21 +93,12 @@ for animal = 1:length(animalList)
         end
 
         close(h);
-       
-        % Store the values in the structure
-        animalFitData(session).animal = animalList(animal);
-        animalFitData(session).date = sessionList(session);
-        animalFitData(session).a = a;
-        animalFitData(session).b = b;
-        animalFitData(session).c = c;
-        animalFitData(session).d = d;
-        animalFitData(session).goodness = goodness;
+
     end % end of 1st session
 
-    % Save the structure for the current animal
-    fitData{animal} = animalFitData;
 end % end of 1st animal
 
-end
+% Save the trtmntFitData variable to a MAT file
+save(fullfile(myPath, sprintf("%s.mat", fileName)), "trtmntFitData");
 
 end
