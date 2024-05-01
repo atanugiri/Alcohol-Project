@@ -29,25 +29,6 @@ alc_bl_Data = fetch(conn, alc_bl_Q);
 alcohol_bl_id = alc_bl_Data.id;
 
 
-% % Alcohol
-% dateQuery = "SELECT id, referencetime FROM live_table ORDER BY id";
-% allDates = fetch(conn, dateQuery);
-% allDates.referencetime = datetime(allDates.referencetime, 'Format', 'MM/dd/yyyy');
-% startDate = datetime('11/02/2022', 'InputFormat', 'MM/dd/yyyy');
-% endDate = datetime('12/01/2022', 'InputFormat', 'MM/dd/yyyy');
-% endDate = endDate + days(1);
-% 
-% dataInRange = allDates(allDates.referencetime >= startDate & allDates.referencetime <= endDate, :);
-% idList = dataInRange.id;
-% idList = strjoin(arrayfun(@num2str, idList, 'UniformOutput', false), ',');
-
-% alcohol_Q = sprintf("SELECT id, health, genotype, tasktypedone, referencetime, " + ...
-%     "subjectid, gender FROM live_table WHERE id IN (%s) " + ...
-%     "AND genotype = 'lg_etoh' " + ...
-%     "AND UPPER(subjectid) <> UPPER('none') ORDER BY id;", idList);
-% alcohol_Data = fetch(conn, alcohol_Q);
-% alcohol_id = alcohol_Data.id;
-
 %% Alcohol L1
 alcohol_L1_male_Q = "SELECT id, health, genotype, tasktypedone, referencetime, " + ...
     "subjectid, gender, notes FROM live_table WHERE (referencetime " + ...

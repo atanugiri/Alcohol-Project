@@ -1,7 +1,8 @@
 % Author: Atanu Giri
 % Date: 01/02/2024
 
-function [BL_P2L1_id, FD_P2L1_id, initial_task_id, late_task_id] = extract_treatment_ids(varargin)
+function [BL_P2L1_id, BL_P2L1L3_id, FD_P2L1_id, initial_task_id, late_task_id] ...
+= extract_treatment_ids(varargin)
 % This function extracts Baseline, Food deprivation, Initial task, and Late
 % task ids.
 
@@ -42,6 +43,14 @@ BL_dates = dataInRange.referencetime >= BL_start_date & ...
 BL_P2L1_data = dataInRange(BL_genotype_filter & BL_health_filter & ...
     P2L1_task_filter & BL_dates, :);
 BL_P2L1_id = BL_P2L1_data.id;
+
+% BL_P2L1L3_id
+BL_P2L1L3_Q = "SELECT id, health, genotype, tasktypedone, referencetime, " + ...
+    "subjectid, gender, notes FROM live_table WHERE genotype = 'CRL: Long Evans' AND " + ...
+    "health = 'N/A' AND REPLACE(tasktypedone, ' ', '') = 'P2L1L3' AND " + ...
+    "UPPER(subjectid) <> UPPER('none') ORDER BY id";
+BL_P2L1L3_data = fetch(conn, BL_P2L1L3_Q);
+BL_P2L1L3_id = BL_P2L1L3_data.id;
 
 % FD_P2L1_id
 FD_health_filter = strcmpi(strrep(dataInRange.health, ' ',''), ...

@@ -12,33 +12,39 @@ end
 
 % Print all health groups
 fprintf("Health groups:\n");
-fprintf("P2L1 Baseline, P2L1 Food deprivation, Initial task, Late task, Oxy, Incubation, \n" + ...
+fprintf("P2L1 Baseline, P2L1L3 Baseline, P2L1 Food deprivation, Initial task, Late task, \n " + ...
+    "Oxy, Incubation, \n" + ...
     "P2L1 Saline, P2L1 Ghrelin, P2L1L3 Saline, P2L1L3 Ghrelin, \n" + ...
     "Sal toyrat, Ghr toyrat, Sal toystick, Ghr toystick, Sal skewer, Ghr skewer, \n" + ...
     "Combined Sal toy, Combined Ghr toy, " + ...
     "P2L1 Boost, P2L1L3 Boost, P2A Boost, \n" + ...
     "Alcohol bl, P2L1 Alcohol, P2L1L3 Alcohol, P2A Alcohol, \n" + ...
+    "P2L1 Boost and alcohol, P2L1L3 Boost and alcohol, P2A Boost and alcohol, \n" + ...
     "P2L1 Sal alcohol, P2L1L3 Sal alcohol, P2A Sal alcohol, \n" + ...
-    "P2L1 Ghr alcohol, P2L1L3 Ghr alcohol, P2A Ghr alcohol\n" + ...
+    "P2L1 Sal alc and sal boost, P2L1L3 Sal alc and sal boost, P2A Sal alc and sal boost, \n" + ...
+    "P2L1 Ghr alcohol, P2L1L3 Ghr alcohol, P2A Ghr alcohol, \n" + ...
+    "P2L1 Ghr alc and ghr boost, P2L1L3 Ghr alc and ghr boost, P2A Ghr alc and ghr boost, \n" + ...
     "Sal repeat, Ghr repeat\n");
 
-% Output from extract_treatment_ids function
+%% Output from extract_treatment_ids function
 if strcmpi(treatment, "P2L1 Baseline")
-    [id, ~, ~, ~] = extract_treatment_ids(conn);
+    [id, ~, ~, ~, ~] = extract_treatment_ids(conn);
+elseif strcmpi(treatment, "P2L1L3 Baseline")
+    [~, id, ~, ~, ~] = extract_treatment_ids(conn);
 elseif strcmpi(treatment, "P2L1 Food deprivation")
-    [~, id, ~, ~] = extract_treatment_ids(conn);
+    [~, ~, id, ~, ~] = extract_treatment_ids(conn);
 elseif strcmpi(treatment, "Initial task")
-    [~, ~, id, ~] = extract_treatment_ids(conn);
+    [~, ~, ~, id, ~] = extract_treatment_ids(conn);
 elseif strcmpi(treatment, "Late task")
-    [~, ~, ~, id] = extract_treatment_ids(conn);
+    [~, ~, ~, ~, id] = extract_treatment_ids(conn);
 
-    % Output from getOxyIncubIds function
+    %% Output from getOxyIncubIds function
 elseif strcmpi(treatment, "Oxy")
     [id, ~] = getOxyIncubIds(conn);
 elseif strcmpi(treatment, "Incubation")
     [~, id] = getOxyIncubIds(conn);
 
-    % Output from extract_sal_ghr_ids function
+    %% Output from extract_sal_ghr_ids function
 elseif strcmpi(treatment, "P2L1 Saline")
     [id, ~, ~, ~] = extract_sal_ghr_ids(conn);
 elseif strcmpi(treatment, "P2L1 Ghrelin")
@@ -48,7 +54,7 @@ elseif strcmpi(treatment, "P2L1L3 Saline")
 elseif strcmpi(treatment, "P2L1L3 Ghrelin")
     [~, ~, ~, id] = extract_sal_ghr_ids(conn);
 
-    % Output from extract_toy_expt_ids function
+    %% Output from extract_toy_expt_ids function
 elseif strcmpi(treatment, "Sal toyrat")
     [id, ~, ~, ~, ~, ~] = extract_toy_expt_ids(conn);
 elseif strcmpi(treatment, "Ghr toyrat")
@@ -72,7 +78,7 @@ elseif strcmpi(treatment,"Combined Ghr toy")
     [~, ~, ~, ghr_toystick_id, ~, ~] = extract_toy_expt_ids(conn);
     id = vertcat(ghr_toyrat_id, ghr_toystick_id);
 
-    % Output from extract_boost_ids function
+    %% Output from extract_boost_ids function
 elseif strcmpi(treatment, "P2L1 Boost")
     [id, ~, ~] = extract_boost_ids(conn);
 elseif strcmpi(treatment, "P2L1L3 Boost")
@@ -80,7 +86,7 @@ elseif strcmpi(treatment, "P2L1L3 Boost")
 elseif strcmpi(treatment, "P2A Boost")
     [~, ~, id] = extract_boost_ids(conn);
 
-    % Output from extract_alcohol_ids function
+    %% Output from extract_alcohol_ids function
 elseif strcmpi(treatment, "Alcohol bl")
     [id, ~, ~, ~] = extract_alcohol_ids(conn);
 elseif strcmpi(treatment, "P2L1 Alcohol")
@@ -90,23 +96,43 @@ elseif strcmpi(treatment, "P2L1L3 Alcohol")
 elseif strcmpi(treatment, "P2A Alcohol")
     [~, ~, ~, id] = extract_alcohol_ids(conn);
 
-    % Output from extract_sal_alcohol_ids function
+    %% Output from extract_combined_boost_alcohol_ids function
+elseif strcmpi(treatment, "P2L1 Boost and alcohol")
+    [id, ~, ~] = extract_combined_boost_alcohol_ids(conn);
+elseif strcmpi(treatment, "P2L1L3 Boost and alcohol")
+    [~, id, ~] = extract_combined_boost_alcohol_ids(conn);
+elseif strcmpi(treatment, "P2A Boost and alcohol")
+    [~, ~, id] = extract_combined_boost_alcohol_ids(conn);
+
+    %% Output from extract_sal_alcohol_ids function
 elseif strcmpi(treatment, "P2L1 Sal alcohol")
-    [id, ~, ~] = extract_sal_alcohol_ids(conn);
+    [id, ~, ~, ~, ~, ~] = extract_sal_alcohol_ids(conn);
 elseif strcmpi(treatment, "P2L1L3 Sal alcohol")
-    [~, id, ~] = extract_sal_alcohol_ids(conn);
+    [~, id, ~, ~, ~, ~] = extract_sal_alcohol_ids(conn);
 elseif strcmpi(treatment, "P2A Sal alcohol")
-    [~, ~, id] = extract_sal_alcohol_ids(conn);
+    [~, ~, id, ~, ~, ~] = extract_sal_alcohol_ids(conn);
+elseif strcmpi(treatment, "P2L1 Sal alc and sal boost")
+    [~, ~, ~, id, ~, ~] = extract_sal_alcohol_ids(conn);
+elseif strcmpi(treatment, "P2L1L3 Sal alc and sal boost")
+    [~, ~, ~, ~, id, ~] = extract_sal_alcohol_ids(conn);
+elseif strcmpi(treatment, "P2A Sal alc and sal boost")
+    [~, ~, ~, ~, ~, id] = extract_sal_alcohol_ids(conn);
 
-    % Output from extract_ghr_alcohol_ids function
+    %% Output from extract_ghr_alcohol_ids function
 elseif strcmpi(treatment, "P2L1 Ghr alcohol")
-    [id, ~, ~] = extract_ghr_alcohol_ids(conn);
+    [id, ~, ~, ~, ~, ~] = extract_ghr_alcohol_ids(conn);
 elseif strcmpi(treatment, "P2L1L3 Ghr alcohol")
-    [~, id, ~] = extract_ghr_alcohol_ids(conn);
+    [~, id, ~, ~, ~, ~] = extract_ghr_alcohol_ids(conn);
 elseif strcmpi(treatment, "P2A Ghr alcohol")
-    [~, ~, id] = extract_ghr_alcohol_ids(conn);
+    [~, ~, id, ~, ~, ~] = extract_ghr_alcohol_ids(conn);
+elseif strcmpi(treatment, "P2L1 Ghr alc and ghr boost")
+    [~, ~, ~, id, ~, ~] = extract_ghr_alcohol_ids(conn);
+elseif strcmpi(treatment, "P2L1L3 Ghr alc and ghr boost")
+    [~, ~, ~, ~, id, ~] = extract_ghr_alcohol_ids(conn);
+elseif strcmpi(treatment, "P2A Ghr alc and ghr boost")
+    [~, ~, ~, ~, ~, id] = extract_ghr_alcohol_ids(conn);
 
-    % Output from extract_new_sal_ghr_ids function
+    %% Output from extract_new_sal_ghr_ids function
 elseif strcmpi(treatment, "Sal repeat")
     [id, ~] = extract_new_sal_ghr_ids(conn);
 elseif strcmpi(treatment, "Ghr repeat")
