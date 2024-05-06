@@ -1,6 +1,8 @@
 % Author: Atanu Giri
 % Date: 03/21/2024
-
+%
+% Extracts ids for alcohol for different task types.
+%
 function [alcohol_bl_id, alcohol_L1_id, alcohol_L1L3_id, alcohol_P2A_id] = ...
     extract_alcohol_ids(varargin)
 
@@ -8,7 +10,7 @@ if numel(varargin) < 1
     datasource = 'live_database';
     conn = database(datasource,'postgres','1234');
 else
-   conn =  varargin{1};
+    conn =  varargin{1};
 end
 
 %% Alcohol baseline
@@ -68,34 +70,40 @@ alcohol_L1_Data = vertcat(alcohol_L1_male_Data, alcohol_L1_female_Data);
 alcohol_L1_id = alcohol_L1_Data.id;
 
 % Data summary
-printTableSummary(alcohol_L1_Data);
+if numel(varargin) <= 1 % To supress output using 'noPrint' 
+    printTableSummary(alcohol_L1_Data);
+end
 
 
 %% Alcohol L1L3 [Matched exactly with dates provided]
 alcohol_L1L3_Q = "SELECT id, health, genotype, tasktypedone, referencetime, " + ...
-"subjectid, gender, notes FROM live_table " + ...
-"WHERE UPPER(subjectid) <> UPPER('none') " + ...
-"AND genotype = 'lg_etoh' AND health = 'N/A' " + ...
-"AND REPLACE(tasktypedone, ' ', '') = 'P2L1L3' ORDER BY id";
+    "subjectid, gender, notes FROM live_table " + ...
+    "WHERE UPPER(subjectid) <> UPPER('none') " + ...
+    "AND genotype = 'lg_etoh' AND health = 'N/A' " + ...
+    "AND REPLACE(tasktypedone, ' ', '') = 'P2L1L3' ORDER BY id";
 
 alcohol_L1L3_Data = fetch(conn, alcohol_L1L3_Q);
 alcohol_L1L3_id = alcohol_L1L3_Data.id;
 
 % Data summary
-printTableSummary(alcohol_L1L3_Data);
+if numel(varargin) <= 1 % To supress output using 'noPrint' 
+    printTableSummary(alcohol_L1L3_Data);
+end
 
 
 %% Alcohol P2A
 alcohol_P2A_Q = "SELECT id, health, genotype, tasktypedone, referencetime, " + ...
-"subjectid, gender, notes FROM live_table " + ...
-"WHERE UPPER(subjectid) <> UPPER('none') " + ...
-"AND genotype = 'lg_etoh' AND health = 'N/A' " + ...
-"AND REPLACE(tasktypedone, ' ', '') = 'P2A' ORDER BY id";
+    "subjectid, gender, notes FROM live_table " + ...
+    "WHERE UPPER(subjectid) <> UPPER('none') " + ...
+    "AND genotype = 'lg_etoh' AND health = 'N/A' " + ...
+    "AND REPLACE(tasktypedone, ' ', '') = 'P2A' ORDER BY id";
 
 alcohol_P2A_Data = fetch(conn, alcohol_P2A_Q);
 alcohol_P2A_id = alcohol_P2A_Data.id;
 
 % Data summary
-printTableSummary(alcohol_P2A_Data);
+if numel(varargin) <= 1 % To supress output using 'noPrint' 
+    printTableSummary(alcohol_P2A_Data);
+end
 
 end

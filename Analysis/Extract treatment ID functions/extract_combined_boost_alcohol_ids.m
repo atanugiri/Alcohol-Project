@@ -12,31 +12,37 @@ else
 end
 
 %% Combined Boost Alcohol L1
-[boost_L1_id, ~, ~] = extract_boost_ids(conn);
-[~, alcohol_L1_id, ~, ~] = extract_alcohol_ids(conn);
+[boost_L1_id, ~, ~] = extract_boost_ids(conn, 'noPrint');
+[~, alcohol_L1_id, ~, ~] = extract_alcohol_ids(conn, 'noPrint');
 boost_alcohol_L1_id = vertcat(boost_L1_id, alcohol_L1_id);
 
 % Data summary
 boost_alcohol_L1_data = dataSummary(boost_alcohol_L1_id);
-printTableSummary(boost_alcohol_L1_data);
+if numel(varargin) <= 1 % To supress output using 'noPrint' 
+    printTableSummary(boost_alcohol_L1_data);
+end
 
 %% Combined Boost Alcohol L1L3
-[~, boost_L1L3_id, ~] = extract_boost_ids(conn);
-[~, ~, alcohol_L1L3_id, ~] = extract_alcohol_ids(conn);
+[~, boost_L1L3_id, ~] = extract_boost_ids(conn, 'noPrint');
+[~, ~, alcohol_L1L3_id, ~] = extract_alcohol_ids(conn, 'noPrint');
 boost_alcohol_L1L3_id = vertcat(boost_L1L3_id, alcohol_L1L3_id);
 
 % Data summary
 boost_alcohol_L1L3_data = dataSummary(boost_alcohol_L1L3_id);
-printTableSummary(boost_alcohol_L1L3_data);
+if numel(varargin) <= 1 % To supress output using 'noPrint' 
+    printTableSummary(boost_alcohol_L1L3_data);
+end
 
 %% Combined Boost Alcohol P2A
-[~, ~, boost_P2A_id] = extract_boost_ids(conn);
-[~, ~, ~, alcohol_P2A_id] = extract_alcohol_ids(conn);
+[~, ~, boost_P2A_id] = extract_boost_ids(conn, 'noPrint');
+[~, ~, ~, alcohol_P2A_id] = extract_alcohol_ids(conn, 'noPrint');
 boost_alcohol_P2A_id = vertcat(boost_P2A_id, alcohol_P2A_id);
 
 % Data summary
 boost_alcohol_P2A_data = dataSummary(boost_alcohol_P2A_id);
-printTableSummary(boost_alcohol_P2A_data);
+if numel(varargin) <= 1 % To supress output using 'noPrint' 
+    printTableSummary(boost_alcohol_P2A_data);
+end
 
 
 

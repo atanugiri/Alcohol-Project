@@ -17,8 +17,10 @@ fprintf("P2L1 Baseline, P2L1L3 Baseline, P2L1 Food deprivation, Initial task, La
     "P2L1 Saline, P2L1 Ghrelin, P2L1L3 Saline, P2L1L3 Ghrelin, \n" + ...
     "Sal toyrat, Ghr toyrat, Sal toystick, Ghr toystick, Sal skewer, Ghr skewer, \n" + ...
     "Combined Sal toy, Combined Ghr toy, " + ...
+    "P2L1 Alcohol bl, P2L1L3 Alcohol bl, P2L1 Boost bl, P2L1L3 Boost bl\n" + ...
     "P2L1 Boost, P2L1L3 Boost, P2A Boost, \n" + ...
     "Alcohol bl, P2L1 Alcohol, P2L1L3 Alcohol, P2A Alcohol, \n" + ...
+    "P2L1 BL for comb boost and alc, P2L1L3 BL for comb boost and alc, \n" + ...
     "P2L1 Boost and alcohol, P2L1L3 Boost and alcohol, P2A Boost and alcohol, \n" + ...
     "P2L1 Sal alcohol, P2L1L3 Sal alcohol, P2A Sal alcohol, \n" + ...
     "P2L1 Sal alc and sal boost, P2L1L3 Sal alc and sal boost, P2A Sal alc and sal boost, \n" + ...
@@ -78,6 +80,16 @@ elseif strcmpi(treatment,"Combined Ghr toy")
     [~, ~, ~, ghr_toystick_id, ~, ~] = extract_toy_expt_ids(conn);
     id = vertcat(ghr_toyrat_id, ghr_toystick_id);
 
+    %% Output from extract_BLforAlcAndBoost_ids function
+elseif strcmpi(treatment, "P2L1 Alcohol bl")
+    [id, ~, ~, ~] = extract_BLforAlcAndBoost_ids(conn);
+elseif strcmpi(treatment, "P2L1L3 Alcohol bl")
+    [~, id, ~, ~] = extract_BLforAlcAndBoost_ids(conn);
+elseif strcmpi(treatment, "P2L1 Boost bl")
+    [~, ~, id, ~] = extract_BLforAlcAndBoost_ids(conn);
+elseif strcmpi(treatment, "P2L1L3 Boost bl")
+    [~, ~, ~, id] = extract_BLforAlcAndBoost_ids(conn);
+
     %% Output from extract_boost_ids function
 elseif strcmpi(treatment, "P2L1 Boost")
     [id, ~, ~] = extract_boost_ids(conn);
@@ -95,6 +107,12 @@ elseif strcmpi(treatment, "P2L1L3 Alcohol")
     [~, ~, id, ~] = extract_alcohol_ids(conn);
 elseif strcmpi(treatment, "P2A Alcohol")
     [~, ~, ~, id] = extract_alcohol_ids(conn);
+
+    %% Output from extract_BLforCombAlcAndBoost_ids function
+elseif strcmpi(treatment, "P2L1 BL for comb boost and alc")
+    [id, ~] = extract_BLforCombAlcAndBoost_ids(conn);
+elseif strcmpi(treatment, "P2L1L3 BL for comb boost and alc")
+    [~, id] = extract_BLforCombAlcAndBoost_ids(conn);
 
     %% Output from extract_combined_boost_alcohol_ids function
 elseif strcmpi(treatment, "P2L1 Boost and alcohol")
