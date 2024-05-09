@@ -27,13 +27,15 @@ P2L1_BLforAlc_Q = sprintf("SELECT id, health, genotype, tasktypedone, referencet
     "= 'P2L1' ORDER BY id", alcohol_L1_animals);
 P2L1_BLforAlc_Data = fetch(conn, P2L1_BLforAlc_Q);
 
-P2L1_BLforAlc_Data.referencetime = datetime(P2L1_BLforAlc_Data.referencetime, ...
-    'Format', 'MM/dd/yyyy');
-start_date = datetime('06/16/2022', 'InputFormat', 'MM/dd/yyyy');
-end_date = datetime('06/23/2022', 'InputFormat', 'MM/dd/yyyy');
-end_date = end_date + days(1);
-P2L1_BLforAlc_Data = P2L1_BLforAlc_Data(P2L1_BLforAlc_Data.referencetime >= start_date & ...
-    P2L1_BLforAlc_Data.referencetime <= end_date, :);
+% With date range used for RECORD paper
+% P2L1_BLforAlc_Data.referencetime = datetime(P2L1_BLforAlc_Data.referencetime, ...
+%     'Format', 'MM/dd/yyyy');
+% start_date = datetime('06/16/2022', 'InputFormat', 'MM/dd/yyyy');
+% end_date = datetime('06/23/2022', 'InputFormat', 'MM/dd/yyyy');
+% end_date = end_date + days(1);
+% P2L1_BLforAlc_Data = P2L1_BLforAlc_Data(P2L1_BLforAlc_Data.referencetime >= start_date & ...
+%     P2L1_BLforAlc_Data.referencetime <= end_date, :);
+
 P2L1_BLforAlc_id = P2L1_BLforAlc_Data.id;
 
 % Data summary
@@ -74,10 +76,12 @@ P2L1_BLforBoost_Q = sprintf("SELECT id, health, genotype, tasktypedone, referenc
     "= 'P2L1' ORDER BY id", boost_L1_animals);
 P2L1_BLforBoost_Data = fetch(conn, P2L1_BLforBoost_Q);
 
-P2L1_BLforBoost_Data.referencetime = datetime(P2L1_BLforBoost_Data.referencetime, ...
-    'Format', 'MM/dd/yyyy');
-P2L1_BLforBoost_Data = P2L1_BLforBoost_Data(P2L1_BLforBoost_Data.referencetime >= start_date & ...
-    P2L1_BLforBoost_Data.referencetime <= end_date, :);
+% With date range used for RECORD paper
+% P2L1_BLforBoost_Data.referencetime = datetime(P2L1_BLforBoost_Data.referencetime, ...
+%     'Format', 'MM/dd/yyyy');
+% P2L1_BLforBoost_Data = P2L1_BLforBoost_Data(P2L1_BLforBoost_Data.referencetime >= start_date & ...
+%     P2L1_BLforBoost_Data.referencetime <= end_date, :);
+
 P2L1_BLforBoost_id = P2L1_BLforBoost_Data.id;
 
 % Data summary

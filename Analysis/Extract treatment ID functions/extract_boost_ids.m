@@ -5,7 +5,6 @@
 %
 
 function [boost_L1_id, Boost_L1L3_id, Boost_P2A_id] = extract_boost_ids(varargin)
-% This function extracts boost treatment id's
 
 if numel(varargin) < 1
     datasource = 'live_database';
