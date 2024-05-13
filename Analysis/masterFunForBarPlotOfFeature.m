@@ -1,17 +1,17 @@
 % Author: Atanu Giri
 % Date: 12/01/2023
-
-%% Invokes treatmentIDfun, fetchHealthDataTable, barPlotValues.
-
-function varargout = masterFunForBarPlotOfFeature(feature, splitByGender, varargin)
 %
 % This function takes 'feature', splitByGender, and treatment group as input from
 % 'ghrelin_featuretable' and returns bar plot for that feature as
 % an average of all animals
-
+%
 % Example usage
 % masterFunForBarPlotOfFeature('distance_until_limiting_time_stamp', ...
 % 'y', 'Alcohol bl', 'Alcohol')
+%
+%% Invokes treatmentIDfun, fetchHealthDataTable, barPlotValues, cleanBadSessionsFromTable.
+%
+function varargout = masterFunForBarPlotOfFeature(feature, splitByGender, varargin)
 
 % feature = 'approachavoid';
 % splitByGender = 'n';
@@ -41,8 +41,10 @@ end
 treatmentIDs_str = cellfun(@(x) strjoin(arrayfun(@num2str, x, 'UniformOutput', ...
     false), ','), treatmentIDs, 'UniformOutput', false);
 treatment_data = cell(1, numel(treatmentIDs_str));
+
 for i = 1:numel(treatmentIDs_str)
     treatment_data{i} = fetchHealthDataTable(feature, treatmentIDs_str{i}, conn);
+    treatment_data{i} = cleanBadSessionsFromTable(treatment_data{i}, feature); % Remove bad sessions
 end
 
 h = figure;

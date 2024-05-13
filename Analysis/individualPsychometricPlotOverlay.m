@@ -11,9 +11,8 @@
 
 function individualPsychometricPlotOverlay(feature, splitByGender, varargin)
 
-% feature = 'approachavoid';
-% splitByGender = 'y';
-% varargin = {'P2L1 Boost', 'P2L1 Ghrelin', 'P2L1 Alcohol', 'P2L1 Ghr alcohol'};
+% feature = 'approachavoid'; splitByGender = 'y';
+% varargin = {'P2L1 BL for comb boost and alc'};
 
 % Connect to database
 datasource = 'live_database';
@@ -45,10 +44,14 @@ Colors = lines(numel(treatmentIDs));
 
 
 if strcmpi(splitByGender, 'n')
-
     for grp = 1:numel(treatmentGroups)
         currentGrpData = treatment_data{grp};
-        [totalSessions(grp), hLines(grp)] = treatrmentGroupPlot(currentGrpData);
+        [totalSessions(grp), validSessions(grp), hLines(grp)] = ...
+            treatrmentGroupPlot(currentGrpData);
+        text(min(xlim), max(ylim), sprintf('n = %s', num2str(validSessions(grp))));
+        fprintf('Total sessions = %d\n', totalSessions(grp));
+        fprintf('Valid sessions = %d\n', validSessions(grp));
+
     end
 
     % Add x ticklabel
@@ -58,7 +61,6 @@ if strcmpi(splitByGender, 'n')
     set(gca,'xticklabel',label,'FontSize',15);
 
 elseif strcmpi(splitByGender, 'y')
-
     for grp = 1:numel(treatmentGroups)
         currentGrpData = treatment_data{grp};
         maleData = currentGrpData(lower(currentGrpData.gender) == 'male', :);
@@ -66,12 +68,16 @@ elseif strcmpi(splitByGender, 'y')
 
         genderData = {maleData, femaleData};
         totalSessions = zeros(1,2);
+        validSessions = zeros(1,2);
 
         for gender = 1:numel(genderData)
             subplot(1,2,gender);
             hold on;
-        
-            [totalSessions(gender), hLines(grp)] = treatrmentGroupPlot(genderData{gender});
+
+            [totalSessions(gender), validSessions(gender), hLines(grp)] = ...
+                treatrmentGroupPlot(genderData{gender});
+            fprintf('Total sessions = %d\n', totalSessions(gender));
+            fprintf('Valid sessions = %d\n', validSessions(gender));
 
             if gender == 1
                 title("Male", 'Interpreter','latex','FontSize',25);
@@ -80,13 +86,13 @@ elseif strcmpi(splitByGender, 'y')
                 title("Female", 'Interpreter','latex','FontSize',25);
             end
 
-            text(min(xlim), max(ylim), sprintf('n = %s', num2str(totalSessions(gender))));
+            text(min(xlim), max(ylim), sprintf('n = %s', num2str(validSessions(gender))));
 
             xticks(1:4);
             label = {'0.5','2','5','9'};
             set(gca,'xticklabel',label,'FontSize',15);
         end
-        
+
     end % end of 1st treatment group
 
 end
@@ -116,29 +122,50 @@ savefig(gcf, fullfile(myPath, figname));
 
 
 %% Description of treatrmentGroupPlot
-    function [totalSessions, hLines] = treatrmentGroupPlot(currentGrpData)
+    function [totalSessions, validSessions, hLines] = treatrmentGroupPlot(currentGrpData)
 
-        totalSessions = 0;
+        totalSessions = 0; % total sessions counter
+        validSessions = 0; % valid sessions counter
 
         animalList = unique(currentGrpData.subjectid);
 
         for animal = 1:length(animalList)
             animalData = currentGrpData(currentGrpData.subjectid == animalList(animal),:);
             sessionList = unique(animalData.referencetime);
+            totalSessions = totalSessions + numel(sessionList); % total sessions counter
 
-            totalSessions = totalSessions + length(sessionList);
+            %% Reduce the number of plots for clarity if needed
+%             if numel(sessionList) >= 5
+%                 randomIdx = randperm(numel(sessionList));
+%                 sessionList = sessionList(randomIdx(1:5));
+%             end
 
             for session = 1:length(sessionList)
                 sessionData = animalData(animalData.referencetime == sessionList(session),:);
-                [featureList, ~, ~] = psychometricFunValues(sessionData, feature);
+                if height(sessionData) >= 40
+                    %                     fprintf('%d trials in session\n', height(sessionData));
 
-                % Check for NaN values in y
-                if any(isnan(featureList))
-                    disp('Skipping iteration due to NaN values in y.');
-                    continue; % Skip the current iteration
+                    try
+                        [featureList, ~, ~] = psychometricFunValues(sessionData, feature);
+
+                        % If all of approach rate = 0, sensor not working.
+                        % Exclude session
+                        if all(featureList == 0)
+                            continue;
+                        end
+
+                        % For sanity check
+                        if all(featureList == 0)
+                            fprintf('%2f ', featureList);
+                            fprintf('\n');
+                        end
+
+                        hLines = plot(x, featureList, 'LineWidth', 2, 'Color', Colors(grp,:));
+                        validSessions = validSessions + 1;
+                    catch
+                        fprintf('Something wrong :( \n')
+                    end
                 end
-
-                hLines = plot(x, featureList, 'LineWidth', 2, 'Color', Colors(grp,:));
 
             end % end of 1st session
 

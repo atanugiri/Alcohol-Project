@@ -32,8 +32,10 @@ end
 treatmentIDs_str = cellfun(@(x) strjoin(arrayfun(@num2str, x, 'UniformOutput', ...
     false), ','), treatmentIDs, 'UniformOutput', false);
 treatment_data = cell(1, numel(treatmentIDs_str));
+
 for i = 1:numel(treatmentIDs_str)
     treatment_data{i} = fetchHealthDataTable(feature, treatmentIDs_str{i}, conn);
+    treatment_data{i} = cleanBadSessionsFromTable(treatment_data{i}, feature); % Remove bad sessions
 end
 
 figure;
