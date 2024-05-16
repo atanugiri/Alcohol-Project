@@ -22,6 +22,8 @@ conn = database(datasource,'postgres','1234');
 treatmentID = treatmentIDfun(treatment, conn);
 treatmentID = strjoin(arrayfun(@num2str, treatmentID, 'UniformOutput', false), ',');
 treatment_data = fetchHealthDataTable(feature, treatmentID, conn);
+treatment_data = cleanBadSessionsFromTable(treatment_data, feature); % Remove bad sessions
+
 
 % File where the fitting results (.mat) and fit plot (pdf) will be saved
 if fitType == 1

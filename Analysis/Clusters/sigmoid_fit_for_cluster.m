@@ -7,7 +7,7 @@
 
 function [h, fit_params, R_squared] = sigmoid_fit_for_cluster(y, fitType)
 
-% y = [0.9, 0.1, 0.5, 0.1]; fitType = 3;
+% y = [0.9, 0.1, 0.5, 0.1]; fitType = 2;
 
 % Define fitobjects
 fitobjects{1} = @(params, x) params(1) ./ (1 + exp(-params(2) * ...
@@ -19,9 +19,8 @@ fitobjects{2} = @(params, x) params(4) + ((params(1) - params(4)) ./ ...
 fitobjects{3} = @(params, x) params(2) + (params(3) - params(2) + ...
     params(5)*x) ./ (1 + exp(params(1)*(log(x) - log(params(4))))); % Brain and Cousens
 
-fitobjects{4} = @(params, x) params(1) ./ (1 + exp(-params(2) * ...
+fitobjects{4} = @(params, x) params(1) ./ (1 + exp(-params(2) * ... % Linear combination
     (x - params(3)))) + params(4) ./ (1 + exp(params(5) * (x - params(6))));
-% Linear combination
 
 % Create x data as equally spaced integers from 1 to the number of elements in y
 x = [1 2 3 4];
@@ -63,8 +62,12 @@ x_values = linspace(min(x), max(x), 100);
 y_pred = fitobject(fit_params, x_values);
 
 h = figure;
-plot(x, y, 'o', x_values, y_pred);
+scatter(x, y, 100, 'o', 'filled');
+hold on;
+plot(x_values, y_pred, 'linewidth', 2);
 xlabel('x');
 ylabel('y');
 legend('Data', 'Fitted Curve');
+hold off;
+ylim([0, 1]);
 end

@@ -34,6 +34,7 @@ treatmentIDs_str = cellfun(@(x) strjoin(arrayfun(@num2str, x, 'UniformOutput', .
 treatment_data = cell(1, numel(treatmentIDs_str));
 for i = 1:numel(treatmentIDs_str)
     treatment_data{i} = fetchHealthDataTable(feature, treatmentIDs_str{i}, conn);
+    treatment_data{i} = cleanBadSessionsFromTable(treatment_data{i}, feature); % Remove bad sessions
 end
 
 % Plotting
@@ -48,7 +49,7 @@ if strcmpi(splitByGender, 'n')
         currentGrpData = treatment_data{grp};
         [totalSessions(grp), validSessions(grp), hLines(grp)] = ...
             treatrmentGroupPlot(currentGrpData);
-        text(min(xlim), max(ylim), sprintf('n = %s', num2str(validSessions(grp))));
+        text(min(xlim), max(ylim), sprintf('n = %s', num2str(totalSessions(grp))));
         fprintf('Total sessions = %d\n', totalSessions(grp));
         fprintf('Valid sessions = %d\n', validSessions(grp));
 
@@ -86,7 +87,7 @@ elseif strcmpi(splitByGender, 'y')
                 title("Female", 'Interpreter','latex','FontSize',25);
             end
 
-            text(min(xlim), max(ylim), sprintf('n = %s', num2str(validSessions(gender))));
+            text(min(xlim), max(ylim), sprintf('n = %s', num2str(totalSessions(gender))));
 
             xticks(1:4);
             label = {'0.5','2','5','9'};
@@ -135,36 +136,23 @@ savefig(gcf, fullfile(myPath, figname));
             totalSessions = totalSessions + numel(sessionList); % total sessions counter
 
             %% Reduce the number of plots for clarity if needed
-%             if numel(sessionList) >= 5
-%                 randomIdx = randperm(numel(sessionList));
-%                 sessionList = sessionList(randomIdx(1:5));
-%             end
+            maxSessPlot = 2;
+            if numel(sessionList) >= maxSessPlot
+                randomIdx = randperm(numel(sessionList));
+                sessionList = sessionList(randomIdx(1:maxSessPlot));
+            end
 
             for session = 1:length(sessionList)
                 sessionData = animalData(animalData.referencetime == sessionList(session),:);
-                if height(sessionData) >= 40
-                    %                     fprintf('%d trials in session\n', height(sessionData));
+                %                     fprintf('%d trials in session\n', height(sessionData));
 
-                    try
-                        [featureList, ~, ~] = psychometricFunValues(sessionData, feature);
+                try
+                    [featureList, ~, ~] = psychometricFunValues(sessionData, feature);
 
-                        % If all of approach rate = 0, sensor not working.
-                        % Exclude session
-                        if all(featureList == 0)
-                            continue;
-                        end
-
-                        % For sanity check
-                        if all(featureList == 0)
-                            fprintf('%2f ', featureList);
-                            fprintf('\n');
-                        end
-
-                        hLines = plot(x, featureList, 'LineWidth', 2, 'Color', Colors(grp,:));
-                        validSessions = validSessions + 1;
-                    catch
-                        fprintf('Something wrong :( \n')
-                    end
+                    hLines = plot(x, featureList, 'LineWidth', 2, 'Color', Colors(grp,:));
+                    validSessions = validSessions + 1;
+                catch
+                    fprintf('Something wrong :( \n')
                 end
 
             end % end of 1st session
