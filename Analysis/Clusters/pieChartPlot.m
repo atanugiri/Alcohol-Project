@@ -1,39 +1,66 @@
 % Author: Atanu Giri
 % Date: 05/15/2024
 %
+% 
+% Possible fit param: 'LA', 'slope', 'shift', 'UA' (From 4-param sig. fit)
+%
 
-function pieChartPlot(matFile)
+function [ct_in_part, totalNonSig] = pieChartPlot(matFile, fitParam)
 
 % matFile = 'P2L1 BL for comb boost and alc_approachavoid_logistic4_fitting_param.mat';
 [LA, slope, shift, UA, Rsq, ~] = allFitParam(sprintf('%s', matFile));
 
-RsqThr = 0.75;
+RsqThr = 0.75; % Threshold to be sigmoid
 RsqArray = Rsq{1,1};
 sigIdx = RsqArray >= RsqThr;
-% filtRsq = RsqArray(sigIdx);
 
-% filtShift = shift{1,1}(sigIdx);
-% shift1 = sum(filtShift < 2.5)/sum(sigIdx);
-% shift2 = sum(filtShift >= 2.5 & filtShift < 3.25)/sum(sigIdx);
-% shift3 = sum(filtShift >= 3.25)/sum(sigIdx);
+if strcmpi(fitParam, 'LA')
+    filtParam = LA{1,1}(sigIdx);
+    paramPartVal = [0.1, 0.2];
 
-filtUA = UA{1,1}(sigIdx);
-figure;
-histogram(filtUA);
-UA1 = sum(filtUA < 0.6)/sum(sigIdx);
-UA2 = sum(filtUA >= 0.6 & filtUA < 0.8)/sum(sigIdx);
-UA3 = sum(filtUA >= 0.8)/sum(sigIdx);
+elseif strcmpi(fitParam, 'slope')
+    filtParam = slope{1,1}(sigIdx);
+    paramPartVal = [25, 50];
 
+elseif strcmpi(fitParam, 'shift')
+    filtParam = shift{1,1}(sigIdx);
+    paramPartVal = [2, 3];
+
+elseif strcmpi(fitParam, 'UA')
+    filtParam = UA{1,1}(sigIdx);
+    paramPartVal = [0.6, 0.8];
+
+else
+    error('Provide correct fit parameter')
+
+end
+
+ct_in_part_1 = sum(filtParam < paramPartVal(1));
+ct_in_part_2 = sum(filtParam >= paramPartVal(1) & filtParam < paramPartVal(2));
+ct_in_part_3 = sum(filtParam >= paramPartVal(2));
+
+ct_in_part = [ct_in_part_1, ct_in_part_2, ct_in_part_3];
+frac_in_part = ct_in_part./length(RsqArray);
+
+% Print data for samity check
+fprintf('Total no of sigmoid:\n')
+fprintf('%d ', ct_in_part);
+fprintf('\n')
+fprintf('Total frac of sigmoid:\n')
+fprintf('%.2f\n', sum(frac_in_part));
 
 sig = sum(sigIdx);
-nonSig = length(RsqArray) - sig;
-fracNonSig = nonSig/(nonSig + sig);
-% fracSig = sig/(nonSig + sig);
-% pie([fracNonSig, shift1, shift2, shift3]);
-% labels = {'Non sigmoidal', 'Sigmoidal (shift1)', 'Sigmoidal (shift2)', 'Sigmoidal (shift3)'};
+totalNonSig = length(RsqArray) - sig;
+fprintf('Total no of non-sigmoid:\n')
+fprintf('%d\n', totalNonSig);
+fracNonSig = totalNonSig/(totalNonSig + sig);
+fprintf('Total frac:\n')
+fprintf('%.2f\n', sum([fracNonSig, frac_in_part]));
 
-pie([fracNonSig, UA1, UA2, UA3]);
-labels = {'Non sigmoidal', 'Sigmoidal (UA1)', 'Sigmoidal (UA2)', 'Sigmoidal (UA3)'};
+% Plotting
+pie([frac_in_part, fracNonSig]);
+labels = {sprintf('Sigmoidal (%s1)', fitParam), sprintf('Sigmoidal (%s2)', fitParam), ...
+    sprintf('Sigmoidal (%s3)', fitParam), 'Non sigmoidal'};
 
 legend(labels, 'Interpreter','latex');
 
@@ -52,8 +79,7 @@ title(titleStr);
 % Save figure
 scriptDir = fileparts(mfilename('fullpath'));
 myPath = fullfile(scriptDir, 'Fig files/');
-figname = sprintf('pieChart_%s', titleStr);
+figname = sprintf('pie_chart_%s_%s', fitParam, titleStr);
 savefig(gcf, fullfile(myPath, figname));
 
 close(gcf);
-end
