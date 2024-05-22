@@ -11,7 +11,7 @@
 %
 % Invokes allFitParam
 
-function fitParamHistogram(param_name, splitbyGender, varargin)
+function varargout = fitParamHistogram(param_name, splitbyGender, varargin)
 
 % param_name = 'shift'; splitbyGender = 'y';
 % varargin = {'P2L1L3 BL for comb boost and alc_approachavoid_logistic4_fitting_param', ...
@@ -59,10 +59,16 @@ elseif strcmpi(param_name, 'Rsq')
     param_array = Rsq;
 end
 
+varargout{1} = param_array;
+
 % Seperate param_array into male and female
 if strcmpi(splitbyGender, 'y')
     datasource = 'live_database';
     conn = database(datasource,'postgres','1234');
+
+    maleParam = cell(1, numel(varargin));
+    femaleParam = cell(1, numel(varargin));
+
 
     for grp = 1:numel(varargin)
         animalStr = strjoin(animals{grp}, "','");
@@ -86,7 +92,13 @@ if strcmpi(splitbyGender, 'y')
 
         param_array{grp}{1} = maleData;
         param_array{grp}{2} = femaleData;
+
+        maleParam{grp} = maleData;
+        femaleParam{grp} = femaleData;
+
     end
+
+    varargout{1} = maleParam; varargout{2} = femaleParam;
 end
 
 scriptDir = fileparts(mfilename('fullpath'));

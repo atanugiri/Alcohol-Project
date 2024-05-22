@@ -3,18 +3,18 @@
 
 fig_directory = '/Users/atanugiri/Downloads/Saline Ghrelin Project/Analysis/Fig files/';
 
-%%
-[h, figname] = cdfOfFeature('distance_until_limiting_time_stamp', ...
-    'Alcohol BL', 'Alcohol', 'Boost');
-savefig(h, fullfile(fig_directory, sprintf('%s.fig',figname)));
-close(h);
+%% CDF plots
+% [h, figname] = cdfOfFeature('distance_until_limiting_time_stamp', ...
+%     'Alcohol BL', 'Alcohol', 'Boost');
+% savefig(h, fullfile(fig_directory, sprintf('%s.fig',figname)));
+% close(h);
+% 
+% [h, figname] = cdfOfFeature('entry_time_25', ...
+%     'Alcohol BL', 'Alcohol', 'Boost');
+% savefig(h, fullfile(fig_directory, sprintf('%s.fig',figname)));
+% close(h);
 
-[h, figname] = cdfOfFeature('entry_time_25', ...
-    'Alcohol BL', 'Alcohol', 'Boost');
-savefig(h, fullfile(fig_directory, sprintf('%s.fig',figname)));
-close(h);
-
-%% Statistics
+%% Feature plots
 featureForEach = masterPsychometricFunctionPlot('approachavoid', 'n', ...
     'P2L1 Boost','P2L1 Ghrelin','P2L1 Alcohol','P2L1 Ghr alcohol');
 twoWayANOVAfun(featureForEach{:})
@@ -25,6 +25,25 @@ twoWayANOVAfun(featureForEach{:})
     'P2L1 Boost','P2L1 Ghrelin','P2L1 Alcohol','P2L1 Ghr alcohol');
 twoWayANOVAfun(featureForEachMale{:})
 twoWayANOVAfun(featureForEachFemale{:})
+
+
+%% 4-param logistic fit plots
+param_array = fitParamHistogram('shift', 'n', 'P2L1 BL for comb boost and alc_approachavoid_logistic4_fitting_param', ...
+'P2L1 Boost and alcohol_approachavoid_logistic4_fitting_param');
+[h, p] = kstest2(param_array{1}, param_array{2});
+fprintf('p = %.4f\n', p);
+
+
+[maleParam, femaleParam] = fitParamHistogram('shift', 'y', 'P2L1 BL for comb boost and alc_approachavoid_logistic4_fitting_param', ...
+'P2L1 Boost and alcohol_approachavoid_logistic4_fitting_param');
+
+[h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000);
+[h_female, p_female] = kstest2(femaleParam{1}, femaleParam{2});
+
+fprintf('Male: p = %.4f\n', p_male);
+fprintf('Female: p = %.4f\n', p_female);
+
+
 
 %% Chi-sqaure test on pie chart
 param = {'LA', 'slope', 'shift', 'UA'};

@@ -1,12 +1,13 @@
 % Author: Atanu Giri
 % Date: 04/02/2024
-
-function twoWayANOVAfun(varargin)
 %
 % This function takes multiple data set of psychometrics values and 
 % performs 2-way ANOVA test for 1st set vs others
 %
 % varargin = featureForEach;
+
+function twoWayANOVAfun(varargin)
+
 
 % Check if at least two data sets are provided
 if numel(varargin) < 2
