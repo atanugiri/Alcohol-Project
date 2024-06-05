@@ -83,6 +83,15 @@ alcohol_L1L3_Q = "SELECT id, health, genotype, tasktypedone, referencetime, " + 
     "AND REPLACE(tasktypedone, ' ', '') = 'P2L1L3' ORDER BY id";
 
 alcohol_L1L3_Data = fetch(conn, alcohol_L1L3_Q);
+
+add_alcohol_L1L3_Q = "SELECT id, health, genotype, tasktypedone, referencetime, " + ...
+    "subjectid, gender, notes FROM live_table " + ...
+    "WHERE UPPER(subjectid) <> UPPER('none') " + ...
+    "AND health ILIKE 'No Injection%' " + ...
+    "AND REPLACE(tasktypedone, ' ', '') = 'P2L1L3' ORDER BY id";
+add_alcohol_L1L3_Data = fetch(conn, add_alcohol_L1L3_Q);
+
+alcohol_L1L3_Data = vertcat(alcohol_L1L3_Data, add_alcohol_L1L3_Data);
 alcohol_L1L3_id = alcohol_L1L3_Data.id;
 
 % Data summary

@@ -1,8 +1,7 @@
 function printTableSummary(myTable)
 
-
-% For testing
 myTable.referencetime = datetime(myTable.referencetime, "Format","MM/dd/uuuu");
+% For testing
 for col = 2:size(myTable,2)
     myTable.(col) = string(myTable.(col));
 end
