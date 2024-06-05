@@ -30,7 +30,7 @@ twoWayANOVAfun(featureForEachFemale{:})
 %% 4-param logistic fit plots
 param_array = fitParamHistogram('shift', 'n', 'P2L1 BL for comb boost and alc_approachavoid_logistic4_fitting_param', ...
 'P2L1 Boost and alcohol_approachavoid_logistic4_fitting_param');
-[h, p] = kstest2(param_array{1}, param_array{2});
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000);
 fprintf('p = %.4f\n', p);
 
 
@@ -38,7 +38,7 @@ fprintf('p = %.4f\n', p);
 'P2L1 Boost and alcohol_approachavoid_logistic4_fitting_param');
 
 [h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000);
-[h_female, p_female] = kstest2(femaleParam{1}, femaleParam{2});
+[h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000);
 
 fprintf('Male: p = %.4f\n', p_male);
 fprintf('Female: p = %.4f\n', p_female);

@@ -135,12 +135,12 @@ savefig(gcf, fullfile(myPath, figname));
             sessionList = unique(animalData.referencetime);
             totalSessions = totalSessions + numel(sessionList); % total sessions counter
 
-            %% Reduce the number of plots for clarity if needed
-            maxSessPlot = 2;
-            if numel(sessionList) >= maxSessPlot
-                randomIdx = randperm(numel(sessionList));
-                sessionList = sessionList(randomIdx(1:maxSessPlot));
-            end
+            %% Reduce the number of plots for clarity if needed (comment out if not needed)
+%             maxSessPlot = 2;
+%             if numel(sessionList) >= maxSessPlot
+%                 randomIdx = randperm(numel(sessionList));
+%                 sessionList = sessionList(randomIdx(1:maxSessPlot));
+%             end
 
             for session = 1:length(sessionList)
                 sessionData = animalData(animalData.referencetime == sessionList(session),:);
