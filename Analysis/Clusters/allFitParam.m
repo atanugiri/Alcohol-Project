@@ -5,7 +5,6 @@
 % logistic3 fit: 'UA', 'slope', 'shift', 'Rsq'
 % logistic4 fit: 'LA', 'slope', 'shift', 'UA', 'Rsq'
 % BC fit: 'LA', 'slope', 'shift', 'UA', 'param_f', 'Rsq'
-% LC fit: 'UA', 'slope', 'shift', 'UA_2', 'slope_2', 'shift_2', 'Rsq'
 %
 % Example usage: allFitParam('Alcohol_approachavoid_logistic3_fitting_param.mat')
 %
@@ -29,10 +28,10 @@ if contains(varargin{1}, 'logistic3')
         [fitParam, R_squared, animal] = helperFun(loadFile);
 
         %% Remove negative slopes (Optional)
-%         ngtvSlpFltr = fitParam(:,2) <= 0;
-%         fitParam = fitParam(~ngtvSlpFltr, :);
-%         R_squared = R_squared(~ngtvSlpFltr, :);
-%         animal = animal(~ngtvSlpFltr, :);
+        ngtvSlpFltr = fitParam(:,2) <= 0;
+        fitParam = fitParam(~ngtvSlpFltr, :);
+        R_squared = R_squared(~ngtvSlpFltr, :);
+        animal = animal(~ngtvSlpFltr, :);
 
         allRsq{grp} = R_squared;
         UA{grp} = fitParam(:,1);
@@ -51,10 +50,10 @@ elseif contains(varargin{1}, 'logistic4')
         [fitParam, R_squared, animal] = helperFun(loadFile);
 
         %% Remove negative slopes (Optional)
-%         ngtvSlpFltr = fitParam(:,2) <= 0;
-%         fitParam = fitParam(~ngtvSlpFltr, :);
-%         R_squared = R_squared(~ngtvSlpFltr, :);
-%         animal = animal(~ngtvSlpFltr, :);
+        ngtvSlpFltr = fitParam(:,2) <= 0;
+        fitParam = fitParam(~ngtvSlpFltr, :);
+        R_squared = R_squared(~ngtvSlpFltr, :);
+        animal = animal(~ngtvSlpFltr, :);
 
         allRsq{grp} = R_squared;
         LA{grp} = fitParam(:,1);
@@ -67,45 +66,31 @@ elseif contains(varargin{1}, 'logistic4')
 
     varargout = {LA, slope, shift, UA, allRsq, animals};
 
-elseif contains(varargin{1}, 'BC')
+elseif contains(varargin{1}, 'GP')
     LA = cell(1, numel(varargin));
-    param_f = cell(1, numel(varargin));
 
     for grp = 1:numel(varargin)
         loadFile = load(fullfile(myPath, varargin{grp}));
         [fitParam, R_squared, animal] = helperFun(loadFile);
 
-        allRsq{grp} = R_squared;
-        LA{grp} = fitParam(:,3);
-        slope{grp} = fitParam(:,1);
-        shift{grp} = fitParam(:,4);
-        UA{grp} = fitParam(:,2);
-        param_f{grp} = fitParam(:,5);
-    end
-
-    varargout = {LA, slope, shift, UA, param_f, allRsq};
-
-elseif contains(varargin{1}, 'LC')
-    UA_2 = cell(1, numel(varargin));
-    slope_2 = cell(1, numel(varargin));
-    shift_2 = cell(1, numel(varargin));
-
-    for grp = 1:numel(varargin)
-        loadFile = load(fullfile(myPath, varargin{grp}));
-        [fitParam, R_squared, animal] = helperFun(loadFile);
+        %% Remove negative slopes (Optional)
+        ngtvSlpFltr = fitParam(:,2) >= 0;
+        fitParam = fitParam(~ngtvSlpFltr, :);
+        R_squared = R_squared(~ngtvSlpFltr, :);
+        animal = animal(~ngtvSlpFltr, :);
 
         allRsq{grp} = R_squared;
-        UA{grp} = fitParam(:,1);
+        LA{grp} = fitParam(:,1);
         slope{grp} = fitParam(:,2);
         shift{grp} = fitParam(:,3);
-        UA_2{grp} = fitParam(:,4);
-        slope_2{grp} = fitParam(:,5);
-        shift_2{grp} = fitParam(:,6);
+        UA{grp} = fitParam(:,4);
+        animals{grp} = animal;
     end
 
-    varargout = {UA, slope, shift, UA_2, slope_2, shift_2, allRsq};
+    varargout = {LA, slope, shift, UA, allRsq, animals};
 
 end
+
 
 %% Description of helperFun
     function [fitParam, R_squared, animal] = helperFun(loadFile)

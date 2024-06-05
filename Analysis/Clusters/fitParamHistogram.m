@@ -7,59 +7,37 @@
 % logistic3 fit: 'UA', 'slope', 'shift', 'Rsq'
 % logistic4 fit: 'LA', 'slope', 'shift', 'UA', 'Rsq'
 % BC fit: 'LA', 'slope', 'shift', 'UA', 'param_f', 'Rsq'
-% LC fit: 'UA', 'slope', 'shift', 'UA_2', 'slope_2', 'shift_2', 'Rsq'
 %
 % Invokes allFitParam
 
 function varargout = fitParamHistogram(param_name, splitbyGender, varargin)
 
-% param_name = 'shift'; splitbyGender = 'y';
+% param_name = 'UA'; splitbyGender = 'n';
 % varargin = {'P2L1L3 BL for comb boost and alc_approachavoid_logistic4_fitting_param', ...
 %     'P2L1L3 Boost and alcohol_approachavoid_logistic4_fitting_param'};
 
 if contains(varargin{1}, 'logistic3')
     [UA, slope, shift, Rsq, animals] = allFitParam(varargin{:});
+    featureMap = struct('UA', UA, 'slope', slope, 'shift', shift, 'Rsq', Rsq);
 
 elseif contains(varargin{1}, 'logistic4')
     [LA, slope, shift, UA, Rsq, animals] = allFitParam(varargin{:});
+    featureMap = struct('LA', LA, 'slope', slope, 'shift', shift, 'UA', UA, ...
+        'Rsq', Rsq);
 
-elseif contains(varargin{1}, 'BC')
-    [LA, slope, shift, UA, param_f, Rsq] = allFitParam(varargin{:});
-
-elseif contains(varargin{1}, 'LC')
-    [UA, slope, shift, UA_2, slope_2, shift_2, Rsq] = allFitParam(varargin{:});
-
+elseif contains(varargin{1}, 'GP')
+    [LA, slope, shift, UA, Rsq, animals] = allFitParam(varargin{:});
+    featureMap = struct('LA', LA, 'slope', slope, 'shift', shift, 'UA', UA, ...
+        'Rsq', Rsq);
 end
 
-Colors = parula(numel(varargin));
-
-% param_name_array = {'UA', 'slope', 'shift', 'LA', 'param_f', 'Rsq'};
-% bwArray = [0.05, 10, 0.15, 0.05, 0.05, 0.05]; % Width of bin
-%
-% index = strcmpi(param_name_array, param_name);
-% currentBW = bwArray(index);
-
-if strcmpi(param_name, 'UA')
-    param_array = UA;
-elseif strcmpi(param_name, 'slope')
-    param_array = slope;
-elseif strcmpi(param_name, 'shift')
-    param_array = shift;
-elseif strcmpi(param_name, 'LA')
-    param_array = LA;
-elseif strcmpi(param_name, 'param_f')
-    param_array = param_f;
-elseif strcmpi(param_name, 'UA_2')
-    param_array = UA_2;
-elseif strcmpi(param_name, 'slope_2')
-    param_array = slope_2;
-elseif strcmpi(param_name, 'shift_2')
-    param_array = shift_2;
-elseif strcmpi(param_name, 'Rsq')
-    param_array = Rsq;
+param_array = cell(1, numel(varargin));
+for i = 1:numel(varargin)
+    param_array{i} = featureMap(i).(param_name);
 end
 
 varargout{1} = param_array;
+Colors = parula(numel(varargin));
 
 % Seperate param_array into male and female
 if strcmpi(splitbyGender, 'y')
@@ -110,11 +88,8 @@ histOfParam(param_array, param_name);
 
 %% Description of histOfParam
     function histOfParam(paramArray, param_name)
+        figure;
         for idx = 1:numel(varargin)
-
-            %             h(idx) = histogram(paramArray{idx}, 'Normalization','pdf','FaceAlpha',0.7, ...
-            %                 'BinWidth', currentBW, 'FaceColor', Colors(idx,:));
-
             if strcmpi(splitbyGender, 'y')
                 subplot(1,2,1);
                 [f_male, x_values_male] = ksdensity(paramArray{idx}{1});
@@ -150,30 +125,24 @@ histOfParam(param_array, param_name);
             ylabel('probability density','Interpreter','latex');
         end
 
-        if contains(varargin{1}, 'logistic3')
-            if strcmpi(splitbyGender, 'y')
-                figname = sprintf('logistic3_%s_hist_%s_MvF', param_name, [varargin{:}]);
-            else
-                figname = sprintf('logistic3_%s_hist_%s', param_name, [varargin{:}]);
+        % Figure name      
+        % Define a map of keywords to prefixes
+        prefixMap = containers.Map({'logistic3', 'logistic4', 'GP'}, ...
+            {'logistic3', 'logistic4', 'GP'});
+
+        % Loop through the keys in the map and check for a match
+        for key = keys(prefixMap)
+            if contains(varargin{1}, key{1})
+                if strcmpi(splitbyGender, 'y')
+                    figname = sprintf('%s_%s_hist_%s_MvF', prefixMap(key{1}), param_name, [varargin{:}]);
+                else
+                    figname = sprintf('%s_%s_hist_%s', prefixMap(key{1}), param_name, [varargin{:}]);
+                end
+                break;
             end
-
-        elseif contains(varargin{1}, 'logistic4')
-            if strcmpi(splitbyGender, 'y')
-                figname = sprintf('logistic4_%s_hist_%s_MvF', param_name, [varargin{:}]);
-            else
-                figname = sprintf('logistic4_%s_hist_%s', param_name, [varargin{:}]);
-            end
-
-        elseif contains(varargin{1}, 'BC')
-            figname = sprintf('BC_%s_hist_%s', param_name, [varargin{:}]);
-
-        elseif contains(varargin{1}, 'LC')
-            figname = sprintf('LC_%s_hist_%s', param_name, [varargin{:}]);
-
         end
 
         savefig(gcf, fullfile(myPath, figname));
-        close(gcf);
     end
 
 end

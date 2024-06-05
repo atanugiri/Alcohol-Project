@@ -8,8 +8,8 @@
 % fitType 3 = Brain and Cousens fit, fitType 4 = linear combinations of
 % 3-param sigmoids
 %
-% Invokes treatmentIDfun, fetchHealthDataTable, psychometricFunValues,
-% sigmoid_fit_for_cluster
+% Invokes treatmentIDfun, fetchHealthDataTable, cleanBadSessionsFromTable,
+% psychometricFunValues, sigmoid_fit_for_cluster
 %
 function extractFittingParam(treatment, feature, fitType)
 
@@ -31,9 +31,7 @@ if fitType == 1
 elseif fitType == 2
     fileName = sprintf("%s_%s_logistic4_fitting_param", treatment, feature);
 elseif fitType == 3
-    fileName = sprintf("%s_%s_BC_fitting_param", treatment, feature);
-elseif fitType == 4
-    fileName = sprintf("%s_%s_LC_fitting_param", treatment, feature);
+    fileName = sprintf("%s_%s_GP_fitting_param", treatment, feature);
 end
 
 scriptDir = fileparts(mfilename('fullpath'));
