@@ -6,7 +6,7 @@
 % Possible parameter names
 % logistic3 fit: 'UA', 'slope', 'shift', 'Rsq'
 % logistic4 fit: 'LA', 'slope', 'shift', 'UA', 'Rsq'
-% BC fit: 'LA', 'slope', 'shift', 'UA', 'param_f', 'Rsq'
+% GP fit: 'LA', 'slope', 'shift', 'UA', 'Rsq'
 %
 % Invokes allFitParam
 

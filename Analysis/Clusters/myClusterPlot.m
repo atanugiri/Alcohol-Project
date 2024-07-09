@@ -12,7 +12,7 @@
 
 function myClusterPlot(varargin)
 
-varargin = {'P2L1 Boost and alcohol_approachavoid_logistic4_fitting_param_2.mat'};
+varargin = {'P2L1 Boost and alcohol_approachavoid_logistic4_fitting_param.mat'};
 
 [LA, slope, shift, UA, Rsq, animals] = allFitParam(varargin{:});
 
