@@ -1,4 +1,10 @@
-function [h_boot, p_boot] = bootstrap_kstest2(array1, array2, numBootstraps)
+function [h_boot, p_boot] = bootstrap_kstest2(array1, array2, numBootstraps, seed)
+    % Set random seed for reproducibility
+    if nargin < 4
+        seed = 'shuffle'; % Default seed if not provided
+    end
+    rng(seed);
+    
     % Initialize bootstrap results
     ks_stats = zeros(numBootstraps, 1);
     
