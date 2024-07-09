@@ -26,7 +26,8 @@ fprintf("P2L1 Baseline, P2L1L3 Baseline, P2L1 Food deprivation, Initial task, La
     "P2L1 Sal alc and sal boost, P2L1L3 Sal alc and sal boost, P2A Sal alc and sal boost, \n" + ...
     "P2L1 Ghr alcohol, P2L1L3 Ghr alcohol, P2A Ghr alcohol, \n" + ...
     "P2L1 Ghr alc and ghr boost, P2L1L3 Ghr alc and ghr boost, P2A Ghr alc and ghr boost, \n" + ...
-    "Sal repeat, Ghr repeat\n");
+    "Sal repeat, Ghr repeat, \n" + ...
+    "L1L3 Post alcohol, P2L1 Alc injection, P2L1L3 Alc injection\n");
 
 %% Output from extract_treatment_ids function
 if strcmpi(treatment, "P2L1 Baseline")
@@ -155,6 +156,16 @@ elseif strcmpi(treatment, "Sal repeat")
     [id, ~] = extract_new_sal_ghr_ids(conn);
 elseif strcmpi(treatment, "Ghr repeat")
     [~, id] = extract_new_sal_ghr_ids(conn);
+
+    %% Output from extract_post_alcohol_ids function
+elseif strcmpi(treatment, "L1L3 Post alcohol")
+    id = extract_post_alcohol_ids(conn);
+
+    %% Output from extract_alc_injection_ids function
+elseif strcmpi(treatment, "P2L1 Alc injection")
+    [id, ~] = extract_alc_injection_ids(conn);
+elseif strcmpi(treatment, "P2L1L3 Alc injection")
+    [~, id] = extract_alc_injection_ids(conn);
 
 else
     disp("Treatment group not found.\n")

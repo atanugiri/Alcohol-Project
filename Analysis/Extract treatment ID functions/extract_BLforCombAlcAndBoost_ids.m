@@ -27,7 +27,7 @@ P2L1_BLforCombAlcAndBoost_Q = sprintf("SELECT id, health, genotype, tasktypedone
     "= 'P2L1' ORDER BY id", boost_alcohol_L1_animals);
 P2L1_BLforCombAlcAndBoost_Data = fetch(conn, P2L1_BLforCombAlcAndBoost_Q);
 
-% With date range used for RECORD paper
+% Remove learning period
 P2L1_BLforCombAlcAndBoost_Data.referencetime = datetime(P2L1_BLforCombAlcAndBoost_Data.referencetime, ...
     'Format', 'MM/dd/yyyy');
 start_date = datetime('11/24/2021', 'InputFormat', 'MM/dd/yyyy');
@@ -36,6 +36,14 @@ end_date = end_date + days(1);
 dateFilter = P2L1_BLforCombAlcAndBoost_Data.referencetime >= start_date & ...
     P2L1_BLforCombAlcAndBoost_Data.referencetime <= end_date;
 P2L1_BLforCombAlcAndBoost_Data(dateFilter, :) = [];
+
+% Match the range of date and number of sessions (Optional)
+start_date = datetime('06/01/2022', 'InputFormat', 'MM/dd/yyyy');
+end_date = datetime('06/23/2022', 'InputFormat', 'MM/dd/yyyy');
+end_date = end_date + days(1);
+dateFilter = P2L1_BLforCombAlcAndBoost_Data.referencetime >= start_date & ...
+    P2L1_BLforCombAlcAndBoost_Data.referencetime <= end_date;
+P2L1_BLforCombAlcAndBoost_Data = P2L1_BLforCombAlcAndBoost_Data(dateFilter, :);
 
 P2L1_BLforCombAlcAndBoost_id = P2L1_BLforCombAlcAndBoost_Data.id;
 
@@ -56,6 +64,11 @@ P2L1L3_BLforCombAlcAndBoost_Q = sprintf("SELECT id, health, genotype, tasktypedo
     "genotype = 'CRL: Long Evans' AND health = 'N/A' AND REPLACE(tasktypedone, ' ', '') " + ...
     "= 'P2L1L3' ORDER BY id", boost_alcohol_L1L3_animals);
 P2L1L3_BLforCombAlcAndBoost_Data = fetch(conn, P2L1L3_BLforCombAlcAndBoost_Q);
+
+dateFilter = P2L1L3_BLforCombAlcAndBoost_Data.referencetime >= start_date & ...
+    P2L1L3_BLforCombAlcAndBoost_Data.referencetime <= end_date;
+P2L1L3_BLforCombAlcAndBoost_Data = P2L1L3_BLforCombAlcAndBoost_Data(dateFilter, :);
+
 P2L1L3_BLforCombAlcAndBoost_id = P2L1L3_BLforCombAlcAndBoost_Data.id;
 
 % Data summary
