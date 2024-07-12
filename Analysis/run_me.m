@@ -3,17 +3,6 @@
 
 fig_directory = '/Users/atanugiri/Downloads/Saline Ghrelin Project/Analysis/Fig files/';
 
-%% CDF plots
-% [h, figname] = cdfOfFeature('distance_until_limiting_time_stamp', ...
-%     'Alcohol BL', 'Alcohol', 'Boost');
-% savefig(h, fullfile(fig_directory, sprintf('%s.fig',figname)));
-% close(h);
-%
-% [h, figname] = cdfOfFeature('entry_time_25', ...
-%     'Alcohol BL', 'Alcohol', 'Boost');
-% savefig(h, fullfile(fig_directory, sprintf('%s.fig',figname)));
-% close(h);
-
 %% Feature plots
 featureForEach = masterPsychometricFunctionPlot('approachavoid', 'n', ...
     'P2L1 Boost','P2L1 Ghrelin','P2L1 Alcohol','P2L1 Ghr alcohol');
@@ -89,18 +78,17 @@ disp('p-value:');
 disp(p);
 
 
-%% Sensitivity analysis
-P2L1_BL_data = sensitivityAnalysis('approachavoid', 'n', 'P2L1 BL for comb boost and alc');
-P2A_data = sensitivityAnalysis('approachavoid', 'n', 'P2A Boost and alcohol');
-
+%% Variance analysis
+data = varianceAnalysis('approachavoid', 'n', 'P2L1 BL for comb boost and alc', ...
+    'P2A Boost and alcohol');
 % Initialize p-values matrix
-[numRows1, numCols] = size(P2L1_BL_data{1});
-[numRows2, ~] = size(P2A_data{1});
+[numRows1, numCols] = size(data{1});
+[numRows2, ~] = size(data{2});
 p_values = zeros(1, numCols);
 
 % Perform F-test for each column
 for j = 1:numCols
-    [~, p_values(j)] = vartest2(P2L1_BL_data{1}(:, j), P2A_data{1}(:, j));
+    [~, p_values(j)] = vartest2(data{1}(:, j), data{2}(:, j));
 end
 
 % Combine p-values using Fisher's method
@@ -110,5 +98,76 @@ combined_p = 1 - chi2cdf(chi2_stat, 2 * length(p_values));
 fprintf('Combined p-value from Fisher''s method: %0.4f\n', combined_p);
 
 
-%% Variance analysis
+%% Individual difference (07/11/2024)
 
+% Define the male names and treatment groups
+males = {'aladdin', 'carl', 'jafar', 'jimi', 'jr', 'kobe', 'mike', 'scar', 'simba', 'sully'};
+treatmentGrps = {'P2L1 BL for comb boost and alc', 'P2L1L3 BL for comb boost and alc', ...
+    'P2A Boost and alcohol'};
+
+% Initialize a cell array to store the feature lists
+featureLists = cell(numel(treatmentGrps), numel(males));
+
+% n = size(featureLists, 2);
+% 
+% % Use parfor with linear indexing to populate the feature lists
+% parfor grp = 1:numel(treatmentGrps)
+%     for animal = 1:n
+%        featureLists{grp, animal} = individualPsychValuesPerSession('approachavoid', ...
+%            treatmentGrps{grp}, males{animal});
+%     end
+% end
+
+% Initialize temporary storage for parfor
+tempFeatureLists = cell(numel(males) * numel(treatmentGrps), 1);
+
+% Use parfor to populate the featureLists with the matrices from individualPsychValuesPerSession
+parfor i = 1:(numel(treatmentGrps) * numel(males))
+    [grp, animal] = ind2sub([numel(treatmentGrps), numel(males)], i);
+    tempFeatureLists{i} = individualPsychValuesPerSession('approachavoid', treatmentGrps{grp}, males{animal});
+end
+
+% Convert temporary storage to the original featureLists structure
+for i = 1:(numel(treatmentGrps) * numel(males))
+    [grp, animal] = ind2sub([numel(treatmentGrps), numel(males)], i);
+    featureLists{grp, animal} = tempFeatureLists{i};
+end
+
+
+results = zeros(numel(treatmentGrps), numel(males));
+
+% Perform comparisons
+for animal = 1:numel(males)
+    % Extract data for the current animal
+    data1 = featureLists{1, animal}; % 'P2L1 BL for comb boost and alc'
+    data2 = featureLists{2, animal}; % 'P2L1L3 BL for comb boost and alc'
+    data3 = featureLists{3, animal}; % 'P2A Boost and alcohol'
+    
+    % Compare 'P2L1 BL for comb boost and alc' vs 'P2L1L3 BL for comb boost and alc'
+    p1_vs_p2 = twoWayANOVAfun(data1, data2);
+    
+    % Compare 'P2L1 BL for comb boost and alc' vs 'P2A Boost and alcohol'
+    p1_vs_p3 = twoWayANOVAfun(data1, data3);
+    
+    % Compare 'P2L1L3 BL for comb boost and alc' vs 'P2A Boost and alcohol'
+    p2_vs_p3 = twoWayANOVAfun(data2, data3);
+    
+    % Store the results
+    results(1, animal) = p1_vs_p2(1);
+    results(2, animal) = p1_vs_p3(1);
+    results(3, animal) = p2_vs_p3(1);
+end
+
+% Create the bar plot
+figure;
+bar(results', 'grouped');
+xlabel('Animals');
+ylabel('p-value');
+set(gca, 'XTickLabel', males);
+title('Comparison of Approach Rates for Different Treatment Groups');
+% Add a horizontal dotted line at y = 0.05
+hold on;
+yline(0.05, '--k', 'LineWidth', 1.5);
+hold off;
+legend('P2L1 BL vs P2L1L3 BL', 'P2L1 BL vs P2A', 'P2L1L3 BL vs P2A', ...
+    'p = 0.5', 'Location', 'Best');

@@ -4,10 +4,10 @@
 % Invokes masterPsychometricFunctionPlot. If varargin is provided then the
 % function will generate plot.
 
-function varianceAnalysis(feature, splitByGender, varargin)
+function varargout = varianceAnalysis(feature, splitByGender, varargin)
 
 % feature = 'approachavoid';
-% splitByGender = 'y';
+% splitByGender = 'n';
 % varargin = {'P2L1 BL for comb boost and alc', 'P2A Boost and alcohol'};
 
 % Check input
@@ -71,10 +71,14 @@ if strcmpi(splitByGender, 'n')
     for grp = 1:numel(treatment_data)
         % Create bar plot for each concentration
         h(grp) = bar(positions(grp,:), var_y{grp}, 'FaceColor', Colors(grp,:), ...
-            'BarWidth', 0.2);
+            'EdgeColor', Colors(grp,:),'BarWidth', 0.2);
         hold on;
-        errorbar(positions(grp, :), var_y{grp}, lowerCI{grp}, upperCI{grp}, 'k.', 'LineWidth', 1.5);
 
+        % Calculate error bars relative to variance
+        lowerError = var_y{grp} - lowerCI{grp};
+        upperError = upperCI{grp} - var_y{grp};
+
+        errorbar(positions(grp, :), var_y{grp}, lowerError, upperError, 'k.', 'LineWidth', 0.5);
     end
 
     % Add labels and legends
@@ -85,6 +89,8 @@ if strcmpi(splitByGender, 'n')
     set(gca,'xticklabel',label,'FontSize',15);
     legend_labels = treatmentGroups;
     legend(h, legend_labels, 'Location', 'best');
+
+    varargout{1} = featureForEach;
 
 elseif strcmpi(splitByGender, 'y')
     featureForEachMale = cell(1, numel(treatment_data));
@@ -107,7 +113,7 @@ elseif strcmpi(splitByGender, 'y')
         femaleData = treatment_data{grp}(strcmpi(treatment_data{grp}.gender,"female"),:);
         featureForEachFemale{grp} = psychometricFunValues(femaleData, feature);
         [female_var_y{grp}, female_lowerCI{grp}, female_upperCI{grp}] = ...
-            varianceCalculation(featureForEachMale{grp});
+            varianceCalculation(featureForEachFemale{grp});
 
     end
 
@@ -115,10 +121,15 @@ elseif strcmpi(splitByGender, 'y')
         subplot(1,2,1);
         % Create bar plot for each concentration
         bar(positions(grp,:), male_var_y{grp}, 'FaceColor', Colors(grp,:), ...
-            'BarWidth', 0.2);
+            'EdgeColor', Colors(grp,:), 'BarWidth', 0.2);
         hold on;
-        errorbar(positions(grp, :), male_var_y{grp}, male_lowerCI{grp}, ...
-            male_upperCI{grp}, 'k.', 'LineWidth', 1.5);
+
+        % Calculate error bars relative to variance
+        male_lowerError = male_var_y{grp} - male_lowerCI{grp};
+        male_upperError = male_upperCI{grp} - male_var_y{grp};
+
+        errorbar(positions(grp, :), male_var_y{grp}, male_lowerError, ...
+            male_upperError, 'k.', 'LineWidth', 0.5);
 
         if grp == 1
             title("Male", 'Interpreter','latex', 'FontSize', 25);
@@ -130,11 +141,15 @@ elseif strcmpi(splitByGender, 'y')
 
         subplot(1,2,2);
         % Create bar plot for each concentration
-        h(i) = bar(positions(grp,:), female_var_y{grp}, 'FaceColor', Colors(grp,:), ...
-            'BarWidth', 0.2);
+        h(grp) = bar(positions(grp,:), female_var_y{grp}, 'FaceColor', Colors(grp,:), ...
+            'EdgeColor', Colors(grp,:), 'BarWidth', 0.2);
         hold on;
-        errorbar(positions(grp, :), female_var_y{grp}, female_lowerCI{grp}, ...
-            female_upperCI{grp}, 'k.', 'LineWidth', 1.5);
+        % Calculate error bars relative to variance
+        female_lowerError = female_var_y{grp} - female_lowerCI{grp};
+        female_upperError = female_upperCI{grp} - female_var_y{grp};
+
+        errorbar(positions(grp, :), female_var_y{grp}, female_lowerError, ...
+            female_upperError, 'k.', 'LineWidth', 0.5);
 
         if grp == 1
             title("Female", 'Interpreter','latex', 'FontSize', 25);
@@ -152,6 +167,9 @@ elseif strcmpi(splitByGender, 'y')
     % Link axes to ensure the same scale
     linkaxes([subplot(1,2,1), subplot(1,2,2)], 'y');
 
+    varargout{1} = featureForEachMale;
+    varargout{2} = featureForEachFemale;
+
 else
     error('Invalid input for splitByGender. Use ''y'' or ''n''.');
 end
@@ -160,9 +178,9 @@ hold off;
 
 % Figure name
 if strcmpi(splitByGender, 'n')
-    figname = sprintf('Variance_%s_%s',trtmntGrp,feature);
+    figname = sprintf('Variance_%s_%s',[treatmentGroups{:}],feature);
 elseif strcmpi(splitByGender, 'y')
-    figname = sprintf('Variance_MvF_%s_%s',trtmntGrp,feature);
+    figname = sprintf('Variance_MvF_%s_%s',[treatmentGroups{:}],feature);
 end
 
 % Save figure
@@ -179,19 +197,20 @@ savefig(gcf, fullfile(myPath, figname));
 
 
 %% Description of varianceCalculation
-function [var_y, lowerCI, upperCI] = varianceCalculation(data)
-% Calculate variance
-var_y = var(data);
-% Number of observations in each column
-n = size(data, 1);
-dF = n - 1;  % degrees of freedom for each column
+    function [var_y, lowerCI, upperCI] = varianceCalculation(data)
+        % Calculate variance
+        var_y = var(data);
+        % Number of observations in each column
+        n = size(data, 1);
+        dF = n - 1;  % degrees of freedom for each column
 
-% Calculate chi-squared values for the desired confidence level (e.g., 95%)
-A = chi2inv(0.975, dF);
-B = chi2inv(0.025, dF);
+        % Calculate chi-squared values for the desired confidence level (e.g., 95%)
+        alpha = 0.05;
+        chi2_lower = chi2inv(alpha/2, dF);
+        chi2_upper = chi2inv(1 - alpha/2, dF);
 
-lowerCI = (dF * var_y) / A;
-upperCI = (dF * var_y) / B;
-end
+        lowerCI = (dF * var_y) / chi2_upper;
+        upperCI = (dF * var_y) / chi2_lower;
+    end
 
 end

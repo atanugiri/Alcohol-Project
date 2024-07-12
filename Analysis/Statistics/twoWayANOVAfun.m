@@ -6,7 +6,7 @@
 %
 % varargin = featureForEach;
 
-function twoWayANOVAfun(varargin)
+function p = twoWayANOVAfun(varargin)
 
 
 % Check if at least two data sets are provided
