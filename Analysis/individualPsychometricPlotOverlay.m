@@ -9,51 +9,33 @@
 
 %% Invokes treatmentIDfun, fetchHealthDataTable, psychometricFunValues
 
-function individualPsychometricPlotOverlay(feature, splitByGender, varargin)
+function individualPsychometricPlotOverlay(feature, splitByGender, trtmntGrp)
 
-% feature = 'approachavoid'; splitByGender = 'y';
-% varargin = {'P2L1 BL for comb boost and alc'};
+% feature = 'approachavoid'; splitByGender = 'n';
+% trtmntGrp = 'P2L1 BL for comb boost and alc';
 
 % Connect to database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
 
-treatmentGroups = cell(1, numel(varargin));
-for i = 1:numel(varargin)
-    treatmentGroups{i} = varargin{i};
-end
-
-treatmentIDs = cell(1, numel(treatmentGroups));
-for i = 1:numel(treatmentGroups)
-    treatmentIDs{i} = treatmentIDfun(treatmentGroups{i}, conn);
-end
+treatmentIDs = treatmentIDfun(trtmntGrp, conn);
 
 % Generate the idList from the filtered data
-treatmentIDs_str = cellfun(@(x) strjoin(arrayfun(@num2str, x, 'UniformOutput', ...
-    false), ','), treatmentIDs, 'UniformOutput', false);
-treatment_data = cell(1, numel(treatmentIDs_str));
-for i = 1:numel(treatmentIDs_str)
-    treatment_data{i} = fetchHealthDataTable(feature, treatmentIDs_str{i}, conn);
-    treatment_data{i} = cleanBadSessionsFromTable(treatment_data{i}, feature); % Remove bad sessions
-end
+treatmentIDs_str = strjoin(arrayfun(@num2str, treatmentIDs, 'UniformOutput', false), ',');
+    
+treatment_data = fetchHealthDataTable(feature, treatmentIDs_str, conn);
+treatment_data = cleanBadSessionsFromTable(treatment_data, feature); % Remove bad sessions
 
 % Plotting
 x = 1:4;
 figure;
 hold on;
-Colors = lines(numel(treatmentIDs));
-
 
 if strcmpi(splitByGender, 'n')
-    for grp = 1:numel(treatmentGroups)
-        currentGrpData = treatment_data{grp};
-        [totalSessions(grp), validSessions(grp), hLines(grp)] = ...
-            treatrmentGroupPlot(currentGrpData);
-        text(min(xlim), max(ylim), sprintf('n = %s', num2str(totalSessions(grp))));
-        fprintf('Total sessions = %d\n', totalSessions(grp));
-        fprintf('Valid sessions = %d\n', validSessions(grp));
-
-    end
+    [totalSessions, validSessions] = treatrmentGroupPlot(treatment_data);
+    text(min(xlim), max(ylim), sprintf('n = %s', num2str(totalSessions)));
+    fprintf('Total sessions = %d\n', totalSessions);
+    fprintf('Valid sessions = %d\n', validSessions);
 
     % Add x ticklabel
     ylabel(sprintf('%s', feature), 'Interpreter','none');
@@ -62,10 +44,8 @@ if strcmpi(splitByGender, 'n')
     set(gca,'xticklabel',label,'FontSize',15);
 
 elseif strcmpi(splitByGender, 'y')
-    for grp = 1:numel(treatmentGroups)
-        currentGrpData = treatment_data{grp};
-        maleData = currentGrpData(lower(currentGrpData.gender) == 'male', :);
-        femaleData = currentGrpData(lower(currentGrpData.gender) == 'female', :);
+        maleData = treatment_data(lower(treatment_data.gender) == 'male', :);
+        femaleData = treatment_data(lower(treatment_data.gender) == 'female', :);
 
         genderData = {maleData, femaleData};
         totalSessions = zeros(1,2);
@@ -75,7 +55,7 @@ elseif strcmpi(splitByGender, 'y')
             subplot(1,2,gender);
             hold on;
 
-            [totalSessions(gender), validSessions(gender), hLines(grp)] = ...
+            [totalSessions(gender), validSessions(gender)] = ...
                 treatrmentGroupPlot(genderData{gender});
             fprintf('Total sessions = %d\n', totalSessions(gender));
             fprintf('Valid sessions = %d\n', validSessions(gender));
@@ -94,19 +74,17 @@ elseif strcmpi(splitByGender, 'y')
             set(gca,'xticklabel',label,'FontSize',15);
         end
 
-    end % end of 1st treatment group
-
 end
 
 % Add legends
-legend(hLines, treatmentGroups, 'Location', 'best');
+legend(gca, trtmntGrp, 'Location', 'best');
 hold off;
 
 % Figure name
 if strcmpi(splitByGender, 'n')
-    figname = sprintf('%s_%s_indiv_psych',[treatmentGroups{:}],string(feature));
+    figname = sprintf('%s_%s_indiv_psych',trtmntGrp,string(feature));
 else
-    figname = sprintf('%s_%s_MvF_indiv_psych',[treatmentGroups{:}],string(feature));
+    figname = sprintf('%s_%s_MvF_indiv_psych',trtmntGrp,string(feature));
 end
 
 % Save figure
@@ -123,7 +101,7 @@ savefig(gcf, fullfile(myPath, figname));
 
 
 %% Description of treatrmentGroupPlot
-    function [totalSessions, validSessions, hLines] = treatrmentGroupPlot(currentGrpData)
+    function [totalSessions, validSessions] = treatrmentGroupPlot(currentGrpData)
 
         totalSessions = 0; % total sessions counter
         validSessions = 0; % valid sessions counter
@@ -136,20 +114,21 @@ savefig(gcf, fullfile(myPath, figname));
             totalSessions = totalSessions + numel(sessionList); % total sessions counter
 
             %% Reduce the number of plots for clarity if needed (comment out if not needed)
-%             maxSessPlot = 2;
-%             if numel(sessionList) >= maxSessPlot
-%                 randomIdx = randperm(numel(sessionList));
-%                 sessionList = sessionList(randomIdx(1:maxSessPlot));
-%             end
+            maxSessPlot = 1;
+            if numel(sessionList) > maxSessPlot
+                rng(42); % Set the random number generator to default settings for reproducibility
+                randomIdx = randperm(numel(sessionList));
+                sessionList = sessionList(randomIdx(1:maxSessPlot));
+            end
 
             for session = 1:length(sessionList)
                 sessionData = animalData(animalData.referencetime == sessionList(session),:);
                 %                     fprintf('%d trials in session\n', height(sessionData));
 
                 try
-                    [featureList, ~, ~] = psychometricFunValues(sessionData, feature);
+                    featureList = psychometricFunValues(sessionData, feature);
 
-                    hLines = plot(x, featureList, 'LineWidth', 2, 'Color', Colors(grp,:));
+                    plot(x, featureList, 'LineWidth', 1, 'Color', 'b');
                     validSessions = validSessions + 1;
                 catch
                     fprintf('Something wrong :( \n')
