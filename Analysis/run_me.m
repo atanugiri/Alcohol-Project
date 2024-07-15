@@ -108,32 +108,21 @@ treatmentGrps = {'P2L1 BL for comb boost and alc', 'P2L1L3 BL for comb boost and
 % Initialize a cell array to store the feature lists
 featureLists = cell(numel(treatmentGrps), numel(males));
 
-% n = size(featureLists, 2);
-% 
-% % Use parfor with linear indexing to populate the feature lists
-% parfor grp = 1:numel(treatmentGrps)
-%     for animal = 1:n
-%        featureLists{grp, animal} = individualPsychValuesPerSession('approachavoid', ...
-%            treatmentGrps{grp}, males{animal});
-%     end
-% end
+nrows = size(featureLists, 1);
+ncols = size(featureLists, 2);
 
-% Initialize temporary storage for parfor
-tempFeatureLists = cell(numel(males) * numel(treatmentGrps), 1);
+parfor grp = 1:nrows
+    tempRow = cell(1, ncols);
+   
+    for animal = 1:ncols
+        tempRow{animal} = individualPsychValuesPerSession('approachavoid', ...
+            treatmentGrps{grp}, males{animal});
+    end
 
-% Use parfor to populate the featureLists with the matrices from individualPsychValuesPerSession
-parfor i = 1:(numel(treatmentGrps) * numel(males))
-    [grp, animal] = ind2sub([numel(treatmentGrps), numel(males)], i);
-    tempFeatureLists{i} = individualPsychValuesPerSession('approachavoid', treatmentGrps{grp}, males{animal});
+    featureLists(grp, :) = tempRow;
 end
 
-% Convert temporary storage to the original featureLists structure
-for i = 1:(numel(treatmentGrps) * numel(males))
-    [grp, animal] = ind2sub([numel(treatmentGrps), numel(males)], i);
-    featureLists{grp, animal} = tempFeatureLists{i};
-end
-
-
+% Initialize an array to store the results
 results = zeros(numel(treatmentGrps), numel(males));
 
 % Perform comparisons
@@ -167,7 +156,7 @@ set(gca, 'XTickLabel', males);
 title('Comparison of Approach Rates for Different Treatment Groups');
 % Add a horizontal dotted line at y = 0.05
 hold on;
-yline(0.05, '--k', 'LineWidth', 1.5);
+yline(0.05, '--k', 'LineWidth', 1.5, 'Color', 'r');
 hold off;
 legend('P2L1 BL vs P2L1L3 BL', 'P2L1 BL vs P2A', 'P2L1L3 BL vs P2A', ...
     'p = 0.5', 'Location', 'Best');

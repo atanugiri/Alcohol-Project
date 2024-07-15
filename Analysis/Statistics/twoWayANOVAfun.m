@@ -27,7 +27,7 @@ for grp = 2:numel(varargin)
     % Display results
     fprintf('ANOVA for T1 vs T%d:\n', grp);
     disp(tbl);
-    fprintf('p-value: %.4e\n\n', p);
+%     fprintf('p-value: %.4e\n\n', p);
 end
 
 end
