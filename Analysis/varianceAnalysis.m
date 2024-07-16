@@ -1,9 +1,10 @@
 % Author: Atanu Giri
 % Date: 07/08/2024
-% This function plots variance of the input treatment group.
+% This function plots variance of the input treatment group at 4 different 
+% concentrations.
 % Invokes masterPsychometricFunctionPlot. If varargin is provided then the
 % function will generate plot.
-
+%
 function varargout = varianceAnalysis(feature, splitByGender, varargin)
 
 % feature = 'approachavoid';

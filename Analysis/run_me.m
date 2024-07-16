@@ -102,6 +102,7 @@ fprintf('Combined p-value from Fisher''s method: %0.4f\n', combined_p);
 
 % Define the male names and treatment groups
 males = {'aladdin', 'carl', 'jafar', 'jimi', 'jr', 'kobe', 'mike', 'scar', 'simba', 'sully'};
+% females = {'alexis', 'fiona', 'harley', 'juana', 'kryssia', 'neftali', 'raven', 'renata', 'sarah', 'shakira'};
 treatmentGrps = {'P2L1 BL for comb boost and alc', 'P2L1L3 BL for comb boost and alc', ...
     'P2A Boost and alcohol'};
 
@@ -160,3 +161,8 @@ yline(0.05, '--k', 'LineWidth', 1.5, 'Color', 'r');
 hold off;
 legend('P2L1 BL vs P2L1L3 BL', 'P2L1 BL vs P2A', 'P2L1L3 BL vs P2A', ...
     'p = 0.5', 'Location', 'Best');
+
+
+%% Cluster for individual difference
+[animalsToUse, param_values, stdErr] = individualParamComparisonPlot(param_name, gender, varargin);
+
