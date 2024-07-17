@@ -114,7 +114,7 @@ ncols = size(featureLists, 2);
 
 parfor grp = 1:nrows
     tempRow = cell(1, ncols);
-   
+
     for animal = 1:ncols
         tempRow{animal} = individualPsychValuesPerSession('approachavoid', ...
             treatmentGrps{grp}, males{animal});
@@ -132,16 +132,16 @@ for animal = 1:numel(males)
     data1 = featureLists{1, animal}; % 'P2L1 BL for comb boost and alc'
     data2 = featureLists{2, animal}; % 'P2L1L3 BL for comb boost and alc'
     data3 = featureLists{3, animal}; % 'P2A Boost and alcohol'
-    
+
     % Compare 'P2L1 BL for comb boost and alc' vs 'P2L1L3 BL for comb boost and alc'
     p1_vs_p2 = twoWayANOVAfun(data1, data2);
-    
+
     % Compare 'P2L1 BL for comb boost and alc' vs 'P2A Boost and alcohol'
     p1_vs_p3 = twoWayANOVAfun(data1, data3);
-    
+
     % Compare 'P2L1L3 BL for comb boost and alc' vs 'P2A Boost and alcohol'
     p2_vs_p3 = twoWayANOVAfun(data2, data3);
-    
+
     % Store the results
     results(1, animal) = p1_vs_p2(1);
     results(2, animal) = p1_vs_p3(1);
@@ -164,5 +164,42 @@ legend('P2L1 BL vs P2L1L3 BL', 'P2L1 BL vs P2A', 'P2L1L3 BL vs P2A', ...
 
 
 %% Cluster for individual difference
-[animalsToUse, param_values, stdErr] = individualParamComparisonPlot(param_name, gender, varargin);
+males = {'aladdin', 'carl', 'jafar', 'jimi', 'jr', 'kobe', 'mike', 'scar', ...
+    'simba', 'sully'};
+% males = {'alexis', 'fiona', 'harley', 'juana', 'kryssia', 'neftali', ...
+%     'raven', 'renata', 'sarah', 'shakira'};
 
+featureList = {'LA', 'slope', 'shift', 'UA', 'Rsq'};
+treatmentGroups = {'P2L1 BL for comb boost and alc_approachavoid_logistic4_fitting_param.mat', ...
+    'P2A Boost and alcohol_approachavoid_logistic4_fitting_param.mat', ...
+    'P2L1L3 BL for comb boost and alc_approachavoid_logistic4_fitting_param.mat'};
+
+maleParams = cell(1, numel(treatmentGroups));
+stdErrMales = cell(1, numel(treatmentGroups));
+
+% Initialize each cell as a struct with feature names
+for grp = 1:numel(treatmentGroups)
+    maleParams{grp} = struct();
+    stdErrMales{grp} = struct();
+    for featureIdx = 1:numel(featureList)
+        feature = featureList{featureIdx};
+        maleParams{grp}.(feature) = [];
+        stdErrMales{grp}.(feature) = [];
+    end
+end
+
+
+for featureIdx = 1:numel(featureList)
+    feature = featureList{featureIdx};
+    [~, maleParam, stdErrMale] = indivAnimalParamCompPlot(feature, 'y', ...
+        treatmentGroups{:});
+%     [~, ~, ~, ~, maleParam, stdErrMale] = indivAnimalParamCompPlot(feature, 'y', ...
+%         treatmentGroups{:});
+
+    for grp = 1:numel(treatmentGroups)
+        maleParams{grp}.(feature) = maleParam(:, grp);
+        stdErrMales{grp}.(feature) = stdErrMale(:, grp);
+    end
+end
+
+featureBiplotForIndivAnimal(featureList, males, treatmentGroups, maleParams);
