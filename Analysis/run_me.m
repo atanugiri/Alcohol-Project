@@ -99,7 +99,6 @@ fprintf('Combined p-value from Fisher''s method: %0.4f\n', combined_p);
 
 
 %% Individual difference (07/11/2024)
-
 % Define the male names and treatment groups
 males = {'aladdin', 'carl', 'jafar', 'jimi', 'jr', 'kobe', 'mike', 'scar', 'simba', 'sully'};
 % females = {'alexis', 'fiona', 'harley', 'juana', 'kryssia', 'neftali', 'raven', 'renata', 'sarah', 'shakira'};
@@ -163,7 +162,7 @@ legend('P2L1 BL vs P2L1L3 BL', 'P2L1 BL vs P2A', 'P2L1L3 BL vs P2A', ...
     'p = 0.5', 'Location', 'Best');
 
 
-%% Cluster for individual difference
+%% Cluster for individual difference (07/17/2024)
 males = {'aladdin', 'carl', 'jafar', 'jimi', 'jr', 'kobe', 'mike', 'scar', ...
     'simba', 'sully'};
 % males = {'alexis', 'fiona', 'harley', 'juana', 'kryssia', 'neftali', ...

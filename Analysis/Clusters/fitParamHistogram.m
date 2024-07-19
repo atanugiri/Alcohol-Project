@@ -13,7 +13,7 @@
 function varargout = fitParamHistogram(param_name, splitbyGender, varargin)
 
 % param_name = 'UA'; splitbyGender = 'n';
-% varargin = {'P2L1L3 BL for comb boost and alc_approachavoid_logistic4_fitting_param', ...
+% varargin = {'P2L1L3 BL for comb boost and alc_approachavoid_logistic4_fitting_param.mat', ...
 %     'P2L1L3 Boost and alcohol_approachavoid_logistic4_fitting_param'};
 
 if contains(varargin{1}, 'logistic3')
@@ -80,7 +80,7 @@ if strcmpi(splitbyGender, 'y')
 end
 
 scriptDir = fileparts(mfilename('fullpath'));
-myPath = fullfile(scriptDir, 'Fig files/');
+figPath = fullfile(scriptDir, 'Fig files/');
 
 % Histogram
 histOfParam(param_array, param_name);
@@ -93,20 +93,20 @@ histOfParam(param_array, param_name);
             if strcmpi(splitbyGender, 'y')
                 subplot(1,2,1);
                 [f_male, x_values_male] = ksdensity(paramArray{idx}{1});
-                h_male(idx) = plot(x_values_male, f_male, 'LineWidth', 2, 'Color', Colors(idx,:));
+                plot(x_values_male, f_male, 'LineWidth', 2, 'Color', Colors(idx,:));
                 xlabel('value','Interpreter','latex');
                 ylabel('probability density','Interpreter','latex');
                 hold on;
 
                 subplot(1,2,2);
                 [f_female, x_values_female] = ksdensity(paramArray{idx}{2});
-                h_female(idx) = plot(x_values_female, f_female, 'LineWidth', 2, 'Color', Colors(idx,:));
+                plot(x_values_female, f_female, 'LineWidth', 2, 'Color', Colors(idx,:));
                 xlabel('value','Interpreter','latex');
                 hold on;
 
             else
                 [f, x_values] = ksdensity(paramArray{idx}); % Compute KDE values and corresponding x-values
-                h(idx) = plot(x_values, f, 'LineWidth', 2, 'Color', Colors(idx,:));
+                plot(x_values, f, 'LineWidth', 2, 'Color', Colors(idx,:));
                 hold on;
             end
         end
@@ -114,13 +114,21 @@ histOfParam(param_array, param_name);
         hold off;
         sgtitle(sprintf('Histogram of %s', param_name), 'Interpreter','latex','FontSize',25);
 
+        % Remove the excess part in varargin for legend
+        legendLabels = cell(1,numel(varargin));
+        for j = 1:numel(varargin)
+            result = regexp(varargin{j}, '^[^_]+', 'match');
+            extracted_part = result{1};
+            legendLabels{j} = extracted_part;
+        end
+
         if strcmpi(splitbyGender, 'y')
-            legend(h_female, varargin, 'Interpreter','none','Location','best');
+            legend(legendLabels, 'Interpreter','none','Location','best');
             linkaxes([subplot(1,2,1), subplot(1,2,2)], 'y');
         end
 
         if ~strcmpi(splitbyGender, 'y')
-            legend(h, varargin, 'Interpreter','none','Location','best');
+            legend(legendLabels, 'Interpreter','none','Location','best');
             xlabel('value','Interpreter','latex');
             ylabel('probability density','Interpreter','latex');
         end
@@ -134,15 +142,15 @@ histOfParam(param_array, param_name);
         for key = keys(prefixMap)
             if contains(varargin{1}, key{1})
                 if strcmpi(splitbyGender, 'y')
-                    figname = sprintf('%s_%s_hist_%s_MvF', prefixMap(key{1}), param_name, [varargin{:}]);
+                    figname = sprintf('%s_%s_hist_%s_MvF', prefixMap(key{1}), param_name, [legendLabels{:}]);
                 else
-                    figname = sprintf('%s_%s_hist_%s', prefixMap(key{1}), param_name, [varargin{:}]);
+                    figname = sprintf('%s_%s_hist_%s', prefixMap(key{1}), param_name, [legendLabels{:}]);
                 end
                 break;
             end
         end
 
-        savefig(gcf, fullfile(myPath, figname));
+        savefig(gcf, fullfile(figPath, figname));
     end
 
 end

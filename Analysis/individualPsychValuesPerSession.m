@@ -7,7 +7,7 @@
 % Example usage:
 % individualPsychPlotPerSession('approachavoid','P2L1 Ghrelin', 'sully')
 %
-function featureList = individualPsychValuesPerSession(feature, trtGroup, animal)
+function [featureList, sessionList] = individualPsychValuesPerSession(feature, trtGroup, animal)
 
 % feature = 'approachavoid'; trtGroup = 'P2L1 BL for comb boost and alc'; animal = 'aladdin';
 
