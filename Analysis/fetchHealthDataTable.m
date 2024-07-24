@@ -1,12 +1,12 @@
 % Author: Atanu Giri
 % Date: 11/14/2023
-
-function mergedTable = fetchHealthDataTable(feature, idList, varargin)
 %
 % This function takes the dates as user input and returns a table of all 
 % id's and corresponding columns from live_table and featuretable
 %
-% feature = 'approachavoid';
+function mergedTable = fetchHealthDataTable(feature, idList, varargin)
+
+% feature = 'stoppingpts_per_unittravel_method6';
 
 if numel(varargin) < 1
     datasource = 'live_database';
@@ -47,6 +47,14 @@ end
 if ~strcmpi(feature, 'distance_until_limiting_time_stamp')
     mergedTable.(feature) = str2double(mergedTable.(feature));
 end
+
+% % Convert feature/unit_distance to raw values
+% if ismember(feature, {'acc_outlier_move_median','stoppingpts_per_unittravel_method6', ...
+%         'rotationpts_per_unittravel_method4'})
+%     mergedTable.(feature) = mergedTable.(feature) .* mergedTable.distance_until_limiting_time_stamp;
+% end
+
+% Since there are bad entries for 'feeder' we need to fix it
 mergedTable.realFeederId = nan(height(mergedTable),1);
 
 for i = 1:height(mergedTable)

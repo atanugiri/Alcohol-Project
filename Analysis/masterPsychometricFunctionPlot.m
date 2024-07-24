@@ -13,25 +13,15 @@
 %
 function varargout = masterPsychometricFunctionPlot(feature, splitByGender, varargin)
 
-% feature = 'distance_until_limiting_time_stamp';
-% splitByGender = 'y';
-% varargin = {'P2L1 Boost','P2L1 Ghrelin','P2L1 Alcohol','P2L1 Ghr alcohol'};
-
-close all;
+% feature = 'stoppingpts_per_unittravel_method6';
+% splitByGender = 'n';
+% varargin = {'P2L1L3 Post alcohol'};
 
 % Connect to database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
 
-if numel(varargin) >= 1
-    treatmentGroups = cell(1, numel(varargin));
-    for i = 1:numel(varargin)
-        treatmentGroups{i} = varargin{i};
-    end
-else
-    treatmentGroups = input("Which health type do you want for treatment? ","s");
-end
-
+treatmentGroups = varargin;
 treatmentIDs = cell(1, numel(treatmentGroups));
 for i = 1:numel(treatmentGroups)
     treatmentIDs{i} = treatmentIDfun(treatmentGroups{i}, conn);

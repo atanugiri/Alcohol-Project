@@ -5,15 +5,17 @@ fig_directory = '/Users/atanugiri/Downloads/Saline Ghrelin Project/Analysis/Fig 
 
 %% Feature plots
 featureForEach = masterPsychometricFunctionPlot('approachavoid', 'n', ...
-    'P2L1 Boost','P2L1 Ghrelin','P2L1 Alcohol','P2L1 Ghr alcohol');
-twoWayANOVAfun(featureForEach{:});
-
+    'P2L1 BL for comb boost and alc','P2L1 Boost and alcohol','P2L1 Post alcohol');
+T1 = featureForEach{1};
+T2 = featureForEach{2};
+data = [T1; T2];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
+% Perform MANOVA
+[d, p, stats] = manova1(data, group);
 
 [featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot( ...
     'approachavoid', 'y', ...
-    'P2L1 Boost','P2L1 Ghrelin','P2L1 Alcohol','P2L1 Ghr alcohol');
-twoWayANOVAfun(featureForEachMale{:})
-twoWayANOVAfun(featureForEachFemale{:})
+    'P2L1 BL for comb boost and alc','P2L1 Boost and alcohol','P2L1 Post alcohol');
 
 
 %% 4-param logistic fit plots
