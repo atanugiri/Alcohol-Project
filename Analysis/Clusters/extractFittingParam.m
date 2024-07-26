@@ -4,10 +4,9 @@
 % Example usage:
 % extractFittingParam("P2L1 Ghrelin", "approachavoid", 1)
 %
-% fitType 1 = 3-param logistic fit, fitType 2 = 4-param logistic fit
-% fitType 3 = Brain and Cousens fit, fitType 4 = linear combinations of
-% 3-param sigmoids
-%
+% fitType 1 = 3-param logistic fit, 
+% fitType 2 = 4-param logistic fit
+% fitType 3 = Gompertz model
 % Invokes treatmentIDfun, fetchHealthDataTable, cleanBadSessionsFromTable,
 % psychometricFunValues, sigmoid_fit_for_cluster
 %
@@ -24,15 +23,9 @@ treatmentID = strjoin(arrayfun(@num2str, treatmentID, 'UniformOutput', false), '
 treatment_data = fetchHealthDataTable(feature, treatmentID, conn);
 treatment_data = cleanBadSessionsFromTable(treatment_data, feature); % Remove bad sessions
 
-
 % File where the fitting results (.mat) and fit plot (pdf) will be saved
-if fitType == 1
-    fileName = sprintf("%s_%s_logistic3_fitting_param", treatment, feature);
-elseif fitType == 2
-    fileName = sprintf("%s_%s_logistic4_fitting_param", treatment, feature);
-elseif fitType == 3
-    fileName = sprintf("%s_%s_GP_fitting_param", treatment, feature);
-end
+fitTypeNames = ["logistic3", "logistic4", "GP"];
+fileName = sprintf("%s_%s_%s_fitting_param", treatment, feature, fitTypeNames(fitType));
 
 scriptDir = fileparts(mfilename('fullpath'));
 folderName = 'Mat files';

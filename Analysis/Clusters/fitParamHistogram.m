@@ -1,7 +1,7 @@
 % Author: Atanu Giri
 % Date: 04/16/2024
 %
-% Plots histogram of input parameter.
+% Generates density plot of input parameter.
 %
 % Possible parameter names
 % logistic3 fit: 'UA', 'slope', 'shift', 'Rsq'
@@ -10,23 +10,29 @@
 %
 % Invokes allFitParam
 
-function varargout = fitParamHistogram(param_name, splitbyGender, varargin)
+function varargout = fitParamHistogram(param_name, feature, fitType, splitbyGender, varargin)
 
-% param_name = 'UA'; splitbyGender = 'n';
-% varargin = {'P2L1L3 BL for comb boost and alc_approachavoid_logistic4_fitting_param.mat', ...
-%     'P2L1L3 Boost and alcohol_approachavoid_logistic4_fitting_param'};
+% param_name = 'UA';
+% feature = 'approachavoid';
+% fitType = 2;
+% splitbyGender = 'n';
+% varargin = {'P2L1L3 BL for comb boost and alc','P2L1L3 Boost and alcohol'};
 
-if contains(varargin{1}, 'logistic3')
-    [UA, slope, shift, Rsq, animals] = allFitParam(varargin{:});
+% Files to fetch
+fitTypeNames = ["logistic3", "logistic4", "GP"];
+files = strcat(varargin, '_', feature, sprintf('_%s_fitting_param', fitTypeNames(fitType)));
+
+if contains(files{1}, 'logistic3')
+    [UA, slope, shift, Rsq, animals] = allFitParam(files{:});
     featureMap = struct('UA', UA, 'slope', slope, 'shift', shift, 'Rsq', Rsq);
 
-elseif contains(varargin{1}, 'logistic4')
-    [LA, slope, shift, UA, Rsq, animals] = allFitParam(varargin{:});
+elseif contains(files{1}, 'logistic4')
+    [LA, slope, shift, UA, Rsq, animals] = allFitParam(files{:});
     featureMap = struct('LA', LA, 'slope', slope, 'shift', shift, 'UA', UA, ...
         'Rsq', Rsq);
 
-elseif contains(varargin{1}, 'GP')
-    [LA, slope, shift, UA, Rsq, animals] = allFitParam(varargin{:});
+elseif contains(files{1}, 'GP')
+    [LA, slope, shift, UA, Rsq, animals] = allFitParam(files{:});
     featureMap = struct('LA', LA, 'slope', slope, 'shift', shift, 'UA', UA, ...
         'Rsq', Rsq);
 end
@@ -113,14 +119,7 @@ histOfParam(param_array, param_name);
 
         hold off;
         sgtitle(sprintf('Histogram of %s', param_name), 'Interpreter','latex','FontSize',25);
-
-        % Remove the excess part in varargin for legend
-        legendLabels = cell(1,numel(varargin));
-        for j = 1:numel(varargin)
-            result = regexp(varargin{j}, '^[^_]+', 'match');
-            extracted_part = result{1};
-            legendLabels{j} = extracted_part;
-        end
+        legendLabels = varargin;
 
         if strcmpi(splitbyGender, 'y')
             legend(legendLabels, 'Interpreter','none','Location','best');
@@ -133,23 +132,9 @@ histOfParam(param_array, param_name);
             ylabel('probability density','Interpreter','latex');
         end
 
-        % Figure name      
-        % Define a map of keywords to prefixes
-        prefixMap = containers.Map({'logistic3', 'logistic4', 'GP'}, ...
-            {'logistic3', 'logistic4', 'GP'});
-
-        % Loop through the keys in the map and check for a match
-        for key = keys(prefixMap)
-            if contains(varargin{1}, key{1})
-                if strcmpi(splitbyGender, 'y')
-                    figname = sprintf('%s_%s_hist_%s_MvF', prefixMap(key{1}), param_name, [legendLabels{:}]);
-                else
-                    figname = sprintf('%s_%s_hist_%s', prefixMap(key{1}), param_name, [legendLabels{:}]);
-                end
-                break;
-            end
-        end
-
+        % Save figure
+        figname = sprintf('density_plot_%s_%s_%s_%s', param_name, feature, ...
+            [legendLabels{:}], fitTypeNames(fitType));
         savefig(gcf, fullfile(figPath, figname));
     end
 

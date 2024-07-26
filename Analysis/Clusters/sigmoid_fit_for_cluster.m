@@ -31,7 +31,8 @@ initial_guess{3} = [min(y), 1, median(x), max(y)];
 % Define lower and upper bounds for parameters
 lb = cell(1, numel(fitobjects)); ub = cell(1, numel(fitobjects));
 lb{1} = [0, -Inf, 0.5]; ub{1} = [1, Inf, 9];
-lb{2} = [0, -Inf, 0.5, 0]; ub{2} = [1, Inf, 9, 1];
+lb{2} = [0, -Inf, 0.5, 0]; ub{2} = [1, Inf, 9, 1]; % for 'approachavoid'
+% lb{2} = [0, -Inf, 0.5, 0]; ub{2} = [15, Inf, 9, 15]; % for 'time_in_feeder_25'
 lb{3} = [0, -Inf, 0.5, 0]; ub{3} = [1, Inf, 9, 1];
 
 % Fit the sigmoid function to the data using nonlinear regression
