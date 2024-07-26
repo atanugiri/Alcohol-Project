@@ -1,12 +1,21 @@
 % Author: Atanu Giri
 % Date: 07/12/2024
 %
-function calculateFractionOfSigmoid(gender, varargin)
+% Plots the fraction of sigmoid of individual animals for input treatment
+% group/s. If the psychometric function is sigmoid or not is decided by a 
+% threshold R^2 value of the fit
+%
+function [count, total] = calculateFractionOfSigmoid(gender, feature, fitType, varargin)
 % gender = 'female';
 % varargin = {'P2L1 BL for comb boost and alc_approachavoid_logistic4_fitting_param.mat', ...
 %     'P2L1L3 BL for comb boost and alc_approachavoid_logistic4_fitting_param.mat', ...
 %     'P2A Boost and alcohol_approachavoid_logistic4_fitting_param.mat'};
 
+% Files to fetch
+fitTypeNames = ["logistic3", "logistic4", "GP"];
+files = strcat(varargin, '_', feature, sprintf('_%s_fitting_param', fitTypeNames(fitType)));
+
+% Fetch mat files where R^2 values are stored.
 scriptDir = fileparts(mfilename('fullpath'));
 myPath = fullfile(scriptDir, 'Clusters/Mat files/');
 
@@ -14,50 +23,37 @@ allRsq = cell(1, numel(varargin));
 animals = cell(1, numel(varargin));
 
 for grp = 1:numel(varargin)
-    loadFile = load(fullfile(myPath, varargin{grp}));
+    loadFile = load(fullfile(myPath, files{grp}));
     [R_squared, animal] = helperFun(loadFile);
 
     allRsq{grp} = R_squared;
     animals{grp} = animal;
 end
 
+% List of males and females
 males = {'aladdin', 'carl', 'jafar', 'jimi', 'jr', 'kobe', 'mike', 'scar', ...
     'simba', 'sully'};
 females = {'alexis', 'fiona', 'harley', 'juana', 'kryssia', 'neftali', ...
     'raven', 'renata', 'sarah', 'shakira'};
 
-fracOfSig = zeros(numel(varargin), numel(males));
-
+% Calculate fraction of sigmoid for each animal by gender
 if strcmpi(gender, 'male')
-    for grp = 1:numel(varargin)
-        for i = 1:numel(males)
-            currentAnimal = males(i);
-            animalData = allRsq{grp}(ismember(animals{grp},currentAnimal));
-            sigFilter = animalData >= 0.9;
-            fracOfSig(grp,i) = sum(sigFilter)/length(animalData);
-
-        end
-    end
-
-
+    fracOfSig = fracOfSigFun(males);
 elseif strcmpi(gender, 'female')
-    for grp = 1:numel(varargin)
-        for i = 1:numel(females)
-            currentAnimal = females(i);
-            animalData = allRsq{grp}(ismember(animals{grp},currentAnimal));
-            sigFilter = animalData >= 0.9;
-            fracOfSig(grp,i) = sum(sigFilter)/length(animalData);
-
-        end
-    end
-
+    fracOfSig = fracOfSigFun(females);
 else
     error('Use correct input for gender');
 end
 
+count = sum(fracOfSig >= 0.7);
+total = length(fracOfSig);
+
 % Create the bar plot
 figure;
 bar(fracOfSig', 'grouped', 'EdgeColor','none');
+hold on;
+yline(0.7, '--r', 'LineWidth', 1.5); % User defined threshold
+
 ylabel('Fraction of sigmoid');
 if strcmpi(gender, 'male')
     xlabel('Male');
@@ -78,8 +74,23 @@ end
 
 % Figure name
 figname = sprintf('FracOfSig_%s', gender);
-
 savefig(gcf, fullfile(figPath, figname));
+
+
+%% Description of fracOfSigFun
+    function fracOfSig = fracOfSigFun(animalList)
+        fracOfSig = zeros(numel(varargin), numel(animalList));
+        for i = 1:numel(varargin)
+            for j = 1:numel(animalList)
+                currentAnimal = animalList(j);
+                animalData = allRsq{i}(ismember(animals{i},currentAnimal));
+                sigFilter = animalData >= 0.9;
+                fracOfSig(i,j) = sum(sigFilter)/length(animalData);
+
+            end
+        end
+    end
+
 
 %% Description of helperFun
     function [R_squared, animal] = helperFun(loadFile)
