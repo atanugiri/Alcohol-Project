@@ -5,7 +5,7 @@
 % model and extracts fitting parameters.
 %
 
-function [h, fit_params, R_squared] = sigmoid_fit_for_cluster(y, feature, fitType)
+function [h, fit_params, R_squared] = sigmoid_fit_fun(y, feature, fitType)
 
 % y = [0.1, 0.3, 0.5, 0.9]; fitType = 1;
 
