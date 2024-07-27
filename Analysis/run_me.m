@@ -19,14 +19,14 @@ group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
 
 
 %% 4-param logistic fit plots
-param_array = fitParamHistogram('shift', 'n', 'P2L1 BL for comb boost and alc_approachavoid_logistic4_fitting_param', ...
-    'P2L1 Boost and alcohol_approachavoid_logistic4_fitting_param');
+param_array = fitParamKernelDensity('shift', 'aproachavoid', 2, 'n', ...
+    'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol');
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000);
 fprintf('p = %.4f\n', p);
 
 
-[maleParam, femaleParam] = fitParamHistogram('shift', 'y', 'P2L1 BL for comb boost and alc_approachavoid_logistic4_fitting_param', ...
-    'P2L1 Boost and alcohol_approachavoid_logistic4_fitting_param');
+[maleParam, femaleParam] = fitParamKernelDensity('shift', 'aproachavoid', 2, 'y', ...
+    'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol');
 
 [h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000);
 [h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000);
@@ -98,6 +98,20 @@ chi2_stat = -2 * sum(log(p_values));
 combined_p = 1 - chi2cdf(chi2_stat, 2 * length(p_values));
 
 fprintf('Combined p-value from Fisher''s method: %0.4f\n', combined_p);
+
+%% Individual difference (07/26/2024)
+[count1, total1] = calculateFractionOfSigmoid('male', 'approachavoid', 2, ...
+    'P2L1 Boost and alcohol');
+figure;
+pie([count1, total1 - count1]);
+
+[count2, total2] = calculateFractionOfSigmoid('female', 'approachavoid', 2, ...
+    'P2L1 Boost and alcohol');
+figure;
+pie([count2, total2 - count2]);
+
+p = chi2test([count1, (total1 - count1); count2, (total2 - count2)]);
+fprintf('p = %.4f\n', p);
 
 
 %% Individual difference (07/11/2024)

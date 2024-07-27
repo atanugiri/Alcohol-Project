@@ -6,10 +6,9 @@
 % threshold R^2 value of the fit
 %
 function [count, total] = calculateFractionOfSigmoid(gender, feature, fitType, varargin)
-% gender = 'female';
-% varargin = {'P2L1 BL for comb boost and alc_approachavoid_logistic4_fitting_param.mat', ...
-%     'P2L1L3 BL for comb boost and alc_approachavoid_logistic4_fitting_param.mat', ...
-%     'P2A Boost and alcohol_approachavoid_logistic4_fitting_param.mat'};
+% gender = 'female'; feature = 'approachavoid'; fitType = 2;
+% varargin = {'P2L1 BL for comb boost and alc', ...
+%     'P2L1L3 BL for comb boost and alc', 'P2A Boost and alcohol'};
 
 % Files to fetch
 fitTypeNames = ["logistic3", "logistic4", "GP"];
@@ -45,7 +44,7 @@ else
     error('Use correct input for gender');
 end
 
-count = sum(fracOfSig >= 0.7);
+count = sum(fracOfSig < 0.7);
 total = length(fracOfSig);
 
 % Create the bar plot
