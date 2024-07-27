@@ -5,7 +5,7 @@
 % model and extracts fitting parameters.
 %
 
-function [h, fit_params, R_squared] = sigmoid_fit_for_cluster(y, fitType)
+function [h, fit_params, R_squared] = sigmoid_fit_for_cluster(y, feature, fitType)
 
 % y = [0.1, 0.3, 0.5, 0.9]; fitType = 1;
 
@@ -27,13 +27,19 @@ initial_guess{1} = [max(y), 1, median(x)];
 initial_guess{2} = [min(y), 1, median(x), max(y)];
 initial_guess{3} = [min(y), 1, median(x), max(y)];
 
-
-% Define lower and upper bounds for parameters
 lb = cell(1, numel(fitobjects)); ub = cell(1, numel(fitobjects));
-lb{1} = [0, -Inf, 0.5]; ub{1} = [1, Inf, 9];
-lb{2} = [0, -Inf, 0.5, 0]; ub{2} = [1, Inf, 9, 1]; % for 'approachavoid'
-% lb{2} = [0, -Inf, 0.5, 0]; ub{2} = [15, Inf, 9, 15]; % for 'time_in_feeder_25'
-lb{3} = [0, -Inf, 0.5, 0]; ub{3} = [1, Inf, 9, 1];
+% Define lower and upper bounds for parameters
+if strcmpi(feature, 'approachavoid')
+    lb{1} = [0, -Inf, 0.5]; ub{1} = [1, Inf, 9];
+    lb{2} = [0, -Inf, 0.5, 0]; ub{2} = [1, Inf, 9, 1];
+    lb{3} = [0, -Inf, 0.5, 0]; ub{3} = [1, Inf, 9, 1];
+elseif strcmpi(feature, 'time_in_feeder_25')
+    lb{1} = [0, -Inf, 0.5]; ub{1} = [15, Inf, 9];
+    lb{2} = [0, -Inf, 0.5, 0]; ub{2} = [15, Inf, 9, 15];
+    lb{3} = [0, -Inf, 0.5, 0]; ub{3} = [15, Inf, 9, 15];
+else
+    error('Use correct input for feature')
+end
 
 % Fit the sigmoid function to the data using nonlinear regression
 %     [fitresult{fitIdx}, goodness] = fit(x', y', fitobjects{fitIdx}, ...
@@ -65,5 +71,9 @@ xlabel('x');
 ylabel('y');
 legend('Data', 'Fitted Curve');
 hold off;
-ylim([0, 1]);
+if strcmpi(feature, 'approachavoid')
+    ylim([0, 1]);
+elseif strcmpi(feature, 'time_in_feeder_25')
+    ylim([0, 15]);
+end
 end

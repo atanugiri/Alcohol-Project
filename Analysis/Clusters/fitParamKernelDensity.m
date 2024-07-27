@@ -10,7 +10,7 @@
 %
 % Invokes allFitParam
 
-function varargout = fitParamHistogram(param_name, feature, fitType, splitbyGender, varargin)
+function varargout = fitParamKernelDensity(param_name, feature, fitType, splitbyGender, varargin)
 
 % param_name = 'UA';
 % feature = 'approachavoid';
@@ -133,8 +133,14 @@ histOfParam(param_array, param_name);
         end
 
         % Save figure
-        figname = sprintf('density_plot_%s_%s_%s_%s', param_name, feature, ...
-            [legendLabels{:}], fitTypeNames(fitType));
+        if strcmpi(splitbyGender, 'y')
+            figname = sprintf('density_plot_%s_%s_%s_%s_MvF', param_name, feature, ...
+                [legendLabels{:}], fitTypeNames(fitType));
+        else
+            figname = sprintf('density_plot_%s_%s_%s_%s', param_name, feature, ...
+                [legendLabels{:}], fitTypeNames(fitType));
+        end
+        
         savefig(gcf, fullfile(figPath, figname));
     end
 

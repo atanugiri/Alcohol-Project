@@ -58,7 +58,7 @@ for animal = 1:length(animalList)
         end
 
         % Fitting
-        [h, fit_params, R_squared] = sigmoid_fit_for_cluster(featureList, fitType);
+        [h, fit_params, R_squared] = sigmoid_fit_for_cluster(featureList, feature, fitType);
 
         title([sprintf('Animal: %s, Session: %s\nR^2 = %.3f\n', ...
             animalList(animal), sessionList(session), R_squared), ...
