@@ -50,10 +50,10 @@ elseif contains(varargin{1}, 'logistic4')
         [fitParam, R_squared, animal] = helperFun(loadFile);
 
         %% Remove negative slopes (Optional)
-        ngtvSlpFltr = fitParam(:,2) <= 0;
-        fitParam = fitParam(~ngtvSlpFltr, :);
-        R_squared = R_squared(~ngtvSlpFltr, :);
-        animal = animal(~ngtvSlpFltr, :);
+%         ngtvSlpFltr = fitParam(:,2) <= 0;
+%         fitParam = fitParam(~ngtvSlpFltr, :);
+%         R_squared = R_squared(~ngtvSlpFltr, :);
+%         animal = animal(~ngtvSlpFltr, :);
 
         allRsq{grp} = R_squared;
         LA{grp} = fitParam(:,1);

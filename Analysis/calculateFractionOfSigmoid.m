@@ -5,7 +5,7 @@
 % group/s. If the psychometric function is sigmoid or not is decided by a 
 % threshold R^2 value of the fit
 %
-function [count, total] = calculateFractionOfSigmoid(gender, feature, fitType, varargin)
+function [non_sig_count, total] = calculateFractionOfSigmoid(gender, feature, fitType, varargin)
 % gender = 'female'; feature = 'approachavoid'; fitType = 2;
 % varargin = {'P2L1 BL for comb boost and alc', ...
 %     'P2L1L3 BL for comb boost and alc', 'P2A Boost and alcohol'};
@@ -44,7 +44,7 @@ else
     error('Use correct input for gender');
 end
 
-count = sum(fracOfSig < 0.7);
+non_sig_count = sum(fracOfSig < 0.7);
 total = length(fracOfSig);
 
 % Create the bar plot

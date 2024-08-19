@@ -19,13 +19,13 @@ group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
 
 
 %% 4-param logistic fit plots
-param_array = fitParamKernelDensity('shift', 'aproachavoid', 2, 'n', ...
+param_array = fitParamKernelDensity('shift', 'approachavoid', 2, 'n', ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol');
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000);
 fprintf('p = %.4f\n', p);
 
 
-[maleParam, femaleParam] = fitParamKernelDensity('shift', 'aproachavoid', 2, 'y', ...
+[maleParam, femaleParam] = fitParamKernelDensity('shift', 'approachavoid', 2, 'y', ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol');
 
 [h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000);
@@ -116,13 +116,13 @@ fprintf('p = %.4f\n', p);
 
 %% Individual difference (07/11/2024)
 % Define the male names and treatment groups
-males = {'aladdin', 'carl', 'jafar', 'jimi', 'jr', 'kobe', 'mike', 'scar', 'simba', 'sully'};
-% females = {'alexis', 'fiona', 'harley', 'juana', 'kryssia', 'neftali', 'raven', 'renata', 'sarah', 'shakira'};
+% males = {'aladdin', 'carl', 'jafar', 'jimi', 'jr', 'kobe', 'mike', 'scar', 'simba', 'sully'};
+females = {'alexis', 'fiona', 'harley', 'juana', 'kryssia', 'neftali', 'raven', 'renata', 'sarah', 'shakira'};
 treatmentGrps = {'P2L1 BL for comb boost and alc', 'P2L1L3 BL for comb boost and alc', ...
     'P2A Boost and alcohol'};
 
 % Initialize a cell array to store the feature lists
-featureLists = cell(numel(treatmentGrps), numel(males));
+featureLists = cell(numel(treatmentGrps), numel(females));
 
 nrows = size(featureLists, 1);
 ncols = size(featureLists, 2);
@@ -132,50 +132,11 @@ parfor grp = 1:nrows
 
     for animal = 1:ncols
         tempRow{animal} = individualPsychValuesPerSession('approachavoid', ...
-            treatmentGrps{grp}, males{animal});
+            treatmentGrps{grp}, females{animal});
     end
 
     featureLists(grp, :) = tempRow;
 end
-
-% Initialize an array to store the results
-results = zeros(numel(treatmentGrps), numel(males));
-
-% Perform comparisons
-for animal = 1:numel(males)
-    % Extract data for the current animal
-    data1 = featureLists{1, animal}; % 'P2L1 BL for comb boost and alc'
-    data2 = featureLists{2, animal}; % 'P2L1L3 BL for comb boost and alc'
-    data3 = featureLists{3, animal}; % 'P2A Boost and alcohol'
-
-    % Compare 'P2L1 BL for comb boost and alc' vs 'P2L1L3 BL for comb boost and alc'
-    p1_vs_p2 = twoWayANOVAfun(data1, data2);
-
-    % Compare 'P2L1 BL for comb boost and alc' vs 'P2A Boost and alcohol'
-    p1_vs_p3 = twoWayANOVAfun(data1, data3);
-
-    % Compare 'P2L1L3 BL for comb boost and alc' vs 'P2A Boost and alcohol'
-    p2_vs_p3 = twoWayANOVAfun(data2, data3);
-
-    % Store the results
-    results(1, animal) = p1_vs_p2(1);
-    results(2, animal) = p1_vs_p3(1);
-    results(3, animal) = p2_vs_p3(1);
-end
-
-% Create the bar plot
-figure;
-bar(results', 'grouped');
-xlabel('Animals');
-ylabel('p-value');
-set(gca, 'XTickLabel', males);
-title('Comparison of Approach Rates for Different Treatment Groups');
-% Add a horizontal dotted line at y = 0.05
-hold on;
-yline(0.05, '--k', 'LineWidth', 1.5, 'Color', 'r');
-hold off;
-legend('P2L1 BL vs P2L1L3 BL', 'P2L1 BL vs P2A', 'P2L1L3 BL vs P2A', ...
-    'p = 0.5', 'Location', 'Best');
 
 
 %% Cluster for individual difference (07/17/2024)
@@ -208,8 +169,8 @@ for featureIdx = 1:numel(featureList)
     feature = featureList{featureIdx};
     [~, maleParam, stdErrMale] = indivAnimalParamCompPlot(feature, 'y', ...
         treatmentGroups{:});
-%     [~, ~, ~, ~, maleParam, stdErrMale] = indivAnimalParamCompPlot(feature, 'y', ...
-%         treatmentGroups{:});
+    %     [~, ~, ~, ~, maleParam, stdErrMale] = indivAnimalParamCompPlot(feature, 'y', ...
+    %         treatmentGroups{:});
 
     for grp = 1:numel(treatmentGroups)
         maleParams{grp}.(feature) = maleParam(:, grp);
