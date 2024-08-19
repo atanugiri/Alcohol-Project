@@ -16,7 +16,7 @@ files = strcat(varargin, '_', feature, sprintf('_%s_fitting_param', fitTypeNames
 
 % Fetch mat files where R^2 values are stored.
 scriptDir = fileparts(mfilename('fullpath'));
-myPath = fullfile(scriptDir, 'Clusters/Mat files/');
+myPath = fullfile(scriptDir, 'Sigmoid fitting/Mat files/');
 
 allRsq = cell(1, numel(varargin));
 animals = cell(1, numel(varargin));

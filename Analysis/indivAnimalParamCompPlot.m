@@ -16,7 +16,7 @@ function varargout = indivAnimalParamCompPlot(param_name, splitByGender, varargi
 %     'P2A Boost and alcohol_approachavoid_logistic4_fitting_param.mat'};
 
 scriptDir = fileparts(mfilename('fullpath'));
-myPath = fullfile(scriptDir, 'Clusters/Mat files/');
+myPath = fullfile(scriptDir, 'Sigmoid fitting/Mat files/');
 
 param_array = cell(1, numel(varargin));
 animals = cell(1, numel(varargin));
