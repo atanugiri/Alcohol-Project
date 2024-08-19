@@ -3,6 +3,7 @@
 *.png
 *.fig
 *.pdf
+*.xlsx
 .DS_Store
 Literature/ search\
 Analysis/.DS_Store
