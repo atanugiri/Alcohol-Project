@@ -364,7 +364,89 @@ data = [T1; T3];
 group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
 [d, p, stats] = manova1(data, group);
 
-% Conflict task exhibits greater variance change
+featureForEach = masterPsychometricFunctionPlot('approachavoid', 'n', ...
+    'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
+T1 = featureForEach{1};
+T2 = featureForEach{2};
+T3 = featureForEach{3};
+data = [T1; T2];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+data = [T1; T3];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+% Conflict task exhibits greater variance change
+data = varianceAnalysis('approachavoid', 'n', ...
+    'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
+% Initialize p-values matrix
+[numRows1, numCols] = size(data{1});
+[numRows2, ~] = size(data{2});
+p_values = zeros(1, numCols);
+
+% Perform F-test for each column
+for j = 1:numCols
+    [~, p_values(j)] = vartest2(data{1}(:, j), data{2}(:, j));
+end
+
+% Combine p-values using Fisher's method
+chi2_stat = -2 * sum(log(p_values));
+combined_p = 1 - chi2cdf(chi2_stat, 2 * length(p_values));
+
+fprintf('Combined p-value from Fisher''s method: %0.4f\n', combined_p);
+
+% Initialize p-values matrix
+[numRows3, ~] = size(data{3});
+p_values = zeros(1, numCols);
+
+% Perform F-test for each column
+for j = 1:numCols
+    [~, p_values(j)] = vartest2(data{1}(:, j), data{3}(:, j));
+end
+
+% Combine p-values using Fisher's method
+chi2_stat = -2 * sum(log(p_values));
+combined_p = 1 - chi2cdf(chi2_stat, 2 * length(p_values));
+
+fprintf('Combined p-value from Fisher''s method: %0.4f\n', combined_p);
+
+data = varianceAnalysis('approachavoid', 'n', ...
+    'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
+% Initialize p-values matrix
+[numRows1, numCols] = size(data{1});
+[numRows2, ~] = size(data{2});
+p_values = zeros(1, numCols);
+
+% Perform F-test for each column
+for j = 1:numCols
+    [~, p_values(j)] = vartest2(data{1}(:, j), data{2}(:, j));
+end
+
+% Combine p-values using Fisher's method
+chi2_stat = -2 * sum(log(p_values));
+combined_p = 1 - chi2cdf(chi2_stat, 2 * length(p_values));
+
+fprintf('Combined p-value from Fisher''s method: %0.4f\n', combined_p);
+
+% Initialize p-values matrix
+[numRows3, ~] = size(data{3});
+p_values = zeros(1, numCols);
+
+% Perform F-test for each column
+for j = 1:numCols
+    [~, p_values(j)] = vartest2(data{1}(:, j), data{3}(:, j));
+end
+
+% Combine p-values using Fisher's method
+chi2_stat = -2 * sum(log(p_values));
+combined_p = 1 - chi2cdf(chi2_stat, 2 * length(p_values));
+
+fprintf('Combined p-value from Fisher''s method: %0.4f\n', combined_p);
+
+
+%% Figure 4
+% Gender-specific psychometric plots of individual sessions
 
 
 %% ToDo
