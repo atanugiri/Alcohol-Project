@@ -439,7 +439,7 @@ individualPsychometricPlotOverlay('approachavoid', 'y', 'P2L1 Post alcohol');
 [h_female2, p_female2] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000);
 
 % PNC influences approach rate in males
-[featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot('approachavoid', 'n', ...
+[featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot('approachavoid', 'y', ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
 T1 = featureForEachMale{1};
 T2 = featureForEachMale{2};
@@ -508,7 +508,7 @@ individualPsychometricPlotOverlay('approachavoid', 'y', 'P2L1L3 Post alcohol');
 [h_female2, p_female2] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000);
 
 % Greater influence on maleapproach rate in PC task
-[featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot('approachavoid', 'n', ...
+[featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot('approachavoid', 'y', ...
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
 T1 = featureForEachMale{1};
 T2 = featureForEachMale{2};
@@ -662,5 +662,133 @@ p = chi2test([count1, (total1 - count1); count2, (total2 - count2)]);
 
 %% SI 3
 %
+featureForEach = masterPsychometricFunctionPlot('time_in_feeder_25', 'n', ...
+    'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
+T1 = featureForEach{1};
+T2 = featureForEach{2};
+T3 = featureForEach{3};
+data = [T1; T2];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
+[d, p, stats] = manova1(data, group);
 
-%% ToDo
+data = [T1; T3];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+featureForEach = masterPsychometricFunctionPlot('time_in_feeder_25', 'n', ...
+    'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
+T1 = featureForEach{1};
+T2 = featureForEach{2};
+T3 = featureForEach{3};
+data = [T1; T2];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+data = [T1; T3];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+% 
+param_array = fitParamKernelDensity('shift', 'time_in_feeder_25', 2, 'n', ...
+    'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000);
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000);
+
+param_array = fitParamKernelDensity('shift', 'time_in_feeder_25', 2, 'n', ...
+    'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000);
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000);
+
+%
+[featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot('time_in_feeder_25', ...
+    'y', 'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
+T1 = featureForEachMale{1};
+T2 = featureForEachMale{2};
+T3 = featureForEachMale{3};
+data = [T1; T2];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+data = [T1; T3];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+T1 = featureForEachFemale{1};
+T2 = featureForEachFemale{2};
+T3 = featureForEachFemale{3};
+data = [T1; T2];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+data = [T1; T3];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+% 
+[maleParam, femaleParam] = fitParamKernelDensity('shift', 'time_in_feeder_25', 2, 'y', ...
+    'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
+[h_male1, p_male1] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000);
+[h_male2, p_male2] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000);
+
+[h_female1, p_female1] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000);
+[h_female2, p_female2] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000);
+
+%
+[featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot('time_in_feeder_25', ...
+    'y', 'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
+T1 = featureForEachMale{1};
+T2 = featureForEachMale{2};
+T3 = featureForEachMale{3};
+data = [T1; T2];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+data = [T1; T3];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+T1 = featureForEachFemale{1};
+T2 = featureForEachFemale{2};
+T3 = featureForEachFemale{3};
+data = [T1; T2];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+data = [T1; T3];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+% 
+[maleParam, femaleParam] = fitParamKernelDensity('shift', 'time_in_feeder_25', 2, 'y', ...
+    'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
+[h_male1, p_male1] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000);
+[h_male2, p_male2] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000);
+
+[h_female1, p_female1] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000);
+[h_female2, p_female2] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000);
+
+% Comparing sigmoid fractions in NCPA: male vs. female
+[count1, total1] = calculateFractionOfSigmoid('male', 'approachavoid', 2, ...
+    'P2L1 Post alcohol');
+figure;
+pie([count1, total1 - count1]);
+
+[count2, total2] = calculateFractionOfSigmoid('female', 'approachavoid', 2, ...
+    'P2L1 Post alcohol');
+figure;
+pie([count2, total2 - count2]);
+
+p = chi2test([count1, (total1 - count1); count2, (total2 - count2)]);
+
+% Comparing sigmoid fractions in CPA: male vs. female
+[count1, total1] = calculateFractionOfSigmoid('male', 'approachavoid', 2, ...
+    'P2L1L3 Post alcohol');
+figure;
+pie([count1, total1 - count1]);
+
+[count2, total2] = calculateFractionOfSigmoid('female', 'approachavoid', 2, ...
+    'P2L1L3 Post alcohol');
+figure;
+pie([count2, total2 - count2]);
+
+p = chi2test([count1, (total1 - count1); count2, (total2 - count2)]);
