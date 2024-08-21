@@ -41,40 +41,11 @@ group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
 % Variance in approach rate accross groups
 data = varianceAnalysis('approachavoid', 'n', 'P2L1 BL for comb boost and alc', ...
     'P2A Boost and alcohol');
-% Initialize p-values matrix
-[numRows1, numCols] = size(data{1});
-[numRows2, ~] = size(data{2});
-p_values = zeros(1, numCols);
-
-% Perform F-test for each column
-for j = 1:numCols
-    [~, p_values(j)] = vartest2(data{1}(:, j), data{2}(:, j));
-end
-
-% Combine p-values using Fisher's method
-chi2_stat = -2 * sum(log(p_values));
-combined_p = 1 - chi2cdf(chi2_stat, 2 * length(p_values));
-
-fprintf('Combined p-value from Fisher''s method: %0.4f\n', combined_p);
-
+combined_p = FisherMethod(data);
 
 data = varianceAnalysis('approachavoid', 'n', 'P2L1L3 BL for comb boost and alc', ...
     'P2A Boost and alcohol');
-% Initialize p-values matrix
-[numRows1, numCols] = size(data{1});
-[numRows2, ~] = size(data{2});
-p_values = zeros(1, numCols);
-
-% Perform F-test for each column
-for j = 1:numCols
-    [~, p_values(j)] = vartest2(data{1}(:, j), data{2}(:, j));
-end
-
-% Combine p-values using Fisher's method
-chi2_stat = -2 * sum(log(p_values));
-combined_p = 1 - chi2cdf(chi2_stat, 2 * length(p_values));
-
-fprintf('Combined p-value from Fisher''s method: %0.4f\n', combined_p);
+combined_p = FisherMethod(data);
 
 
 %% Figure 2
@@ -108,37 +79,9 @@ group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
 % Unchanged variance in approach rates
 [maleData,femaleData] = varianceAnalysis('approachavoid', 'y', ...
     'P2L1 BL for comb boost and alc', 'P2A Boost and alcohol');
-% Initialize p-values matrix
-[numRows1, numCols] = size(maleData{1});
-[numRows2, ~] = size(maleData{2});
-p_values = zeros(1, numCols);
 
-% Perform F-test for each column
-for j = 1:numCols
-    [~, p_values(j)] = vartest2(maleData{1}(:, j), maleData{2}(:, j));
-end
-
-% Combine p-values using Fisher's method
-chi2_stat = -2 * sum(log(p_values));
-combined_p = 1 - chi2cdf(chi2_stat, 2 * length(p_values));
-
-fprintf('Combined p-value from Fisher''s method: %0.4f\n', combined_p);
-
-% Initialize p-values matrix
-[numRows1, numCols] = size(femaleData{1});
-[numRows2, ~] = size(femaleData{2});
-p_values = zeros(1, numCols);
-
-% Perform F-test for each column
-for j = 1:numCols
-    [~, p_values(j)] = vartest2(femaleData{1}(:, j), femaleData{2}(:, j));
-end
-
-% Combine p-values using Fisher's method
-chi2_stat = -2 * sum(log(p_values));
-combined_p = 1 - chi2cdf(chi2_stat, 2 * length(p_values));
-
-fprintf('Combined p-value from Fisher''s method: %0.4f\n', combined_p);
+combined_p = FisherMethod(maleData);
+combined_p = FisherMethod(femaleData);
 
 % Gender-specificpsychometric plots
 individualPsychometricPlotOverlay('approachavoid', 'y', 'P2L1L3 BL for comb boost and alc');
@@ -169,37 +112,8 @@ group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
 % Males exhibitvariance change
 [maleData,femaleData] = varianceAnalysis('approachavoid', 'y', ...
     'P2L1L3 BL for comb boost and alc', 'P2A Boost and alcohol');
-% Initialize p-values matrix
-[numRows1, numCols] = size(maleData{1});
-[numRows2, ~] = size(maleData{2});
-p_values = zeros(1, numCols);
-
-% Perform F-test for each column
-for j = 1:numCols
-    [~, p_values(j)] = vartest2(maleData{1}(:, j), maleData{2}(:, j));
-end
-
-% Combine p-values using Fisher's method
-chi2_stat = -2 * sum(log(p_values));
-combined_p = 1 - chi2cdf(chi2_stat, 2 * length(p_values));
-
-fprintf('Combined p-value from Fisher''s method: %0.4f\n', combined_p);
-
-% Initialize p-values matrix
-[numRows1, numCols] = size(femaleData{1});
-[numRows2, ~] = size(femaleData{2});
-p_values = zeros(1, numCols);
-
-% Perform F-test for each column
-for j = 1:numCols
-    [~, p_values(j)] = vartest2(femaleData{1}(:, j), femaleData{2}(:, j));
-end
-
-% Combine p-values using Fisher's method
-chi2_stat = -2 * sum(log(p_values));
-combined_p = 1 - chi2cdf(chi2_stat, 2 * length(p_values));
-
-fprintf('Combined p-value from Fisher''s method: %0.4f\n', combined_p);
+combined_p = FisherMethod(maleData);
+combined_p = FisherMethod(femaleData);
 
 
 %% Figure 3
@@ -359,69 +273,11 @@ group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
 % Conflict task exhibits greater variance change
 data = varianceAnalysis('approachavoid', 'n', ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
-% Initialize p-values matrix
-[numRows1, numCols] = size(data{1});
-[numRows2, ~] = size(data{2});
-p_values = zeros(1, numCols);
-
-% Perform F-test for each column
-for j = 1:numCols
-    [~, p_values(j)] = vartest2(data{1}(:, j), data{2}(:, j));
-end
-
-% Combine p-values using Fisher's method
-chi2_stat = -2 * sum(log(p_values));
-combined_p = 1 - chi2cdf(chi2_stat, 2 * length(p_values));
-
-fprintf('Combined p-value from Fisher''s method: %0.4f\n', combined_p);
-
-% Initialize p-values matrix
-[numRows3, ~] = size(data{3});
-p_values = zeros(1, numCols);
-
-% Perform F-test for each column
-for j = 1:numCols
-    [~, p_values(j)] = vartest2(data{1}(:, j), data{3}(:, j));
-end
-
-% Combine p-values using Fisher's method
-chi2_stat = -2 * sum(log(p_values));
-combined_p = 1 - chi2cdf(chi2_stat, 2 * length(p_values));
-
-fprintf('Combined p-value from Fisher''s method: %0.4f\n', combined_p);
+combined_p = FisherMethod(data);
 
 data = varianceAnalysis('approachavoid', 'n', ...
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
-% Initialize p-values matrix
-[numRows1, numCols] = size(data{1});
-[numRows2, ~] = size(data{2});
-p_values = zeros(1, numCols);
-
-% Perform F-test for each column
-for j = 1:numCols
-    [~, p_values(j)] = vartest2(data{1}(:, j), data{2}(:, j));
-end
-
-% Combine p-values using Fisher's method
-chi2_stat = -2 * sum(log(p_values));
-combined_p = 1 - chi2cdf(chi2_stat, 2 * length(p_values));
-
-fprintf('Combined p-value from Fisher''s method: %0.4f\n', combined_p);
-
-% Initialize p-values matrix
-[numRows3, ~] = size(data{3});
-p_values = zeros(1, numCols);
-
-% Perform F-test for each column
-for j = 1:numCols
-    [~, p_values(j)] = vartest2(data{1}(:, j), data{3}(:, j));
-end
-
-% Combine p-values using Fisher's method
-chi2_stat = -2 * sum(log(p_values));
-combined_p = 1 - chi2cdf(chi2_stat, 2 * length(p_values));
-
-fprintf('Combined p-value from Fisher''s method: %0.4f\n', combined_p);
+combined_p = FisherMethod(data);
 
 
 %% Figure 6
@@ -466,33 +322,10 @@ group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
 % Slight variance change observed for both genders
 [maleData,femaleData] = varianceAnalysis('approachavoid', 'y', ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
-% Initialize p-values matrix
-[numRows1, numCols] = size(maleData{1});
-[numRows2, ~] = size(maleData{2});
 
-p_values = zeros(1, numCols);
+combined_p = FisherMethod(maleData);
+combined_p = FisherMethod(femaleData);
 
-% Perform F-test for each column
-for j = 1:numCols
-    [~, p_values(j)] = vartest2(maleData{1}(:, j), maleData{2}(:, j));
-end
-
-% Combine p-values using Fisher's method
-chi2_stat = -2 * sum(log(p_values));
-combined_p = 1 - chi2cdf(chi2_stat, 2 * length(p_values));
-
-% Initialize p-values matrix
-[numRows3, ~] = size(maleData{3});
-p_values = zeros(1, numCols);
-
-% Perform F-test for each column
-for j = 1:numCols
-    [~, p_values(j)] = vartest2(maleData{1}(:, j), maleData{3}(:, j));
-end
-
-% Combine p-values using Fisher's method
-chi2_stat = -2 * sum(log(p_values));
-combined_p = 1 - chi2cdf(chi2_stat, 2 * length(p_values));
 
 % Gender-specific psychometric plots of individual sessions
 individualPsychometricPlotOverlay('approachavoid', 'y', 'P2L1L3 Boost and alcohol');
@@ -533,6 +366,11 @@ group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
 [d, p, stats] = manova1(data, group);
 
 % Strong variance change observed in males
+[maleData,femaleData] = varianceAnalysis('approachavoid', 'y', ...
+    'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
+
+combined_p = FisherMethod(maleData);
+combined_p = FisherMethod(femaleData);
 
 
 %% Figure 7
