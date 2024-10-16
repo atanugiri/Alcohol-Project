@@ -15,22 +15,15 @@ function varargout = masterFunForBoxPlot(feature, splitByGender, varargin)
 
 % feature = 'approachavoid';
 % splitByGender = 'y';
-% varargin = {'P2L1 BL for comb boost and alc'};
+% varargin = {'P2L1 BL for comb boost and alc', 'P2A Boost and alcohol'};
 
 % Connect to database
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
 
-if numel(varargin) >= 1
-    treatmentGroups = cell(1, numel(varargin));
-    for i = 1:numel(varargin)
-        treatmentGroups{i} = varargin{i};
-    end
-else
-    error('Treatment group may be missing');
-end
-
+treatmentGroups = varargin;
 treatmentIDs = cell(1, numel(treatmentGroups));
+
 for i = 1:numel(treatmentGroups)
     treatmentIDs{i} = treatmentIDfun(treatmentGroups{i}, conn);
 end
@@ -78,11 +71,11 @@ if strcmpi(splitByGender, 'n')
         for conc = 1:4
             data = featureForEach{grp}(:, conc);
             h = boxplot(data, 'Positions', positions(grp,conc), 'Colors', Colors(grp,:), ...
-                'Widths', 0.2, 'Symbol', '');
+                'Widths', 0.15, 'Symbol', '');
 
             % Scatter individual data points
-            scatter(positions(grp, conc) * ones(size(data)), data, 25, Colors(grp,:), ...
-                'filled', 'jitter', 'on', 'jitterAmount', 0.05);
+%             scatter(positions(grp, conc) * ones(size(data)), data, 25, Colors(grp,:), ...
+%                 'filled', 'jitter', 'on', 'jitterAmount', 0.05);
 
             % Store the handle for the legend (only one handle per group)
             if conc == 1
@@ -119,11 +112,11 @@ elseif strcmpi(splitByGender, 'y')
         for conc = 1:4
             data = featureForEachMale{grp}(:, conc);
             boxplot(data, 'Positions', positions(grp,conc), 'Colors', Colors(grp,:), ...
-                'Widths', 0.2, 'Symbol', '');
+                'Widths', 0.15, 'Symbol', '');
 
-                        % Scatter individual data points
-            scatter(positions(grp, conc) * ones(size(data)), data, 25, Colors(grp,:), ...
-                'filled', 'jitter', 'on', 'jitterAmount', 0.05);
+            % Scatter individual data points
+%             scatter(positions(grp, conc) * ones(size(data)), data, 25, Colors(grp,:), ...
+%                 'filled', 'jitter', 'on', 'jitterAmount', 0.05);
         end
 
         if grp == 1
@@ -141,10 +134,10 @@ elseif strcmpi(splitByGender, 'y')
         for conc = 1:4
             data = featureForEachFemale{grp}(:, conc);
             h = boxplot(data, 'Positions', positions(grp,conc), 'Colors', Colors(grp,:), ...
-                'Widths', 0.2, 'Symbol', '');
+                'Widths', 0.15, 'Symbol', '');
             % Scatter individual data points
-            scatter(positions(grp, conc) * ones(size(data)), data, 50, Colors(grp,:), ...
-                'filled', 'jitter', 'on', 'jitterAmount', 0.05);
+%             scatter(positions(grp, conc) * ones(size(data)), data, 50, Colors(grp,:), ...
+%                 'filled', 'jitter', 'on', 'jitterAmount', 0.05);
 
             % Store the handle for the legend (only one handle per group)
             if conc == 1

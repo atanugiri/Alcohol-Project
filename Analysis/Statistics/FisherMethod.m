@@ -1,7 +1,7 @@
 % Author: Atanu Giri
 % Date: 08/20/2024
 
-function combined_p = FisherMethod(data)
+function [p_values, combined_p] = FisherMethod(data)
 
 % Initialize p-values matrix
 [~, numCols] = size(data{1});

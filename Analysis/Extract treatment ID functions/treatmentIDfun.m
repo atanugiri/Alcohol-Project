@@ -12,7 +12,7 @@ end
 
 % Print all health groups
 fprintf("Health groups:\n");
-fprintf("P2L1 Baseline, P2L1L3 Baseline, P2L1 Food deprivation, Initial task, Late task, \n " + ...
+fprintf("P2L1 Baseline, P2L1L3 Baseline, P2L1 Food deprivation, Initial task, Late task, \n" + ...
     "Oxy, Incubation, \n" + ...
     "P2L1 Saline, P2L1 Ghrelin, P2L1L3 Saline, P2L1L3 Ghrelin, \n" + ...
     "Sal toyrat, Ghr toyrat, Sal toystick, Ghr toystick, Sal skewer, Ghr skewer, \n" + ...
@@ -28,7 +28,9 @@ fprintf("P2L1 Baseline, P2L1L3 Baseline, P2L1 Food deprivation, Initial task, La
     "P2L1 Ghr alc and ghr boost, P2L1L3 Ghr alc and ghr boost, P2A Ghr alc and ghr boost, \n" + ...
     "Sal repeat, Ghr repeat, \n" + ...
     "P2L1 Post alcohol, P2L1L3 Post alcohol, \n" + ...
-    "P2L1 Alc injection, P2L1L3 Alc injection\n");
+    "P2L1 Alc injection, P2L1L3 Alc injection, \n" + ...
+    "P2L1_control_id_p1, P2L1_control_id_p2, P2L1_control_id_p3, \n" + ...
+    "P2L1L3_control_id_p1, P2L1L3_control_id_p2, P2L1L3_control_id_p3, \n");
 
 %% Output from extract_treatment_ids function
 if strcmpi(treatment, "P2L1 Baseline")
@@ -169,6 +171,20 @@ elseif strcmpi(treatment, "P2L1 Alc injection")
     [id, ~] = extract_alc_injection_ids(conn);
 elseif strcmpi(treatment, "P2L1L3 Alc injection")
     [~, id] = extract_alc_injection_ids(conn);
+
+    %% Output from extract_control_ids function
+elseif strcmpi(treatment, "P2L1_control_id_p1")
+    id = extract_control_ids(conn);
+elseif strcmpi(treatment, "P2L1_control_id_p2")
+    [~, id] = extract_control_ids(conn);
+elseif strcmpi(treatment, "P2L1_control_id_p3")
+    [~, ~, id] = extract_control_ids(conn);
+elseif strcmpi(treatment, "P2L1L3_control_id_p1")
+    [~, ~, ~, id] = extract_control_ids(conn);
+elseif strcmpi(treatment, "P2L1L3_control_id_p2")
+    [~, ~, ~, ~, id] = extract_control_ids(conn);
+elseif strcmpi(treatment, "P2L1L3_control_id_p3")
+    [~, ~, ~, ~, ~, id] = extract_control_ids(conn);
 
 else
     disp("Treatment group not found.\n")

@@ -4,7 +4,7 @@
 fig_directory = '/Users/atanugiri/Downloads/Alcohol Project/Analysis/Fig files/';
 
 %% Figure 1
-% Psychometric plots of individual sessions 
+% Psychometric plots of individual sessions
 individualPsychometricPlotOverlay('approachavoid', 'n', 'P2L1 BL for comb boost and alc');
 individualPsychometricPlotOverlay('approachavoid', 'n', 'P2L1L3 BL for comb boost and alc');
 individualPsychometricPlotOverlay('approachavoid', 'n', 'P2A Boost and alcohol');
@@ -14,38 +14,38 @@ extractFittingParam("P2L1 BL for comb boost and alc", "approachavoid", 2);
 
 % Shift of inflection point observed in conflict task
 param_array = fitParamKernelDensity('shift', 'approachavoid', 2, 'n', ...
-    'P2L1 BL for comb boost and alc', 'P2A Boost and alcohol');
-[h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000);
+    'P2L1 BL for comb boost and alc', 'P2A Boost and alcohol', 'P2L1 Post alcohol');
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000, 42);
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000, 42);
 
 param_array = fitParamKernelDensity('shift', 'approachavoid', 2, 'n', ...
-    'P2L1L3 BL for comb boost and alc', 'P2A Boost and alcohol');
-[h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000);
+    'P2L1L3 BL for comb boost and alc', 'P2A Boost and alcohol', 'P2L1L3 Post alcohol');
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000, 42);
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000, 42);
 
 % Increased approach rate during conflict task
 featureForEach = masterFunForBoxPlot('approachavoid', 'n', ...
-    'P2L1 BL for comb boost and alc','P2A Boost and alcohol');
-T1 = featureForEach{1};
-T2 = featureForEach{2};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
+    'P2L1 BL for comb boost and alc','P2A Boost and alcohol', 'P2L1 Post alcohol');
+
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEach{1}, featureForEach{2});
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEach{1}, featureForEach{3});
+
 
 featureForEach = masterFunForBoxPlot('approachavoid', 'n', ...
-    'P2L1L3 BL for comb boost and alc','P2A Boost and alcohol');
-T1 = featureForEach{1};
-T2 = featureForEach{2};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
+    'P2L1L3 BL for comb boost and alc','P2A Boost and alcohol', 'P2L1L3 Post alcohol');
+
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEach{1}, featureForEach{2});
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEach{1}, featureForEach{3});
+
 
 % Variance in approach rate accross groups
 data = varianceAnalysis('approachavoid', 'n', 'P2L1 BL for comb boost and alc', ...
-    'P2A Boost and alcohol');
-combined_p = FisherMethod(data);
+    'P2A Boost and alcohol', 'P2L1 Post alcohol');
+[p_values, combined_p] = FisherMethod(data);
 
 data = varianceAnalysis('approachavoid', 'n', 'P2L1L3 BL for comb boost and alc', ...
-    'P2A Boost and alcohol');
-combined_p = FisherMethod(data);
+    'P2A Boost and alcohol', 'P2L1L3 Post alcohol');
+[p_values, combined_p] = FisherMethod(data);
 
 
 %% Figure 2
@@ -55,146 +55,64 @@ individualPsychometricPlotOverlay('approachavoid', 'y', 'P2A Boost and alcohol')
 
 % Inflection pointshift observed in males
 [maleParam, femaleParam] = fitParamKernelDensity('shift', 'approachavoid', 2, 'y', ...
-    'P2L1 BL for comb boost and alc', 'P2A Boost and alcohol');
+    'P2L1 BL for comb boost and alc', 'P2A Boost and alcohol', 'P2L1 Post alcohol');
 
-[h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000);
-[h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000);
+[h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000, 42);
+[h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000, 42);
+
+[h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000, 42);
+[h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000, 42);
 
 % AA influencesapproach rate in males
 [featureForEachMale, featureForEachFemale] = masterFunForBoxPlot( ...
-    'approachavoid', 'y', 'P2L1 BL for comb boost and alc','P2A Boost and alcohol');
+    'approachavoid', 'y', 'P2L1 BL for comb boost and alc','P2A Boost and alcohol', ...
+    'P2L1 Post alcohol');
 
-T1 = featureForEachMale{1};
-T2 = featureForEachMale{2};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachMale{1}, featureForEachMale{2});
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachMale{1}, featureForEachMale{3});
 
-T1 = featureForEachFemale{1};
-T2 = featureForEachFemale{2};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachFemale{1}, featureForEachFemale{2});
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachFemale{1}, featureForEachFemale{3});
 
 % Unchanged variance in approach rates
 [maleData,femaleData] = varianceAnalysis('approachavoid', 'y', ...
-    'P2L1 BL for comb boost and alc', 'P2A Boost and alcohol');
+    'P2L1 BL for comb boost and alc', 'P2A Boost and alcohol', 'P2L1 Post alcohol');
 
-combined_p = FisherMethod(maleData);
-combined_p = FisherMethod(femaleData);
+[p_values, combined_p] = FisherMethod(maleData);
+[p_values, combined_p] = FisherMethod(femaleData);
 
 % Gender-specificpsychometric plots
 individualPsychometricPlotOverlay('approachavoid', 'y', 'P2L1L3 BL for comb boost and alc');
 
 % Inflection pointshift observed in males
 [maleParam, femaleParam] = fitParamKernelDensity('shift', 'approachavoid', 2, 'y', ...
-    'P2L1L3 BL for comb boost and alc', 'P2A Boost and alcohol');
+    'P2L1L3 BL for comb boost and alc', 'P2A Boost and alcohol', 'P2L1L3 Post alcohol');
 
-[h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000);
-[h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000);
+[h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000, 42);
+[h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000, 42);
+
+[h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000, 42);
+[h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000, 42);
 
 % AA exerts stronger influenceon male approach rate
 [featureForEachMale, featureForEachFemale] = masterFunForBoxPlot( ...
-    'approachavoid', 'y', 'P2L1L3 BL for comb boost and alc','P2A Boost and alcohol');
+    'approachavoid', 'y', 'P2L1L3 BL for comb boost and alc','P2A Boost and alcohol', ...
+    'P2L1L3 Post alcohol');
 
-T1 = featureForEachMale{1};
-T2 = featureForEachMale{2};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachMale{1}, featureForEachMale{2});
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachMale{1}, featureForEachMale{3});
 
-T1 = featureForEachFemale{1};
-T2 = featureForEachFemale{2};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachFemale{1}, featureForEachFemale{2});
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachFemale{1}, featureForEachFemale{3});
 
 % Males exhibitvariance change
 [maleData,femaleData] = varianceAnalysis('approachavoid', 'y', ...
-    'P2L1L3 BL for comb boost and alc', 'P2A Boost and alcohol');
-combined_p = FisherMethod(maleData);
-combined_p = FisherMethod(femaleData);
+    'P2L1L3 BL for comb boost and alc', 'P2A Boost and alcohol', 'P2L1L3 Post alcohol');
+[p_values, combined_p] = FisherMethod(maleData);
+[p_values, combined_p] = FisherMethod(femaleData);
 
 
 %% Figure 3
-% Sample plots illustrating time in reward zone
-trajectoryPlot(77530);
-trajectoryPlot(77401);
-
-% Enhanced impact notedduring conflict task
-featureForEach = masterPsychometricFunctionPlot('time_in_feeder_25', 'n', ...
-    'P2L1 BL for comb boost and alc','P2A Boost and alcohol');
-T1 = featureForEach{1};
-T2 = featureForEach{2};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
-
-featureForEach = masterPsychometricFunctionPlot('time_in_feeder_25', 'n', ...
-    'P2L1L3 BL for comb boost and alc','P2A Boost and alcohol');
-T1 = featureForEach{1};
-T2 = featureForEach{2};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
-
-% Shift in inflection pointis observed in both tasks
-param_array = fitParamKernelDensity('shift', 'time_in_feeder_25', 2, 'n', ...
-    'P2L1 BL for comb boost and alc', 'P2A Boost and alcohol');
-[h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000);
-
-param_array = fitParamKernelDensity('shift', 'time_in_feeder_25', 2, 'n', ...
-    'P2L1L3 BL for comb boost and alc', 'P2A Boost and alcohol');
-[h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000);
-
-% AA influences time feature in males
-[featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot( ...
-    'time_in_feeder_25', 'y', 'P2L1 BL for comb boost and alc','P2A Boost and alcohol');
-
-T1 = featureForEachMale{1};
-T2 = featureForEachMale{2};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
-
-T1 = featureForEachFemale{1};
-T2 = featureForEachFemale{2};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
-
-% Shift of inflection pointobserved in males
-[maleParam, femaleParam] = fitParamKernelDensity('shift', 'time_in_feeder_25', ...
-    2, 'y', 'P2L1 BL for comb boost and alc', 'P2A Boost and alcohol');
-
-[h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000);
-[h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000);
-
-% AA influencestime in feeder in males
-[featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot( ...
-    'time_in_feeder_25', 'y', 'P2L1L3 BL for comb boost and alc','P2A Boost and alcohol');
-
-T1 = featureForEachMale{1};
-T2 = featureForEachMale{2};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
-
-T1 = featureForEachFemale{1};
-T2 = featureForEachFemale{2};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
-
-% Shift of inflection pointstronger in males
-[maleParam, femaleParam] = fitParamKernelDensity('shift', 'time_in_feeder_25', ...
-    2, 'y', 'P2L1L3 BL for comb boost and alc', 'P2A Boost and alcohol');
-
-[h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000);
-[h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000);
-
-
-%% Figure 4
 % Psychometric profiles of a vulnerable animal: AA impact
 individualPsychPlotPerSession('approachavoid', ...
     'P2L1 BL for comb boost and alc', 'sully');
@@ -224,7 +142,7 @@ pie([count2, total2 - count2]);
 p = chi2test([count1, (total1 - count1); count2, (total2 - count2)]);
 
 
-%% Figure 5
+%% Figure 4
 % Psychometric plots of individual sessions
 individualPsychometricPlotOverlay('approachavoid', 'n', 'P2L1 Boost and alcohol');
 individualPsychometricPlotOverlay('approachavoid', 'n', 'P2L1L3 Boost and alcohol');
@@ -235,52 +153,38 @@ individualPsychometricPlotOverlay('approachavoid', 'n', 'P2L1L3 Post alcohol');
 % Shift of inflection pointobserved only in PC
 param_array = fitParamKernelDensity('shift', 'approachavoid', 2, 'n', ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
-[h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000);
-[h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000);
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000, 42);
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000, 42);
 
 param_array = fitParamKernelDensity('shift', 'approachavoid', 2, 'n', ...
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
-[h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000);
-[h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000);
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000, 42);
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000, 42);
 
 % Greater influence onapproach rate in conflict task
 featureForEach = masterPsychometricFunctionPlot('approachavoid', 'n', ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
-T1 = featureForEach{1};
-T2 = featureForEach{2};
-T3 = featureForEach{3};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEach{1}, featureForEach{2});
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEach{1}, featureForEach{3});
 
-data = [T1; T3];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
-[d, p, stats] = manova1(data, group);
 
 featureForEach = masterPsychometricFunctionPlot('approachavoid', 'n', ...
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
-T1 = featureForEach{1};
-T2 = featureForEach{2};
-T3 = featureForEach{3};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
 
-data = [T1; T3];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
-[d, p, stats] = manova1(data, group);
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEach{1}, featureForEach{2});
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEach{1}, featureForEach{3});
 
 % Conflict task exhibits greater variance change
 data = varianceAnalysis('approachavoid', 'n', ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
-combined_p = FisherMethod(data);
+[p_values, combined_p] = FisherMethod(data);
 
 data = varianceAnalysis('approachavoid', 'n', ...
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
-combined_p = FisherMethod(data);
+[p_values, combined_p] = FisherMethod(data);
 
 
-%% Figure 6
+%% Figure 5
 % Gender-specific psychometric plots of individual sessions
 individualPsychometricPlotOverlay('approachavoid', 'y', 'P2L1 Boost and alcohol');
 individualPsychometricPlotOverlay('approachavoid', 'y', 'P2L1 Post alcohol');
@@ -288,43 +192,28 @@ individualPsychometricPlotOverlay('approachavoid', 'y', 'P2L1 Post alcohol');
 % Shift of inflection pointis not affected
 [maleParam, femaleParam] = fitParamKernelDensity('shift', 'approachavoid', 2, 'y', ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
-[h_male1, p_male1] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000);
-[h_male2, p_male2] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000);
+[h_male1, p_male1] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000, 42);
+[h_male2, p_male2] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000, 42);
 
-[h_female1, p_female1] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000);
-[h_female2, p_female2] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000);
+[h_female1, p_female1] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000, 42);
+[h_female2, p_female2] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000, 42);
 
 % PNC influences approach rate in males
 [featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot('approachavoid', 'y', ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
-T1 = featureForEachMale{1};
-T2 = featureForEachMale{2};
-T3 = featureForEachMale{3};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
 
-data = [T1; T3];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
-[d, p, stats] = manova1(data, group);
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachMale{1}, featureForEachMale{2});
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachMale{1}, featureForEachMale{3});
 
-T1 = featureForEachFemale{1};
-T2 = featureForEachFemale{2};
-T3 = featureForEachFemale{3};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
-
-data = [T1; T3];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
-[d, p, stats] = manova1(data, group);
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachFemale{1}, featureForEachFemale{2});
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachFemale{1}, featureForEachFemale{3});
 
 % Slight variance change observed for both genders
 [maleData,femaleData] = varianceAnalysis('approachavoid', 'y', ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
 
-combined_p = FisherMethod(maleData);
-combined_p = FisherMethod(femaleData);
+[p_values, combined_p] = FisherMethod(maleData);
+[p_values, combined_p] = FisherMethod(femaleData);
 
 
 % Gender-specific psychometric plots of individual sessions
@@ -334,46 +223,31 @@ individualPsychometricPlotOverlay('approachavoid', 'y', 'P2L1L3 Post alcohol');
 % Shift of inflection pointstronger in males
 [maleParam, femaleParam] = fitParamKernelDensity('shift', 'approachavoid', 2, 'y', ...
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
-[h_male1, p_male1] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000);
-[h_male2, p_male2] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000);
+[h_male1, p_male1] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000, 42);
+[h_male2, p_male2] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000, 42);
 
-[h_female1, p_female1] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000);
-[h_female2, p_female2] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000);
+[h_female1, p_female1] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000, 42);
+[h_female2, p_female2] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000, 42);
 
 % Greater influence on maleapproach rate in PC task
 [featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot('approachavoid', 'y', ...
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
-T1 = featureForEachMale{1};
-T2 = featureForEachMale{2};
-T3 = featureForEachMale{3};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
 
-data = [T1; T3];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
-[d, p, stats] = manova1(data, group);
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachMale{1}, featureForEachMale{2});
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachMale{1}, featureForEachMale{3});
 
-T1 = featureForEachFemale{1};
-T2 = featureForEachFemale{2};
-T3 = featureForEachFemale{3};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
-
-data = [T1; T3];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
-[d, p, stats] = manova1(data, group);
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachFemale{1}, featureForEachFemale{2});
+[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachFemale{1}, featureForEachFemale{3});
 
 % Strong variance change observed in males
 [maleData,femaleData] = varianceAnalysis('approachavoid', 'y', ...
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
 
-combined_p = FisherMethod(maleData);
-combined_p = FisherMethod(femaleData);
+[p_values, combined_p] = FisherMethod(maleData);
+[p_values, combined_p] = FisherMethod(femaleData);
 
 
-%% Figure 7
+%% Figure 6
 % Comparing sigmoid fractions in PNC: male vs. female
 [count1, total1] = calculateFractionOfSigmoid('male', 'approachavoid', 2, ...
     'P2L1 Boost and alcohol');
@@ -404,56 +278,148 @@ p = chi2test([count1, (total1 - count1); count2, (total2 - count2)]);
 %% SI 1
 % Psychometric mean analysisof approach rate
 featureForEach = masterPsychometricFunctionPlot('approachavoid', 'n', ...
-    'P2L1 BL for comb boost and alc','P2A Boost and alcohol');
-T1 = featureForEach{1};
-T2 = featureForEach{2};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
+    'P2L1 BL for comb boost and alc','P2A Boost and alcohol', 'P2L1 Post alcohol');
 
 % Gender-specific psychometric meananalysis
 [featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot( ...
-    'approachavoid', 'y', 'P2L1 BL for comb boost and alc','P2A Boost and alcohol');
-
-T1 = featureForEachMale{1};
-T2 = featureForEachMale{2};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
-
-T1 = featureForEachFemale{1};
-T2 = featureForEachFemale{2};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
+    'approachavoid', 'y', 'P2L1 BL for comb boost and alc','P2A Boost and alcohol', ...
+    'P2L1 Post alcohol');
 
 % Psychometric mean analysisof approach rate
 featureForEach = masterPsychometricFunctionPlot('approachavoid', 'n', ...
-    'P2L1L3 BL for comb boost and alc','P2A Boost and alcohol');
+    'P2L1L3 BL for comb boost and alc','P2A Boost and alcohol', 'P2L1L3 Post alcohol');
+
+% Gender-specific psychometric meananalysis
+[featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot( ...
+    'approachavoid', 'y', 'P2L1L3 BL for comb boost and alc','P2A Boost and alcohol', ...
+    'P2L1L3 Post alcohol');
+
+
+%% SI 2
+% Sample plots illustrating time in reward zone
+trajectoryPlot(77530);
+trajectoryPlot(77401);
+
+% Enhanced impact notedduring conflict task
+featureForEach = masterPsychometricFunctionPlot('time_in_feeder_25', 'n', ...
+    'P2L1 BL for comb boost and alc','P2A Boost and alcohol', 'P2L1 Post alcohol');
 T1 = featureForEach{1};
 T2 = featureForEach{2};
+T3 = featureForEach{3};
+
 data = [T1; T2];
 group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
 [d, p, stats] = manova1(data, group);
 
-% Gender-specific psychometric meananalysis
+data = [T1; T3];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+featureForEach = masterPsychometricFunctionPlot('time_in_feeder_25', 'n', ...
+    'P2L1L3 BL for comb boost and alc','P2A Boost and alcohol', 'P2L1L3 Post alcohol');
+T1 = featureForEach{1};
+T2 = featureForEach{2};
+T3 = featureForEach{3};
+
+data = [T1; T2];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+data = [T1; T3];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+% Shift in inflection pointis observed in both tasks
+param_array = fitParamKernelDensity('shift', 'time_in_feeder_25', 2, 'n', ...
+    'P2L1 BL for comb boost and alc', 'P2A Boost and alcohol', 'P2L1 Post alcohol');
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000, 42);
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000, 42);
+
+param_array = fitParamKernelDensity('shift', 'time_in_feeder_25', 2, 'n', ...
+    'P2L1L3 BL for comb boost and alc', 'P2A Boost and alcohol', 'P2L1L3 Post alcohol');
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000, 42);
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000, 42);
+
+% AA influences time feature in males
 [featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot( ...
-    'approachavoid', 'y', 'P2L1L3 BL for comb boost and alc','P2A Boost and alcohol');
+    'time_in_feeder_25', 'y', 'P2L1 BL for comb boost and alc','P2A Boost and alcohol', ...
+    'P2L1 Post alcohol');
 
 T1 = featureForEachMale{1};
 T2 = featureForEachMale{2};
+T3 = featureForEachMale{3};
+
 data = [T1; T2];
 group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+data = [T1; T3];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
 [d, p, stats] = manova1(data, group);
 
 T1 = featureForEachFemale{1};
 T2 = featureForEachFemale{2};
+T3 = featureForEachFemale{3};
+
 data = [T1; T2];
 group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
 [d, p, stats] = manova1(data, group);
 
+data = [T1; T3];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
+[d, p, stats] = manova1(data, group);
 
-%% SI 2
+% Shift of inflection pointobserved in males
+[maleParam, femaleParam] = fitParamKernelDensity('shift', 'time_in_feeder_25', ...
+    2, 'y', 'P2L1 BL for comb boost and alc', 'P2A Boost and alcohol', 'P2L1 Post alcohol');
+
+[h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000, 42);
+[h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000, 42);
+
+[h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000, 42);
+[h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000, 42);
+
+% AA influencestime in feeder in males
+[featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot( ...
+    'time_in_feeder_25', 'y', 'P2L1L3 BL for comb boost and alc','P2A Boost and alcohol', ...
+    'P2L1L3 Post alcohol');
+
+T1 = featureForEachMale{1};
+T2 = featureForEachMale{2};
+T3 = featureForEachMale{3};
+
+data = [T1; T2];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+data = [T1; T3];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+T1 = featureForEachFemale{1};
+T2 = featureForEachFemale{2};
+T3 = featureForEachFemale{3};
+
+data = [T1; T2];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+data = [T1; T3];
+group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
+[d, p, stats] = manova1(data, group);
+
+% Shift of inflection pointstronger in males
+[maleParam, femaleParam] = fitParamKernelDensity('shift', 'time_in_feeder_25', ...
+    2, 'y', 'P2L1L3 BL for comb boost and alc', 'P2A Boost and alcohol', 'P2L1L3 Post alcohol');
+
+[h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000, 42);
+[h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000, 42);
+
+[h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000, 42);
+[h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000, 42);
+
+
+%% SI 3
 males = {'aladdin', 'carl', 'jafar', 'jimi', 'jr', 'kobe', 'mike', 'scar', ...
 'simba', 'sully'};
 females = {'alexis', 'fiona', 'harley', 'juana', 'kryssia', 'neftali', ...
@@ -498,7 +464,7 @@ pie([count2, total2 - count2]);
 p = chi2test([count1, (total1 - count1); count2, (total2 - count2)]);
 
 
-%% SI 3
+%% SI 4
 %
 featureForEach = masterPsychometricFunctionPlot('time_in_feeder_25', 'n', ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
@@ -529,13 +495,13 @@ group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
 % 
 param_array = fitParamKernelDensity('shift', 'time_in_feeder_25', 2, 'n', ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
-[h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000);
-[h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000);
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000, 42);
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000, 42);
 
 param_array = fitParamKernelDensity('shift', 'time_in_feeder_25', 2, 'n', ...
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
-[h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000);
-[h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000);
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000, 42);
+[h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000, 42);
 
 %
 [featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot('time_in_feeder_25', ...
@@ -565,11 +531,11 @@ group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
 % 
 [maleParam, femaleParam] = fitParamKernelDensity('shift', 'time_in_feeder_25', 2, 'y', ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
-[h_male1, p_male1] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000);
-[h_male2, p_male2] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000);
+[h_male1, p_male1] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000, 42);
+[h_male2, p_male2] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000, 42);
 
-[h_female1, p_female1] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000);
-[h_female2, p_female2] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000);
+[h_female1, p_female1] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000, 42);
+[h_female2, p_female2] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000, 42);
 
 %
 [featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot('time_in_feeder_25', ...
@@ -599,11 +565,11 @@ group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
 % 
 [maleParam, femaleParam] = fitParamKernelDensity('shift', 'time_in_feeder_25', 2, 'y', ...
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
-[h_male1, p_male1] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000);
-[h_male2, p_male2] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000);
+[h_male1, p_male1] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000, 42);
+[h_male2, p_male2] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000, 42);
 
-[h_female1, p_female1] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000);
-[h_female2, p_female2] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000);
+[h_female1, p_female1] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000, 42);
+[h_female2, p_female2] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000, 42);
 
 % Comparing sigmoid fractions in NCPA: male vs. female
 [count1, total1] = calculateFractionOfSigmoid('male', 'approachavoid', 2, ...

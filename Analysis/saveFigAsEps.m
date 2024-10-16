@@ -7,7 +7,7 @@
 
 % Specify the directory containing the .fig files
 scriptDir = fileparts(mfilename('fullpath'));
-figDir = fullfile(scriptDir, 'Fig files');
+figDir = fullfile(scriptDir, 'Sigmoid fitting/Fig files');
 
 % Get a list of all .fig files in the directory
 figFiles = dir(fullfile(figDir, '*.fig'));

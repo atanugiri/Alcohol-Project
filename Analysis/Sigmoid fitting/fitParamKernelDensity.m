@@ -12,10 +12,10 @@
 
 function varargout = fitParamKernelDensity(param_name, feature, fitType, splitbyGender, varargin)
 
-% param_name = 'UA';
+% param_name = 'shift';
 % feature = 'approachavoid';
 % fitType = 2;
-% splitbyGender = 'n';
+% splitbyGender = 'y';
 % varargin = {'P2L1L3 BL for comb boost and alc','P2L1L3 Boost and alcohol'};
 
 % Files to fetch
@@ -94,39 +94,63 @@ histOfParam(param_array, param_name);
 
 %% Description of histOfParam
     function histOfParam(paramArray, param_name)
-        figure;
+        figure(1);
+        figure(2);
         for idx = 1:numel(varargin)
             if strcmpi(splitbyGender, 'y')
-                subplot(1,2,1);
                 [f_male, x_values_male] = ksdensity(paramArray{idx}{1});
+                figure(1);
+                subplot(1,2,1);
                 plot(x_values_male, f_male, 'LineWidth', 2, 'Color', Colors(idx,:));
                 xlabel('value','Interpreter','latex');
                 ylabel('probability density','Interpreter','latex');
                 hold on;
 
-                subplot(1,2,2);
+                figure(2);
+                subplot(1,2,1);
+                h = cdfplot(paramArray{idx}{1});
+                set(h,'LineWidth', 2, 'Color', Colors(idx,:));
+                hold on;
+
                 [f_female, x_values_female] = ksdensity(paramArray{idx}{2});
+                figure(1);
+                subplot(1,2,2);
                 plot(x_values_female, f_female, 'LineWidth', 2, 'Color', Colors(idx,:));
                 xlabel('value','Interpreter','latex');
                 hold on;
 
+                figure(2);
+                subplot(1,2,2);
+                h = cdfplot(paramArray{idx}{2});
+                set(h,'LineWidth', 2, 'Color', Colors(idx,:));
+                hold on;
+
             else
                 [f, x_values] = ksdensity(paramArray{idx}); % Compute KDE values and corresponding x-values
+                figure(1);
                 plot(x_values, f, 'LineWidth', 2, 'Color', Colors(idx,:));
                 hold on;
+
+                figure(2);
+                h = cdfplot(paramArray{idx});
+                set(h,'LineWidth', 2, 'Color', Colors(idx,:));
+                hold on;                
             end
         end
 
         hold off;
-        sgtitle(sprintf('Histogram of %s', param_name), 'Interpreter','latex','FontSize',25);
+        figure(1);
+        sgtitle(sprintf('pdf of %s', param_name), 'Interpreter','latex','FontSize',25);
         legendLabels = varargin;
 
         if strcmpi(splitbyGender, 'y')
+            figure(1);
             legend(legendLabels, 'Interpreter','none','Location','best');
             linkaxes([subplot(1,2,1), subplot(1,2,2)], 'y');
         end
 
         if ~strcmpi(splitbyGender, 'y')
+            figure(1);
             legend(legendLabels, 'Interpreter','none','Location','best');
             xlabel('value','Interpreter','latex');
             ylabel('probability density','Interpreter','latex');
@@ -134,14 +158,19 @@ histOfParam(param_array, param_name);
 
         % Save figure
         if strcmpi(splitbyGender, 'y')
-            figname = sprintf('density_plot_%s_%s_%s_%s_MvF', param_name, feature, ...
+            figname1 = sprintf('pdf_%s_%s_%s_%s_MvF', param_name, feature, ...
+                [legendLabels{:}], fitTypeNames(fitType));
+            figname2 = sprintf('cdf_%s_%s_%s_%s_MvF', param_name, feature, ...
                 [legendLabels{:}], fitTypeNames(fitType));
         else
-            figname = sprintf('density_plot_%s_%s_%s_%s', param_name, feature, ...
+            figname1 = sprintf('pdf_%s_%s_%s_%s', param_name, feature, ...
+                [legendLabels{:}], fitTypeNames(fitType));
+            figname2 = sprintf('cdf_%s_%s_%s_%s', param_name, feature, ...
                 [legendLabels{:}], fitTypeNames(fitType));
         end
         
-        savefig(gcf, fullfile(figPath, figname));
+        savefig(figure(1), fullfile(figPath, figname1));
+        savefig(figure(2), fullfile(figPath, figname2));
     end
 
 end

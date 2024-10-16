@@ -19,9 +19,17 @@ datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
 
 treatmentID = treatmentIDfun(treatment, conn);
+if length(treatmentID) < 1
+    return;
+end
 treatmentID = strjoin(arrayfun(@num2str, treatmentID, 'UniformOutput', false), ',');
 treatment_data = fetchHealthDataTable(feature, treatmentID, conn);
 treatment_data = cleanBadSessionsFromTable(treatment_data, feature); % Remove bad sessions
+fprintf('Number of trials: %d\n', height(treatment_data));
+
+if height(treatment_data) < 1
+    return;
+end
 
 % File where the fitting results (.mat) and fit plot (pdf) will be saved
 fitTypeNames = ["logistic3", "logistic4", "GP"];
