@@ -18,35 +18,55 @@ param_array = fitParamKernelDensity('shift', 'approachavoid', 2, 'n', ...
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000, 42);
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000, 42);
 
+power = estimateKStest2Power(param_array{1}, param_array{2}, 1000);
+power = estimateKStest2Power(param_array{1}, param_array{3}, 1000);
+
+
 param_array = fitParamKernelDensity('shift', 'approachavoid', 2, 'n', ...
     'P2L1L3 BL for comb boost and alc', 'P2A Boost and alcohol', 'P2L1L3 Post alcohol');
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000, 42);
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000, 42);
 
+power = estimateKStest2Power(param_array{1}, param_array{2}, 1000);
+power = estimateKStest2Power(param_array{1}, param_array{3}, 1000);
+
 % Increased approach rate during conflict task
-featureForEach = masterFunForBoxPlot('approachavoid', 'n', ...
+featureForEach = masterPsychometricFunctionPlot('approachavoid', 'n', ...
     'P2L1 BL for comb boost and alc','P2A Boost and alcohol', 'P2L1 Post alcohol');
 
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEach{1}, featureForEach{2});
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEach{1}, featureForEach{3});
+group_1_data = py.numpy.array(featureForEach{1});
+group_2_data = py.numpy.array(featureForEach{2});
+group_3_data = py.numpy.array(featureForEach{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEach{1}, 1), size(featureForEach{2}, 1), 4, 0.05);
 
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEach{1}, 1), size(featureForEach{3}, 1), 4, 0.05);
 
-featureForEach = masterFunForBoxPlot('approachavoid', 'n', ...
+featureForEach = masterPsychometricFunctionPlot('approachavoid', 'n', ...
     'P2L1L3 BL for comb boost and alc','P2A Boost and alcohol', 'P2L1L3 Post alcohol');
-
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEach{1}, featureForEach{2});
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEach{1}, featureForEach{3});
-
+group_1_data = py.numpy.array(featureForEach{1});
+group_2_data = py.numpy.array(featureForEach{2});
+group_3_data = py.numpy.array(featureForEach{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEach{1}, 1), size(featureForEach{2}, 1), 4, 0.05);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEach{1}, 1), size(featureForEach{3}, 1), 4, 0.05);
 
 % Variance in approach rate accross groups
 data = varianceAnalysis('approachavoid', 'n', 'P2L1 BL for comb boost and alc', ...
     'P2A Boost and alcohol', 'P2L1 Post alcohol');
 [p_values, combined_p] = FisherMethod(data);
+power = estimatePowerFisherMethod(data, 1000);
 
 data = varianceAnalysis('approachavoid', 'n', 'P2L1L3 BL for comb boost and alc', ...
     'P2A Boost and alcohol', 'P2L1L3 Post alcohol');
 [p_values, combined_p] = FisherMethod(data);
-
+power = estimatePowerFisherMethod(data, 1000);
 
 %% Figure 2
 % Gender-specific psychometric plots of individual sessions
@@ -59,20 +79,38 @@ individualPsychometricPlotOverlay('approachavoid', 'y', 'P2A Boost and alcohol')
 
 [h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000, 42);
 [h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000, 42);
+power = estimateKStest2Power(maleParam{1}, maleParam{2}, 1000);
+power = estimateKStest2Power(maleParam{1}, maleParam{3}, 1000);
 
 [h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000, 42);
 [h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000, 42);
+power = estimateKStest2Power(femaleParam{1}, femaleParam{2}, 1000);
+power = estimateKStest2Power(femaleParam{1}, femaleParam{3}, 1000);
 
 % AA influencesapproach rate in males
-[featureForEachMale, featureForEachFemale] = masterFunForBoxPlot( ...
+[featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot( ...
     'approachavoid', 'y', 'P2L1 BL for comb boost and alc','P2A Boost and alcohol', ...
     'P2L1 Post alcohol');
 
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachMale{1}, featureForEachMale{2});
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachMale{1}, featureForEachMale{3});
+group_1_data = py.numpy.array(featureForEachMale{1});
+group_2_data = py.numpy.array(featureForEachMale{2});
+group_3_data = py.numpy.array(featureForEachMale{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachMale{1}, 1), size(featureForEachMale{2}, 1), 4, 0.05);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachMale{1}, 1), size(featureForEachMale{3}, 1), 4, 0.05);
 
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachFemale{1}, featureForEachFemale{2});
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachFemale{1}, featureForEachFemale{3});
+group_1_data = py.numpy.array(featureForEachFemale{1});
+group_2_data = py.numpy.array(featureForEachFemale{2});
+group_3_data = py.numpy.array(featureForEachFemale{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachFemale{1}, 1), size(featureForEachFemale{2}, 1), 4, 0.05);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachFemale{1}, 1), size(featureForEachFemale{3}, 1), 4, 0.05);
 
 % Unchanged variance in approach rates
 [maleData,femaleData] = varianceAnalysis('approachavoid', 'y', ...
@@ -90,20 +128,38 @@ individualPsychometricPlotOverlay('approachavoid', 'y', 'P2L1L3 BL for comb boos
 
 [h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000, 42);
 [h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000, 42);
+power = estimateKStest2Power(maleParam{1}, maleParam{2}, 1000);
+power = estimateKStest2Power(maleParam{1}, maleParam{3}, 1000);
 
 [h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000, 42);
 [h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000, 42);
+power = estimateKStest2Power(femaleParam{1}, femaleParam{2}, 1000);
+power = estimateKStest2Power(femaleParam{1}, femaleParam{3}, 1000);
 
 % AA exerts stronger influenceon male approach rate
-[featureForEachMale, featureForEachFemale] = masterFunForBoxPlot( ...
+[featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot( ...
     'approachavoid', 'y', 'P2L1L3 BL for comb boost and alc','P2A Boost and alcohol', ...
     'P2L1L3 Post alcohol');
 
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachMale{1}, featureForEachMale{2});
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachMale{1}, featureForEachMale{3});
+group_1_data = py.numpy.array(featureForEachMale{1});
+group_2_data = py.numpy.array(featureForEachMale{2});
+group_3_data = py.numpy.array(featureForEachMale{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachMale{1}, 1), size(featureForEachMale{2}, 1), 4, 0.05);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachMale{1}, 1), size(featureForEachMale{3}, 1), 4, 0.05);
 
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachFemale{1}, featureForEachFemale{2});
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachFemale{1}, featureForEachFemale{3});
+group_1_data = py.numpy.array(featureForEachFemale{1});
+group_2_data = py.numpy.array(featureForEachFemale{2});
+group_3_data = py.numpy.array(featureForEachFemale{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachFemale{1}, 1), size(featureForEachFemale{2}, 1), 4, 0.05);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachFemale{1}, 1), size(featureForEachFemale{3}, 1), 4, 0.05);
 
 % Males exhibitvariance change
 [maleData,femaleData] = varianceAnalysis('approachavoid', 'y', ...
@@ -111,38 +167,7 @@ individualPsychometricPlotOverlay('approachavoid', 'y', 'P2L1L3 BL for comb boos
 [p_values, combined_p] = FisherMethod(maleData);
 [p_values, combined_p] = FisherMethod(femaleData);
 
-
 %% Figure 3
-% Psychometric profiles of a vulnerable animal: AA impact
-individualPsychPlotPerSession('approachavoid', ...
-    'P2L1 BL for comb boost and alc', 'sully');
-individualPsychPlotPerSession('approachavoid', ...
-    'P2L1L3 BL for comb boost and alc', 'sully');
-individualPsychPlotPerSession('approachavoid', ...
-    'P2A Boost and alcohol', 'sully');
-
-individualPsychPlotPerSession('approachavoid', ...
-    'P2L1 BL for comb boost and alc', 'shakira');
-individualPsychPlotPerSession('approachavoid', ...
-    'P2L1L3 BL for comb boost and alc', 'shakira');
-individualPsychPlotPerSession('approachavoid', ...
-    'P2A Boost and alcohol', 'shakira');
-
-% Comparing sigmoid fractions in AA: male vs. female
-[count1, total1] = calculateFractionOfSigmoid('male', 'approachavoid', 2, ...
-    'P2A Boost and alcohol');
-figure;
-pie([count1, total1 - count1]);
-
-[count2, total2] = calculateFractionOfSigmoid('female', 'approachavoid', 2, ...
-    'P2A Boost and alcohol');
-figure;
-pie([count2, total2 - count2]);
-
-p = chi2test([count1, (total1 - count1); count2, (total2 - count2)]);
-
-
-%% Figure 4
 % Psychometric plots of individual sessions
 individualPsychometricPlotOverlay('approachavoid', 'n', 'P2L1 Boost and alcohol');
 individualPsychometricPlotOverlay('approachavoid', 'n', 'P2L1L3 Boost and alcohol');
@@ -155,24 +180,39 @@ param_array = fitParamKernelDensity('shift', 'approachavoid', 2, 'n', ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000, 42);
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000, 42);
+power = estimateKStest2Power(param_array{1}, param_array{2}, 1000);
+power = estimateKStest2Power(param_array{1}, param_array{3}, 1000);
 
 param_array = fitParamKernelDensity('shift', 'approachavoid', 2, 'n', ...
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000, 42);
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000, 42);
+power = estimateKStest2Power(param_array{1}, param_array{2}, 1000);
+power = estimateKStest2Power(param_array{1}, param_array{3}, 1000);
 
 % Greater influence onapproach rate in conflict task
 featureForEach = masterPsychometricFunctionPlot('approachavoid', 'n', ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEach{1}, featureForEach{2});
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEach{1}, featureForEach{3});
+
+group_1_data = py.numpy.array(featureForEach{1});
+group_2_data = py.numpy.array(featureForEach{2});
+group_3_data = py.numpy.array(featureForEach{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+disp(result);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+disp(result);
 
 
 featureForEach = masterPsychometricFunctionPlot('approachavoid', 'n', ...
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
 
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEach{1}, featureForEach{2});
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEach{1}, featureForEach{3});
+group_1_data = py.numpy.array(featureForEach{1});
+group_2_data = py.numpy.array(featureForEach{2});
+group_3_data = py.numpy.array(featureForEach{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+disp(result);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+disp(result);
 
 % Conflict task exhibits greater variance change
 data = varianceAnalysis('approachavoid', 'n', ...
@@ -184,7 +224,7 @@ data = varianceAnalysis('approachavoid', 'n', ...
 [p_values, combined_p] = FisherMethod(data);
 
 
-%% Figure 5
+%% Figure 4
 % Gender-specific psychometric plots of individual sessions
 individualPsychometricPlotOverlay('approachavoid', 'y', 'P2L1 Boost and alcohol');
 individualPsychometricPlotOverlay('approachavoid', 'y', 'P2L1 Post alcohol');
@@ -194,19 +234,33 @@ individualPsychometricPlotOverlay('approachavoid', 'y', 'P2L1 Post alcohol');
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
 [h_male1, p_male1] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000, 42);
 [h_male2, p_male2] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000, 42);
+power = estimateKStest2Power(maleParam{1}, maleParam{2}, 1000);
+power = estimateKStest2Power(maleParam{1}, maleParam{3}, 1000);
 
 [h_female1, p_female1] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000, 42);
 [h_female2, p_female2] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000, 42);
+power = estimateKStest2Power(femaleParam{1}, femaleParam{2}, 1000);
+power = estimateKStest2Power(femaleParam{1}, femaleParam{3}, 1000);
 
 % PNC influences approach rate in males
 [featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot('approachavoid', 'y', ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
 
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachMale{1}, featureForEachMale{2});
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachMale{1}, featureForEachMale{3});
+group_1_data = py.numpy.array(featureForEachMale{1});
+group_2_data = py.numpy.array(featureForEachMale{2});
+group_3_data = py.numpy.array(featureForEachMale{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+disp(result);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+disp(result);
 
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachFemale{1}, featureForEachFemale{2});
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachFemale{1}, featureForEachFemale{3});
+group_1_data = py.numpy.array(featureForEachFemale{1});
+group_2_data = py.numpy.array(featureForEachFemale{2});
+group_3_data = py.numpy.array(featureForEachFemale{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+disp(result);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+disp(result);
 
 % Slight variance change observed for both genders
 [maleData,femaleData] = varianceAnalysis('approachavoid', 'y', ...
@@ -225,19 +279,33 @@ individualPsychometricPlotOverlay('approachavoid', 'y', 'P2L1L3 Post alcohol');
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
 [h_male1, p_male1] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000, 42);
 [h_male2, p_male2] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000, 42);
+power = estimateKStest2Power(maleParam{1}, maleParam{2}, 1000);
+power = estimateKStest2Power(maleParam{1}, maleParam{3}, 1000);
 
 [h_female1, p_female1] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000, 42);
 [h_female2, p_female2] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000, 42);
+power = estimateKStest2Power(femaleParam{1}, femaleParam{2}, 1000);
+power = estimateKStest2Power(femaleParam{1}, femaleParam{3}, 1000);
 
 % Greater influence on maleapproach rate in PC task
 [featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot('approachavoid', 'y', ...
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
 
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachMale{1}, featureForEachMale{2});
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachMale{1}, featureForEachMale{3});
+group_1_data = py.numpy.array(featureForEachMale{1});
+group_2_data = py.numpy.array(featureForEachMale{2});
+group_3_data = py.numpy.array(featureForEachMale{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+disp(result);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+disp(result);
 
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachFemale{1}, featureForEachFemale{2});
-[d_manova, p_manova, stats_manova] = manovaAndPostHoc(featureForEachFemale{1}, featureForEachFemale{3});
+group_1_data = py.numpy.array(featureForEachFemale{1});
+group_2_data = py.numpy.array(featureForEachFemale{2});
+group_3_data = py.numpy.array(featureForEachFemale{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+disp(result);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+disp(result);
 
 % Strong variance change observed in males
 [maleData,femaleData] = varianceAnalysis('approachavoid', 'y', ...
@@ -245,34 +313,6 @@ individualPsychometricPlotOverlay('approachavoid', 'y', 'P2L1L3 Post alcohol');
 
 [p_values, combined_p] = FisherMethod(maleData);
 [p_values, combined_p] = FisherMethod(femaleData);
-
-
-%% Figure 6
-% Comparing sigmoid fractions in PNC: male vs. female
-[count1, total1] = calculateFractionOfSigmoid('male', 'approachavoid', 2, ...
-    'P2L1 Boost and alcohol');
-figure;
-pie([count1, total1 - count1]);
-
-[count2, total2] = calculateFractionOfSigmoid('female', 'approachavoid', 2, ...
-    'P2L1 Boost and alcohol');
-figure;
-pie([count2, total2 - count2]);
-
-p = chi2test([count1, (total1 - count1); count2, (total2 - count2)]);
-
-% Comparing sigmoid fractions in PC: male vs. female
-[count1, total1] = calculateFractionOfSigmoid('male', 'approachavoid', 2, ...
-    'P2L1L3 Boost and alcohol');
-figure;
-pie([count1, total1 - count1]);
-
-[count2, total2] = calculateFractionOfSigmoid('female', 'approachavoid', 2, ...
-    'P2L1L3 Boost and alcohol');
-figure;
-pie([count2, total2 - count2]);
-
-p = chi2test([count1, (total1 - count1); count2, (total2 - count2)]);
 
 
 %% SI 1
@@ -303,31 +343,29 @@ trajectoryPlot(77401);
 % Enhanced impact notedduring conflict task
 featureForEach = masterPsychometricFunctionPlot('time_in_feeder_25', 'n', ...
     'P2L1 BL for comb boost and alc','P2A Boost and alcohol', 'P2L1 Post alcohol');
-T1 = featureForEach{1};
-T2 = featureForEach{2};
-T3 = featureForEach{3};
+group_1_data = py.numpy.array(featureForEach{1});
+group_2_data = py.numpy.array(featureForEach{2});
+group_3_data = py.numpy.array(featureForEach{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEach{1}, 1), size(featureForEach{2}, 1), 4, 0.05);
 
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
-
-data = [T1; T3];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
-[d, p, stats] = manova1(data, group);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEach{1}, 1), size(featureForEach{3}, 1), 4, 0.05);
 
 featureForEach = masterPsychometricFunctionPlot('time_in_feeder_25', 'n', ...
     'P2L1L3 BL for comb boost and alc','P2A Boost and alcohol', 'P2L1L3 Post alcohol');
-T1 = featureForEach{1};
-T2 = featureForEach{2};
-T3 = featureForEach{3};
+group_1_data = py.numpy.array(featureForEach{1});
+group_2_data = py.numpy.array(featureForEach{2});
+group_3_data = py.numpy.array(featureForEach{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEach{1}, 1), size(featureForEach{2}, 1), 4, 0.05);
 
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
-
-data = [T1; T3];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
-[d, p, stats] = manova1(data, group);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEach{1}, 1), size(featureForEach{3}, 1), 4, 0.05);
 
 % Shift in inflection pointis observed in both tasks
 param_array = fitParamKernelDensity('shift', 'time_in_feeder_25', 2, 'n', ...
@@ -335,39 +373,41 @@ param_array = fitParamKernelDensity('shift', 'time_in_feeder_25', 2, 'n', ...
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000, 42);
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000, 42);
 
+power = estimateKStest2Power(param_array{1}, param_array{2}, 1000);
+power = estimateKStest2Power(param_array{1}, param_array{3}, 1000);
+
 param_array = fitParamKernelDensity('shift', 'time_in_feeder_25', 2, 'n', ...
     'P2L1L3 BL for comb boost and alc', 'P2A Boost and alcohol', 'P2L1L3 Post alcohol');
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000, 42);
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000, 42);
+
+power = estimateKStest2Power(param_array{1}, param_array{2}, 1000);
+power = estimateKStest2Power(param_array{1}, param_array{3}, 1000);
 
 % AA influences time feature in males
 [featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot( ...
     'time_in_feeder_25', 'y', 'P2L1 BL for comb boost and alc','P2A Boost and alcohol', ...
     'P2L1 Post alcohol');
 
-T1 = featureForEachMale{1};
-T2 = featureForEachMale{2};
-T3 = featureForEachMale{3};
+group_1_data = py.numpy.array(featureForEachMale{1});
+group_2_data = py.numpy.array(featureForEachMale{2});
+group_3_data = py.numpy.array(featureForEachMale{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachMale{1}, 1), size(featureForEachMale{2}, 1), 4, 0.05);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachMale{1}, 1), size(featureForEachMale{3}, 1), 4, 0.05);
 
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
-
-data = [T1; T3];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
-[d, p, stats] = manova1(data, group);
-
-T1 = featureForEachFemale{1};
-T2 = featureForEachFemale{2};
-T3 = featureForEachFemale{3};
-
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
-
-data = [T1; T3];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
-[d, p, stats] = manova1(data, group);
+group_1_data = py.numpy.array(featureForEachFemale{1});
+group_2_data = py.numpy.array(featureForEachFemale{2});
+group_3_data = py.numpy.array(featureForEachFemale{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachFemale{1}, 1), size(featureForEachFemale{2}, 1), 4, 0.05);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachFemale{1}, 1), size(featureForEachFemale{3}, 1), 4, 0.05);
 
 % Shift of inflection pointobserved in males
 [maleParam, femaleParam] = fitParamKernelDensity('shift', 'time_in_feeder_25', ...
@@ -375,6 +415,9 @@ group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
 
 [h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000, 42);
 [h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000, 42);
+
+power = estimateKStest2Power(maleParam{1}, maleParam{2}, 1000);
+power = estimateKStest2Power(maleParam{1}, maleParam{3}, 1000);
 
 [h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000, 42);
 [h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000, 42);
@@ -384,29 +427,25 @@ group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
     'time_in_feeder_25', 'y', 'P2L1L3 BL for comb boost and alc','P2A Boost and alcohol', ...
     'P2L1L3 Post alcohol');
 
-T1 = featureForEachMale{1};
-T2 = featureForEachMale{2};
-T3 = featureForEachMale{3};
+group_1_data = py.numpy.array(featureForEachMale{1});
+group_2_data = py.numpy.array(featureForEachMale{2});
+group_3_data = py.numpy.array(featureForEachMale{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachMale{1}, 1), size(featureForEachMale{2}, 1), 4, 0.05);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachMale{1}, 1), size(featureForEachMale{3}, 1), 4, 0.05);
 
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
-
-data = [T1; T3];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
-[d, p, stats] = manova1(data, group);
-
-T1 = featureForEachFemale{1};
-T2 = featureForEachFemale{2};
-T3 = featureForEachFemale{3};
-
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
-
-data = [T1; T3];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
-[d, p, stats] = manova1(data, group);
+group_1_data = py.numpy.array(featureForEachFemale{1});
+group_2_data = py.numpy.array(featureForEachFemale{2});
+group_3_data = py.numpy.array(featureForEachFemale{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachFemale{1}, 1), size(featureForEachFemale{2}, 1), 4, 0.05);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachFemale{1}, 1), size(featureForEachFemale{3}, 1), 4, 0.05);
 
 % Shift of inflection pointstronger in males
 [maleParam, femaleParam] = fitParamKernelDensity('shift', 'time_in_feeder_25', ...
@@ -414,12 +453,45 @@ group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
 
 [h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000, 42);
 [h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000, 42);
+power = estimateKStest2Power(maleParam{1}, maleParam{2}, 1000);
+power = estimateKStest2Power(maleParam{1}, maleParam{3}, 1000);
 
 [h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000, 42);
 [h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000, 42);
-
+power = estimateKStest2Power(femaleParam{1}, femaleParam{2}, 1000);
+power = estimateKStest2Power(femaleParam{1}, femaleParam{3}, 1000);
 
 %% SI 3
+% Psychometric profiles of a vulnerable animal: AA impact
+individualPsychPlotPerSession('approachavoid', ...
+    'P2L1 BL for comb boost and alc', 'sully');
+individualPsychPlotPerSession('approachavoid', ...
+    'P2L1L3 BL for comb boost and alc', 'sully');
+individualPsychPlotPerSession('approachavoid', ...
+    'P2A Boost and alcohol', 'sully');
+
+individualPsychPlotPerSession('approachavoid', ...
+    'P2L1 BL for comb boost and alc', 'shakira');
+individualPsychPlotPerSession('approachavoid', ...
+    'P2L1L3 BL for comb boost and alc', 'shakira');
+individualPsychPlotPerSession('approachavoid', ...
+    'P2A Boost and alcohol', 'shakira');
+
+% Comparing sigmoid fractions in AA: male vs. female
+[count1, total1] = calculateFractionOfSigmoid('male', 'approachavoid', 2, ...
+    'P2A Boost and alcohol');
+figure;
+pie([count1, total1 - count1]);
+
+[count2, total2] = calculateFractionOfSigmoid('female', 'approachavoid', 2, ...
+    'P2A Boost and alcohol');
+figure;
+pie([count2, total2 - count2]);
+
+p = chi2test([count1, (total1 - count1); count2, (total2 - count2)]);
+power = estimateChi2Power(count1, total1, count2, total2);
+
+%% SI 4
 males = {'aladdin', 'carl', 'jafar', 'jimi', 'jr', 'kobe', 'mike', 'scar', ...
 'simba', 'sully'};
 females = {'alexis', 'fiona', 'harley', 'juana', 'kryssia', 'neftali', ...
@@ -463,70 +535,101 @@ pie([count2, total2 - count2]);
 
 p = chi2test([count1, (total1 - count1); count2, (total2 - count2)]);
 
+%% SI 5
+% Comparing sigmoid fractions in PNC: male vs. female
+[count1, total1] = calculateFractionOfSigmoid('male', 'approachavoid', 2, ...
+    'P2L1 Boost and alcohol');
+figure;
+pie([count1, total1 - count1]);
 
-%% SI 4
+[count2, total2] = calculateFractionOfSigmoid('female', 'approachavoid', 2, ...
+    'P2L1 Boost and alcohol');
+figure;
+pie([count2, total2 - count2]);
+
+p = chi2test([count1, (total1 - count1); count2, (total2 - count2)]);
+power = estimateChi2Power(count1, total1, count2, total2);
+
+% Comparing sigmoid fractions in PC: male vs. female
+[count1, total1] = calculateFractionOfSigmoid('male', 'approachavoid', 2, ...
+    'P2L1L3 Boost and alcohol');
+figure;
+pie([count1, total1 - count1]);
+
+[count2, total2] = calculateFractionOfSigmoid('female', 'approachavoid', 2, ...
+    'P2L1L3 Boost and alcohol');
+figure;
+pie([count2, total2 - count2]);
+
+p = chi2test([count1, (total1 - count1); count2, (total2 - count2)]);
+
+%% SI 6
 %
 featureForEach = masterPsychometricFunctionPlot('time_in_feeder_25', 'n', ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
-T1 = featureForEach{1};
-T2 = featureForEach{2};
-T3 = featureForEach{3};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
+group_1_data = py.numpy.array(featureForEach{1});
+group_2_data = py.numpy.array(featureForEach{2});
+group_3_data = py.numpy.array(featureForEach{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEach{1}, 1), size(featureForEach{2}, 1), 4, 0.05);
 
-data = [T1; T3];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
-[d, p, stats] = manova1(data, group);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEach{1}, 1), size(featureForEach{3}, 1), 4, 0.05);
 
 featureForEach = masterPsychometricFunctionPlot('time_in_feeder_25', 'n', ...
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
-T1 = featureForEach{1};
-T2 = featureForEach{2};
-T3 = featureForEach{3};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
+group_1_data = py.numpy.array(featureForEach{1});
+group_2_data = py.numpy.array(featureForEach{2});
+group_3_data = py.numpy.array(featureForEach{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEach{1}, 1), size(featureForEach{2}, 1), 4, 0.05);
 
-data = [T1; T3];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
-[d, p, stats] = manova1(data, group);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEach{1}, 1), size(featureForEach{3}, 1), 4, 0.05);
 
 % 
 param_array = fitParamKernelDensity('shift', 'time_in_feeder_25', 2, 'n', ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000, 42);
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000, 42);
+power = estimateKStest2Power(param_array{1}, param_array{2}, 1000);
+power = estimateKStest2Power(param_array{1}, param_array{3}, 1000);
 
 param_array = fitParamKernelDensity('shift', 'time_in_feeder_25', 2, 'n', ...
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000, 42);
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000, 42);
+power = estimateKStest2Power(param_array{1}, param_array{2}, 1000);
+power = estimateKStest2Power(param_array{1}, param_array{3}, 1000);
 
 %
 [featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot('time_in_feeder_25', ...
     'y', 'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
-T1 = featureForEachMale{1};
-T2 = featureForEachMale{2};
-T3 = featureForEachMale{3};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
+group_1_data = py.numpy.array(featureForEachMale{1});
+group_2_data = py.numpy.array(featureForEachMale{2});
+group_3_data = py.numpy.array(featureForEachMale{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachMale{1}, 1), size(featureForEachMale{2}, 1), 4, 0.05);
 
-data = [T1; T3];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
-[d, p, stats] = manova1(data, group);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachMale{1}, 1), size(featureForEachMale{3}, 1), 4, 0.05);
 
-T1 = featureForEachFemale{1};
-T2 = featureForEachFemale{2};
-T3 = featureForEachFemale{3};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
+group_1_data = py.numpy.array(featureForEachFemale{1});
+group_2_data = py.numpy.array(featureForEachFemale{2});
+group_3_data = py.numpy.array(featureForEachFemale{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachFemale{1}, 1), size(featureForEachFemale{2}, 1), 4, 0.05);
 
-data = [T1; T3];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
-[d, p, stats] = manova1(data, group);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachFemale{1}, 1), size(featureForEachFemale{3}, 1), 4, 0.05);
 
 % 
 [maleParam, femaleParam] = fitParamKernelDensity('shift', 'time_in_feeder_25', 2, 'y', ...
@@ -534,33 +637,39 @@ group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
 [h_male1, p_male1] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000, 42);
 [h_male2, p_male2] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000, 42);
 
+power = estimateKStest2Power(maleParam{1}, maleParam{2}, 1000);
+power = estimateKStest2Power(maleParam{1}, maleParam{3}, 1000);
+
 [h_female1, p_female1] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000, 42);
 [h_female2, p_female2] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000, 42);
+
+power = estimateKStest2Power(femaleParam{1}, femaleParam{2}, 1000);
+power = estimateKStest2Power(femaleParam{1}, femaleParam{3}, 1000);
 
 %
 [featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot('time_in_feeder_25', ...
     'y', 'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
-T1 = featureForEachMale{1};
-T2 = featureForEachMale{2};
-T3 = featureForEachMale{3};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
+group_1_data = py.numpy.array(featureForEachMale{1});
+group_2_data = py.numpy.array(featureForEachMale{2});
+group_3_data = py.numpy.array(featureForEachMale{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachMale{1}, 1), size(featureForEachMale{2}, 1), 4, 0.05);
 
-data = [T1; T3];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
-[d, p, stats] = manova1(data, group);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachMale{1}, 1), size(featureForEachMale{3}, 1), 4, 0.05);
 
-T1 = featureForEachFemale{1};
-T2 = featureForEachFemale{2};
-T3 = featureForEachFemale{3};
-data = [T1; T2];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T2'}, size(T2,1), 1)];
-[d, p, stats] = manova1(data, group);
+group_1_data = py.numpy.array(featureForEachFemale{1});
+group_2_data = py.numpy.array(featureForEachFemale{2});
+group_3_data = py.numpy.array(featureForEachFemale{3});
+result = py.manovaTest.manovaTest(group_1_data, group_2_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachFemale{1}, 1), size(featureForEachFemale{2}, 1), 4, 0.05);
 
-data = [T1; T3];
-group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
-[d, p, stats] = manova1(data, group);
+result = py.manovaTest.manovaTest(group_1_data, group_3_data);
+power = py.manova_power.compute_manova_power(result{1}, ...
+    size(featureForEachFemale{1}, 1), size(featureForEachFemale{3}, 1), 4, 0.05);
 
 % 
 [maleParam, femaleParam] = fitParamKernelDensity('shift', 'time_in_feeder_25', 2, 'y', ...
@@ -568,8 +677,14 @@ group = [repmat({'T1'}, size(T1,1), 1); repmat({'T3'}, size(T3,1), 1)];
 [h_male1, p_male1] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000, 42);
 [h_male2, p_male2] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000, 42);
 
+power = estimateKStest2Power(maleParam{1}, maleParam{2}, 1000);
+power = estimateKStest2Power(maleParam{1}, maleParam{3}, 1000);
+
 [h_female1, p_female1] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000, 42);
 [h_female2, p_female2] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000, 42);
+
+power = estimateKStest2Power(femaleParam{1}, femaleParam{2}, 1000);
+power = estimateKStest2Power(femaleParam{1}, femaleParam{3}, 1000);
 
 % Comparing sigmoid fractions in NCPA: male vs. female
 [count1, total1] = calculateFractionOfSigmoid('male', 'approachavoid', 2, ...

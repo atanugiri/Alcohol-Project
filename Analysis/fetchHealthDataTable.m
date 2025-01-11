@@ -15,7 +15,7 @@ else
    conn =  varargin{1};
 end
 
-liveTableQuery = sprintf("SELECT id, subjectid, referencetime, gender, feeder, " + ...
+liveTableQuery = sprintf("SELECT id, subjectid, referencetime, gender, feeder, trialname, " + ...
     "health, trialcontrolsettings, tasktypedone, approachavoid FROM live_table " + ...
     "WHERE id IN (%s) ORDER BY id;", idList);
 liveTableData = fetch(conn, liveTableQuery);
@@ -41,6 +41,9 @@ mergedTable.feeder = str2double(mergedTable.feeder);
 mergedTable.health = string(mergedTable.health);
 mergedTable.trialcontrolsettings = string(mergedTable.trialcontrolsettings);
 mergedTable.tasktypedone = string(mergedTable.tasktypedone);
+mergedTable.trialname = regexprep(string(mergedTable.trialname), 'Trial\s*(\d+)', '$1');
+mergedTable.trialname = str2double(mergedTable.trialname);
+
 if ~strcmpi(feature,'approachavoid')
     mergedTable.distance_until_limiting_time_stamp = str2double(mergedTable.distance_until_limiting_time_stamp);
 end

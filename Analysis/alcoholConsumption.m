@@ -64,7 +64,7 @@ femaleConsumOverall = mean(femaleConsum);
 figure;
 overallMean = [mean(maleConsumOverall), mean(femaleConsumOverall)];
 b = bar(overallMean, 'FaceColor','flat');
-b.CData(1,:) = [0 0 1]; 
+b.CData(1,:) = [0 0 1];
 b.CData(2,:) = [1 0 0];
 hold on;
 errorbar(overallMean, [std(maleConsumOverall)/sqrt(length(maleConsumOverall)), ...
