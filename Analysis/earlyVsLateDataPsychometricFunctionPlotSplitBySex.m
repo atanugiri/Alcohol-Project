@@ -1,11 +1,11 @@
 % Author: Atanu Giri
 % Date: 01/11/2025
 %
-function varargout = earlyVsLatePsychometricFunctionPlotSplitBySex(feature, splitByGender, sessionFraction, varargin)
+function varargout = earlyVsLateDataPsychometricFunctionPlotSplitBySex(feature, splitType, fraction, varargin)
 %
 % feature = 'approachavoid';
 % varargin = {'P2A Boost and alcohol'};
-% sessionFraction = 0.5;
+% trailFraction = 0.5;
 
 datasource = 'live_database';
 treatmentGroups = varargin;
@@ -45,6 +45,10 @@ featureForEachFemale = cell(numel(treatmentIDs),2);
 avFeatureFemale = cell(numel(treatmentIDs),2);
 stdErrFemale = cell(numel(treatmentIDs),2);
 
+% Plot Psychometric function
+x = 1:4;
+Colors = parula(2*numel(treatmentIDs));
+
 for grp = 1:numel(treatmentIDs)
     % Male Data
     maleData = treatment_data{grp}(strcmpi(treatment_data{grp}.gender,"male"),:);
@@ -52,8 +56,8 @@ for grp = 1:numel(treatmentIDs)
     numTrialsMale = height(maleData);
 
     % Split into early and late sessions
-    earlySessionsMale = maleData(1:floor(sessionFraction*numTrialsMale),:);
-    startIndex = ceil((1 - sessionFraction) * numTrialsMale) + 1;
+    earlySessionsMale = maleData(1:floor(fraction*numTrialsMale),:);
+    startIndex = ceil((1 - fraction) * numTrialsMale) + 1;
     lateSessionsMale = maleData(startIndex:end, :);
 
     % Compute psychometric function values
@@ -66,14 +70,14 @@ for grp = 1:numel(treatmentIDs)
     % Plot early sessions
     figure;
     plot(x, avFeatureMale{grp,1}, '.-', 'LineWidth', 2, 'Color', Colors(grp,:), ...
-        'DisplayName',sprintf('%s_early_session_%.1f', treatmentGroups{grp}, sessionFraction));
+        'DisplayName',sprintf('%s_early_session_%.1f', treatmentGroups{grp}, fraction));
     hold on;
     errorbar(x, avFeatureMale{grp,1},stdErrMale{grp,1},'LineStyle', 'none', ...
         'LineWidth', 1.5, 'Color','k', 'HandleVisibility', 'off');
 
     % Plot late sessions
     plot(x, avFeatureMale{grp,2}, '.-', 'LineWidth', 2, 'Color', Colors(grp+1,:), ...
-        'DisplayName',sprintf('%s_late_session_%.1f', treatmentGroups{grp}, sessionFraction));
+        'DisplayName',sprintf('%s_late_session_%.1f', treatmentGroups{grp}, fraction));
     errorbar(x, avFeatureMale{grp,2},stdErrMale{grp,2},'LineStyle', 'none', ...
         'LineWidth', 1.5, 'Color','k', 'HandleVisibility', 'off');
 
@@ -87,8 +91,8 @@ for grp = 1:numel(treatmentIDs)
     numTrialsFemale = height(femaleData);
 
     % Split into early and late sessions
-    earlySessionsFemale = femaleData(1:floor(sessionFraction*numTrialsFemale),:);
-    startIndex = ceil((1 - sessionFraction) * numTrialsFemale) + 1;
+    earlySessionsFemale = femaleData(1:floor(fraction*numTrialsFemale),:);
+    startIndex = ceil((1 - fraction) * numTrialsFemale) + 1;
     lateSessionsFemale = femaleData(startIndex:end, :);
 
     % Compute psychometric function values
@@ -101,14 +105,14 @@ for grp = 1:numel(treatmentIDs)
     figure;
     % Plot early sessions
     plot(x, avFeatureFemale{grp,1}, '.-', 'LineWidth', 2, 'Color', Colors(grp,:), ...
-        'DisplayName',sprintf('%s_early_session_%.1f', treatmentGroups{grp}, sessionFraction));
+        'DisplayName',sprintf('%s_early_session_%.1f', treatmentGroups{grp}, fraction));
     hold on;
     errorbar(x, avFeatureFemale{grp,1},stdErrMale{grp,1},'LineStyle', 'none', ...
         'LineWidth', 1.5, 'Color','k', 'HandleVisibility', 'off');
 
     % Plot late sessions
     plot(x, avFeatureFemale{grp,2}, '.-', 'LineWidth', 2, 'Color', Colors(grp+1,:), ...
-        'DisplayName',sprintf('%s_late_session_%.1f', treatmentGroups{grp}, sessionFraction));
+        'DisplayName',sprintf('%s_late_session_%.1f', treatmentGroups{grp}, fraction));
     errorbar(x, avFeatureFemale{grp,2},stdErrMale{grp,2},'LineStyle', 'none', ...
         'LineWidth', 1.5, 'Color','k', 'HandleVisibility', 'off');
 
