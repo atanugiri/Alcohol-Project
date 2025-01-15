@@ -14,7 +14,23 @@ function varargout = earlyVsLateDataPsychometricFunctionPlot(feature, splitType,
 % fraction = 0.5;
 % varargin = {'P2A Boost and alcohol'};
 
+% Initialize animalList
+animalList = [];
+
+% Check if the last input argument is the animalList
+if ~isempty(varargin) && iscell(varargin{end}) && all(cellfun(@ischar, varargin{end}))
+    animalList = varargin{end}; % Extract animalList
+    varargin(end) = [];         % Remove animalList from varargin
+end
+
 treatment_data = extractTreatmentData(feature, splitType, varargin);
+
+% Filter treatment_data if animalList is provided
+if ~isempty(animalList)
+    for i = 1:numel(treatment_data)
+        treatment_data{i} = treatment_data{i}(ismember(treatment_data{i}.subjectid, animalList), :);
+    end
+end
 
 % Initialize variables for early and late sessions
 earlyData = cell(1, numel(treatment_data));
