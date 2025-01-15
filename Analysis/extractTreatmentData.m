@@ -2,10 +2,9 @@
 % Date: 01/14/2025
 %
 
-function treatment_data = extractTreatmentData(feature, splitType, varargin)
+function treatment_data = extractTreatmentData(feature, splitType, treatmentGroups)
 
 datasource = 'live_database';
-treatmentGroups = varargin;
 treatmentIDs = cell(1, numel(treatmentGroups));
 
 parfor i = 1:numel(treatmentGroups)

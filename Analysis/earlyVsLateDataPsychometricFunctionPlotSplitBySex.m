@@ -7,7 +7,8 @@ function varargout = earlyVsLateDataPsychometricFunctionPlotSplitBySex(feature, 
 % varargin = {'P2A Boost and alcohol'};
 % trailFraction = 0.5;
 
-treatment_data = extractTreatmentData(feature, splitType, varargin);
+treatmentGroups = varargin;
+treatment_data = extractTreatmentData(feature, splitType, treatmentGroups);
 
 featureForEachMale = cell(numel(treatment_data),2);
 avFeatureMale = cell(numel(treatment_data),2);

@@ -23,7 +23,8 @@ if ~isempty(varargin) && iscell(varargin{end}) && all(cellfun(@ischar, varargin{
     varargin(end) = [];         % Remove animalList from varargin
 end
 
-treatment_data = extractTreatmentData(feature, splitType, varargin);
+treatmentGroups = varargin;
+treatment_data = extractTreatmentData(feature, splitType, treatmentGroups);
 
 % Filter treatment_data if animalList is provided
 if ~isempty(animalList)
