@@ -7,6 +7,16 @@
 % 'fraction' is the amount of data in early and late sessions.
 % 'varargin' is health group the user wants to analyze.
 %
+% Example usage: 
+% psychometricFunctionPlotPerPartition('approachavoid', 'trial', 'P2A Boost
+% and alcohol')
+% 
+% OR
+%
+% animalList = {'aladdin', 'jafar', 'jimi', 'jr', 'mike', 'scar', 'sully'};
+% psychometricFunctionPlotPerPartition('approachavoid', 'trial', 'P2A Boost
+% and alcohol', animalList)
+
 function varargout = earlyVsLateDataPsychometricFunctionPlot(feature, splitType, fraction, varargin)
 
 % feature = 'approachavoid';
@@ -112,6 +122,12 @@ end
 
 hold off;
 
+% Add label and legend
+xlabel('Sucrose conc.', 'Interpreter','none', 'FontSize', 25);
+ylabel(sprintf('%s', feature), 'Interpreter','none', 'FontSize', 25);
+xticks(1:4);
+label = {'0.5','2','5','9'};
+set(gca,'xticklabel',label,'FontSize',15);
 legend('show', 'Interpreter', 'none');
 
 varargout{1} = earlyDataFeatureForEach;

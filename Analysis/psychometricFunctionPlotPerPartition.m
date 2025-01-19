@@ -6,8 +6,16 @@
 % split the health group data.
 % 'varargin' is health group the user wants to analyze.
 %
-% Example usage:
+% Example usage: 
+% psychometricFunctionPlotPerPartition('approachavoid', 'trial', 'P2A Boost
+% and alcohol')
 % 
+% OR
+%
+% animalList = {'aladdin', 'jafar', 'jimi', 'jr', 'mike', 'scar', 'sully'};
+% psychometricFunctionPlotPerPartition('approachavoid', 'trial', 'P2A Boost
+% and alcohol', animalList)
+
 function varargout = psychometricFunctionPlotPerPartition(feature, splitType, varargin)
 
 % feature = 'approachavoid';
@@ -91,6 +99,11 @@ for i = 1:numel(treatment_data)
         if isempty(splitData{i, j})
             continue;
         end
+
+        % if j == 1
+        %     continue;
+        % end
+
         % Plot early sessions
         plot(x, splitDataAvFeature{i,j}, '.-', 'LineWidth', 2, 'Color', Colors(i-1+j, :), ...
             'DisplayName',sprintf('%s_%d', varargin{i}, j));
@@ -102,6 +115,12 @@ end
 
 hold off;
 
+% Add label and legend
+xlabel('Sucrose conc.', 'Interpreter','none', 'FontSize', 25);
+ylabel(sprintf('%s', feature), 'Interpreter','none', 'FontSize', 25);
+xticks(1:4);
+label = {'0.5','2','5','9'};
+set(gca,'xticklabel',label,'FontSize',15);
 legend('show', 'Interpreter', 'none');
 
 varargout = splitDataFeatureForEach;
