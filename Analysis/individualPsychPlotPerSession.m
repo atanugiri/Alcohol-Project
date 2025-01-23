@@ -5,47 +5,60 @@
 % plots the psychometric function per session.
 %
 % Example usage:
-% individualPsychPlotPerSession('approachavoid','P2L1 Ghrelin', 'sully')
+% individualPsychPlotPerSession('approachavoid','P2L1 Ghrelin', {'sully'})
 
 %% Invokes individualPsychValuesPerSession
 
-function individualPsychPlotPerSession(feature, trtGroup, animal)
+function individualPsychPlotPerSession(feature, trtGroup, animalList)
 
-[featureList, sessionList] = individualPsychValuesPerSession(feature, trtGroup, animal);
+datasource = 'live_database';
+conn = database(datasource, 'postgres', '1234');
 
-x = [1,2,3,4];
-Colors = parula(size(featureList, 1));
-figure;
+treatmentIDs = treatmentIDfun(trtGroup, conn);
+treatmentIDs_str = strjoin(arrayfun(@num2str, treatmentIDs, 'UniformOutput', false), ',');
 
-for session = 1:size(featureList)
-    % Check for NaN values in y
-    if any(isnan(featureList))
-        disp('Skipping iteration due to NaN values in y.');
-        continue; % Skip the current iteration
+% Fetch norm_x, norm_y, norm_t
+treatment_data = fetchHealthDataTable(feature, treatmentIDs_str, conn);
+treatment_data = cleanBadSessionsFromTable(treatment_data, feature); % Remove bad sessions
+
+% Filter treatment_data by animalList
+treatment_data = treatment_data(ismember(treatment_data.subjectid, animalList), :);
+
+x = 1:4;
+
+for animal = 1:numel(animalList)
+    animalData = treatment_data(ismember(treatment_data.subjectid, animalList{animal}), :);
+    featureForEach = psychometricFunValuesPerSession(animalData, feature);
+
+    % Plot figure
+    figure;
+    Colors = parula(size(featureForEach, 1));
+
+    for session = 1:size(featureForEach, 1)
+        plot(x, featureForEach(session, :), 'LineWidth', 2, 'Color', Colors(session,:), ...
+            'DisplayName', sprintf('session_%d%', session));
+        hold on;
     end
 
-    plot(x, featureList(session, :), 'LineWidth', 2, 'Color', Colors(session,:), ...
-        'DisplayName', sessionList(session));
-    hold on;
-end
+    hold off;
+    % ylim([0, 1]);
+    xlabel('Sucrose conc.', 'Interpreter','none', 'FontSize', 25);
+    ylabel(sprintf('%s', feature), 'Interpreter','none', 'FontSize', 25);
+    xticks(1:4);
+    label = {'0.5','2','5','9'};
+    set(gca,'xticklabel',label,'FontSize',15);
+    legend('show', 'Interpreter', 'none');
+    title(sprintf('Individual psychometric function: %s', animalList{animal}), 'Interpreter','none');
 
-ylim([0, 1]);
-title(sprintf('%s %s', trtGroup, animal));
-legend('show', 'Location', 'best');
-ylabel(sprintf('%s', feature), "Interpreter","none");
+    % Save figure
+    figname = sprintf('%s_%s_%s_sessions_psych',trtGroup, animalList{animal}, feature);
+    scriptDir = fileparts(mfilename('fullpath'));
+    folderName = 'Fig files';
+    myPath = fullfile(scriptDir, folderName);
+    % Check if the folder exists, if not, create it
+    if ~exist(myPath, 'dir')
+        mkdir(myPath);
+    end
 
-% Figure name
-figname = sprintf('%s_%s_%s_sessions_psych',trtGroup, animal, feature);
-
-% Save figure
-scriptDir = fileparts(mfilename('fullpath'));
-folderName = 'Fig files';
-myPath = fullfile(scriptDir, folderName);
-% Check if the folder exists, if not, create it
-if ~exist(myPath, 'dir')
-    mkdir(myPath);
-end
-
-savefig(gcf, fullfile(myPath, figname));
-
+    savefig(gcf, fullfile(myPath, figname));
 end

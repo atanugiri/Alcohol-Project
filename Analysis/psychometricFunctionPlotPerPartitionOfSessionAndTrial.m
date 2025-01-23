@@ -28,9 +28,7 @@ if nargin < 4
     animalList = {};
 end
 
-treatment_table = extractTreatmentData(feature, splitType, {treatmentGroup});
-treatment_data = treatment_table{1,1};
-treatment_data = cleanBadSessionsFromTable(treatment_data, feature); % Remove bad sessions
+treatment_data = extractTreatmentData(feature, splitType, treatmentGroup);
 
 % Filter treatment_data if animalList is provided
 if ~isempty(animalList)

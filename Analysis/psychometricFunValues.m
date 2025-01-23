@@ -39,17 +39,6 @@ end % end of animal 1
 tf = arrayfun(@(x) any(isnan(featureForEach(x, :))), 1:size(featureForEach, 1));
 featureForEach(tf', :) = [];
 
-%% Uncomment this part if you want to change standard error per animal
-% animalSession(tf', :) = [];
-% uniqueAnimals = unique(animalSession);
-% averaged_features = zeros(numel(uniqueAnimals), 4);
-% for animal = 1:length(uniqueAnimals)
-%     indices = animalSession == uniqueAnimals(animal);
-%     animalFeature = featureForEach(indices, :);
-%     averaged_features(animal, :) = mean(animalFeature);
-% end
-% featureForEach = averaged_features;
-
 % Calculate average
 avFeature = mean(featureForEach);
 

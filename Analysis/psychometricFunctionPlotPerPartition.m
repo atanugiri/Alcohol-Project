@@ -25,9 +25,7 @@ if nargin < 4
     animalList = {};
 end
 
-treatment_table = extractTreatmentData(feature, splitType, {treatmentGroup});
-treatment_data = treatment_table{1,1};
-treatment_data = cleanBadSessionsFromTable(treatment_data, feature); % Remove bad sessions
+treatment_data = extractTreatmentData(feature, splitType, treatmentGroup);
 
 % Filter treatment_data if animalList is provided
 if ~isempty(animalList)
@@ -37,7 +35,6 @@ end
 
 if strcmpi(splitType, 'trial')
     featureForEach = cell(1,4); 
-    % featureForEach = zeros(4,4); % 4 trial sections x 4 conc.
 
     x = 1:4;
     figure;
@@ -62,7 +59,6 @@ if strcmpi(splitType, 'trial')
             'LineWidth', 1.5, 'Color','k', 'HandleVisibility', 'off');
 
         featureForEach{j} = featurePerSession;
-        % featureForEach(j,:) = avFeature;
 
     end
 
