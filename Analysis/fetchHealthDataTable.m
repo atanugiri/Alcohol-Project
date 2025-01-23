@@ -51,12 +51,6 @@ if ~strcmpi(feature, 'distance_until_limiting_time_stamp')
     mergedTable.(feature) = str2double(mergedTable.(feature));
 end
 
-% % Convert feature/unit_distance to raw values
-% if ismember(feature, {'acc_outlier_move_median','stoppingpts_per_unittravel_method6', ...
-%         'rotationpts_per_unittravel_method4'})
-%     mergedTable.(feature) = mergedTable.(feature) .* mergedTable.distance_until_limiting_time_stamp;
-% end
-
 % Since there are bad entries for 'feeder' we need to fix it
 mergedTable.realFeederId = nan(height(mergedTable),1);
 

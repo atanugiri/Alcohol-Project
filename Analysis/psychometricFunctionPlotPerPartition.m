@@ -4,116 +4,106 @@
 % 'feature' can be any column from ghrelin_featuretable.
 % 'splitType' can be 'session' or 'trial', depending how the user wants to
 % split the health group data.
-% 'varargin' is health group the user wants to analyze.
 %
-% Example usage: 
+% Example usage:
 % psychometricFunctionPlotPerPartition('approachavoid', 'trial', 'P2A Boost
 % and alcohol')
-% 
+%
 % OR
 %
 % animalList = {'aladdin', 'jafar', 'jimi', 'jr', 'mike', 'scar', 'sully'};
 % psychometricFunctionPlotPerPartition('approachavoid', 'trial', 'P2A Boost
 % and alcohol', animalList)
 
-function varargout = psychometricFunctionPlotPerPartition(feature, splitType, varargin)
-
+function varargout = psychometricFunctionPlotPerPartition(feature, splitType, treatmentGroup, animalList)
+%
 % feature = 'approachavoid';
 % splitType = 'trial';
-% varargin = {'P2A Boost and alcohol'};
+% treatmentGroup = 'P2L1 Post alcohol';
 
-% Initialize animalList
-animalList = [];
-
-% Check if the last input argument is the animalList
-if ~isempty(varargin) && iscell(varargin{end}) && all(cellfun(@ischar, varargin{end}))
-    animalList = varargin{end}; % Extract animalList
-    varargin(end) = [];         % Remove animalList from varargin
+if nargin < 4
+    animalList = {};
 end
 
-treatmentGroups = varargin;
-treatment_data = extractTreatmentData(feature, splitType, treatmentGroups);
+treatment_table = extractTreatmentData(feature, splitType, {treatmentGroup});
+treatment_data = treatment_table{1,1};
+treatment_data = cleanBadSessionsFromTable(treatment_data, feature); % Remove bad sessions
 
 % Filter treatment_data if animalList is provided
 if ~isempty(animalList)
-    for i = 1:numel(treatment_data)
-        treatment_data{i} = treatment_data{i}(ismember(treatment_data{i}.subjectid, animalList), :);
-    end
+    treatment_data = treatment_data(ismember(treatment_data.subjectid, animalList), :);
 end
 
-% Initialize variables for early and late sessions
-splitData = cell(1, numel(treatment_data));
-
-
-splitDataFeatureForEach = cell(1, numel(treatment_data));
-splitDataAvFeature = cell(1, numel(treatment_data));
-splitDataStdErr = cell(1, numel(treatment_data));
 
 if strcmpi(splitType, 'trial')
-    for i = 1:numel(treatment_data)
+    featureForEach = cell(1,4); 
+    % featureForEach = zeros(4,4); % 4 trial sections x 4 conc.
 
-        for j = 1:4
-            % Compute the range for trialname based on j
-            trialRange = ((j-1)*10 + 1):(j*10);
+    x = 1:4;
+    figure;
+    Colors = parula(4);
 
-            % Filter treatment_data{i} based on trialname range
-            splitData{i, j} = treatment_data{i}(ismember(treatment_data{i}.trialname, trialRange), :);
+    for j = 1:4
+        % Compute the range for trialname based on j
+        trialRange = ((j-1)*10 + 1):(j*10);
 
-            % Compute psychometric function values
-            [splitDataFeatureForEach{i,j}, splitDataAvFeature{i,j}, splitDataStdErr{i,j}] ...
-                = psychometricFunValues(splitData{i,j}, feature);
-        end
+        % Filter treatment_data{i} based on trialname range
+        splitData = treatment_data(ismember(treatment_data.trialname, trialRange), :);
+
+        featurePerSession = psychometricFunValuesPerSession(splitData, feature);
+        avFeature = mean(featurePerSession,1);
+        std_dev = std(featurePerSession);
+        stdErr = std_dev ./sqrt(size(featurePerSession, 1));
+
+        plot(x, avFeature, '.-', 'LineWidth', 2, 'Color', Colors(j, :), ...
+            'DisplayName',sprintf('Trial_section_%d', j));
+        hold on;
+        errorbar(x, avFeature, stdErr,'LineStyle', 'none', ...
+            'LineWidth', 1.5, 'Color','k', 'HandleVisibility', 'off');
+
+        featureForEach{j} = featurePerSession;
+        % featureForEach(j,:) = avFeature;
+
     end
+
+    varargout{1} = featureForEach;
 
 elseif strcmpi(splitType, 'session')
-    for i = 1:numel(treatment_data)
+    [featureForEach, stdErr, trialCt] = psychometricFunValuesPerSession(treatment_data, feature);
+    
+    % Special for 'P2A Boost and alcohol'
+    if strcmpi(treatmentGroup, 'P2A Boost and alcohol')
+        validSessions = trialCt(:,1) > 80;
+        featureForEach = featureForEach(validSessions, :);
+        stdErr = stdErr(validSessions, :);
 
-        % Extract and sort unique dates
-        uniqueDates = unique(treatment_data{i}.referencetime);
-        uniqueDates = sort(uniqueDates); % Ensure dates are sorted chronologically
-
-        % Determine the number of early and late dates
-        numUniqueDates = numel(uniqueDates);
-
-        for date = 1:numUniqueDates
-            % Filter rows for early and late sessions based on unique dates
-            splitData{i,date} = treatment_data{i}(ismember(treatment_data{i}.referencetime, ...
-                uniqueDates(date)), :);
-            % Compute psychometric function values
-            [splitDataFeatureForEach{i,date}, splitDataAvFeature{i,date}, splitDataStdErr{i,date}] ...
-                = psychometricFunValues(splitData{i,date}, feature);
-        end
+        % Remove the first row as the animals were introduced to alcohol
+        % for the first time
+        featureForEach(1, :) = [];
+        stdErr(1, :) = [];
     end
+
+    % Plot Psychometric function
+    x = 1:4;
+    figure;
+    Colors = parula(size(featureForEach,1));
+
+    for session = 1:size(featureForEach,1)
+        % Plot sessions
+        plot(x, featureForEach(session,:), '.-', 'LineWidth', 2, 'Color', Colors(session, :), ...
+            'DisplayName',sprintf('Session_%d', session));
+        hold on;
+        errorbar(x, featureForEach(session,:), stdErr(session,:),'LineStyle', 'none', ...
+            'LineWidth', 1.5, 'Color','k', 'HandleVisibility', 'off');
+    end
+
+    hold off;
+
+    varargout{1} = featureForEach;
 
 else
     error('Invalid splitType: "%s". Valid options are "trial" or "session".', splitType);
 end
-
-% Plot Psychometric function
-figure;
-x = 1:4;
-Colors = parula(size(splitDataAvFeature,1)*size(splitDataAvFeature,2));
-
-for i = 1:numel(treatment_data)
-    for j = 1:size(splitData,2)
-        if isempty(splitData{i, j})
-            continue;
-        end
-
-        % if j == 1
-        %     continue;
-        % end
-
-        % Plot early sessions
-        plot(x, splitDataAvFeature{i,j}, '.-', 'LineWidth', 2, 'Color', Colors(i-1+j, :), ...
-            'DisplayName',sprintf('%s_%d', varargin{i}, j));
-        hold on;
-        errorbar(x, splitDataAvFeature{i,j},splitDataStdErr{i,j},'LineStyle', 'none', ...
-            'LineWidth', 1.5, 'Color','k', 'HandleVisibility', 'off');
-    end
-end
-
-hold off;
 
 % Add label and legend
 xlabel('Sucrose conc.', 'Interpreter','none', 'FontSize', 25);
@@ -123,5 +113,4 @@ label = {'0.5','2','5','9'};
 set(gca,'xticklabel',label,'FontSize',15);
 legend('show', 'Interpreter', 'none');
 
-varargout = splitDataFeatureForEach;
-end
+title(sprintf('%s', treatmentGroup), 'Interpreter','latex','FontSize',25);

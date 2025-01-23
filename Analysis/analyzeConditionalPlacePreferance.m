@@ -3,20 +3,17 @@
 %
 % 'treatmentGroup' is health group the user wants to analyze.
 % 'tonePhase' can be 'pre' or 'post'.
-% 'varargin' could be user specified animalList.
+% 'animalList' can be specific animals user wants to analyze.
 %
-function time_in_each_feeder = analyzeConditionalPlacePreferance(treatmentGroup, tonePhase, varargin)
+function time_in_each_feeder = analyzeConditionalPlacePreferance(treatmentGroup, tonePhase, animalList)
 
 % treatmentGroup = 'P2A Boost and alcohol';
 % varargin = {};
 % tonePhase = 'pre';
 % animalList = {'aladdin', 'jafar', 'jimi', 'jr', 'mike', 'scar', 'sully'};
 
-% Initialize animalList to an empty cell array
-animalList = [];
-
-if numel(varargin) >= 1
-    animalList = varargin{1};
+if nargin < 3
+    animalList = {};
 end
 
 datasource = 'live_database';
@@ -46,9 +43,7 @@ treatment_data = cleanBadSessionsFromTable(treatment_data, 'approachavoid'); % R
 
 % Filter treatment_data if animalList is provided
 if ~isempty(animalList)
-    for i = 1:numel(treatment_data)
-        treatment_data{i} = treatment_data{i}(ismember(treatment_data{i}.subjectid, animalList), :);
-    end
+    treatment_data = treatment_data(ismember(treatment_data.subjectid, animalList), :);
 end
 
 % Placeholder for time
@@ -58,14 +53,17 @@ time_in_each_feeder = zeros(4,4); % maze(1 -> 4) x conc(9 -> 0.5) matrix
 for maze = unique(treatment_data.mazenumber)'
     currentMazeData = treatment_data(treatment_data.mazenumber == maze, :);
 
-    % for col = 1:numel(cols)
+    % Placeholder for timestamp and corrdinates of current maze
     X = []; Y = []; t = [];
-    % concatArray = [];
-    for row = 1:size(currentMazeData,1)
+
+    for trial = 1:size(currentMazeData,1)
+
+        % Placeholder for current trial data
         tempX = []; tempY = []; tempT = [];
         cols = {'norm_x', 'norm_y', 'norm_t'};
+
         for col = 1:numel(cols)
-            pgArray = currentMazeData.(cols{col}){row};        % Extract the PgArray
+            pgArray = currentMazeData.(cols{col}){trial};        % Extract the PgArray
             matlabArray = pgArray.getArray();  % Convert to MATLAB array
             % Convert Java array to MATLAB cell array
             matlabCellArray = cell(matlabArray);
@@ -92,47 +90,8 @@ for maze = unique(treatment_data.mazenumber)'
         X = [X; tempX]; Y = [Y; tempY]; t = [t; tempT];
     end
 
-    if maze == 1
-        filter9 = X >= -1.05 & X <= -0.75 & Y >= 0.75 & Y <= 1.05;
-        timeInConc9 = sum(filter9);
-        filter5 = X >= -1.05 & X <= -0.75 & Y >= -0.05 & Y <= 0.25;
-        timeInConc5 = sum(filter5);
-        filter2 = X >= -0.25 & X <= 0.05 & Y >= -0.05 & Y <= 0.25;
-        timeInConc2 = sum(filter2);
-        filter0_5 = X >= -0.25 & X <= 0.05 & Y >= 0.75 & Y <= 1.05;
-        timeInConc0_5 = sum(filter0_5);
-
-    elseif maze == 2
-        filter9 = X >= 0.75 & X <= 1.05 & Y >= -0.05 & Y <= 0.25;
-        timeInConc9 = sum(filter9);
-        filter5 = X >= -0.05 & X <= 0.25 & Y >= -0.05 & Y <= 0.25;
-        timeInConc5 = sum(filter5);
-        filter2 = X >= -0.05 & X <= 0.25 & Y >= 0.75 & Y <= 1.05;
-        timeInConc2 = sum(filter2);
-        filter0_5 = X >= 0.75 & X <= 1.05 & Y >= 0.75 & Y <= 1.05;
-        timeInConc0_5 = sum(filter0_5);
-
-    elseif maze == 3
-        filter9 = X >= -0.25 & X <= 0.05 & Y >= -1.05 & Y <= -0.75;
-        timeInConc9 = sum(filter9);
-        filter5 = X >= -1.05 & X <= -0.75 & Y >= -1.05 & Y <= -0.75;
-        timeInConc5 = sum(filter5);
-        filter2 = X >= -1.05 & X <= -0.75 & Y >= -0.25 & Y <= 0.05;
-        timeInConc2 = sum(filter2);
-        filter0_5 = X >= -0.25 & X <= 0.05 & Y >= -0.25 & Y <= 0.05;
-        timeInConc0_5 = sum(filter0_5);
-
-    elseif maze == 4
-        filter9 = X >= -0.05 & X <= 0.25 & Y >= -0.25 & Y <= 0.05;
-        timeInConc9 = sum(filter9);
-        filter5 = X >= 0.75 & X <= 1.05 & Y >= -0.25 & Y <= 0.05;
-        timeInConc5 = sum(filter5);
-        filter2 = X >= 0.75 & X <= 1.05 & Y >= -1.05 & Y <= -0.75;
-        timeInConc2 = sum(filter2);
-        filter0_5 = X >= -0.05 & X <= 0.25 & Y >= -1.05 & Y <= -0.75;
-        timeInConc0_5 = sum(filter0_5);
-
-    end
+    [timeInConc9, timeInConc5, timeInConc2, timeInConc0_5] = ...
+        extractTimeInFeederFromCoordinates(X, Y, maze);
 
     figure;
     plot(X, Y, '.');
@@ -146,8 +105,6 @@ for maze = unique(treatment_data.mazenumber)'
     end
     title(sprintf('Maze_%s_%s_tone', num2str(maze), tonePhase), 'Interpreter','none');
 
-    time_in_each_feeder(maze, :) = [(timeInConc9*0.1)/size(currentMazeData,1), ...
-        (timeInConc5*0.1)/size(currentMazeData,1), ...
-        (timeInConc2*0.1)/size(currentMazeData,1), ...
-        (timeInConc0_5*0.1)/size(currentMazeData,1)];
+    time_in_each_feeder(maze, :) = [timeInConc9, timeInConc5, timeInConc2, ...
+        timeInConc0_5] ./size(currentMazeData,1);
 end

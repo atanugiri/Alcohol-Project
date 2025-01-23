@@ -1,6 +1,8 @@
 % Author: Atanu Giri
 % Date: 02/11/2024
-
+%
+% Returns the id list of the input health group.
+% 
 function id = treatmentIDfun(treatment, varargin)
 
 if numel(varargin) < 1

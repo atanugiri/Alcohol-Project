@@ -7,13 +7,17 @@
 % Example usage:
 % individualPsychPlotPerSession('approachavoid','P2L1 Ghrelin', 'sully')
 %
-function [featureList, sessionList] = individualPsychValuesPerSession(feature, trtGroup, animal)
+function [featureList, sessionList] = individualPsychValuesPerSession(feature, trtGroup, animal, varargin)
 
 % feature = 'approachavoid'; trtGroup = 'P2L1 BL for comb boost and alc'; animal = 'aladdin';
 
-% Connect to database
-datasource = 'live_database';
-conn = database(datasource,'postgres','1234');
+if numel(varargin) < 1
+    % Connect to database
+    datasource = 'live_database';
+    conn = database(datasource,'postgres','1234');
+else
+    conn = varargin{1};
+end
 
 treatmentIDs = treatmentIDfun(trtGroup, conn);
 treatmentIDs_str = strjoin(arrayfun(@num2str, treatmentIDs, 'UniformOutput', false), ',');
