@@ -39,7 +39,16 @@ addLTdata.mazenumber = regexprep(string(addLTdata.mazenumber), 'maze\s*(\d+)', '
 addLTdata.mazenumber = str2double(addLTdata.mazenumber);
 
 treatment_data = innerjoin(treatment_data,addLTdata,'Keys','id');
-treatment_data = cleanBadSessionsFromTable(treatment_data, 'approachavoid'); % Remove bad sessions
+
+% L1 and L3 task in L1L3 will naturally have 20 trials
+trtGroupsToExclude = {'P2L1L3 BL for comb boost and alc L1', ...
+    'P2L1L3 BL for comb boost and alc L3','P2L1L3 Boost and alcohol L1', ...
+    'P2L1L3 Boost and alcohol L3', 'P2L1L3 Post alcohol L1', ...
+    'P2L1L3 Post alcohol L3'};
+
+if ~ismember(treatmentGroup,trtGroupsToExclude)
+    treatment_data = cleanBadSessionsFromTable(treatment_data, feature); % Remove bad sessions
+end
 
 % Filter treatment_data if animalList is provided
 if ~isempty(animalList)

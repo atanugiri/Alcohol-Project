@@ -1,14 +1,14 @@
 % Author: Atanu Giri
 % Date: 12/04/2023
 %
-% This function takes 'feature', splitByGender('y' or 'n') and treatment 
-% group/s as input from and returns psychometric plot for that feature as 
+% This function takes 'feature', splitByGender('y' or 'n') and treatment
+% group/s as input from and returns psychometric plot for that feature as
 % an average of all animals
 %
 % Example usage
 % masterPsychometricFunctionPlot('distance_until_limiting_time_stamp','y','P2L1 Saline','P2L1 Ghrelin')
 %
-%% Invokes treatmentIDfun, fetchHealthDataTable, psychometricFunValues, 
+%% Invokes treatmentIDfun, fetchHealthDataTable, psychometricFunValues,
 %% cleanBadSessionsFromTable.
 %
 function varargout = masterPsychometricFunctionPlot(feature, splitByGender, varargin)
@@ -32,9 +32,17 @@ treatmentIDs_str = cellfun(@(x) strjoin(arrayfun(@num2str, x, 'UniformOutput', .
     false), ','), treatmentIDs, 'UniformOutput', false);
 treatment_data = cell(1, numel(treatmentIDs_str));
 
+% L1 and L3 task in L1L3 will naturally have 20 trials
+trtGroupsToExclude = {'P2L1L3 BL for comb boost and alc L1', ...
+    'P2L1L3 BL for comb boost and alc L3','P2L1L3 Boost and alcohol L1', ...
+    'P2L1L3 Boost and alcohol L3', 'P2L1L3 Post alcohol L1', ...
+    'P2L1L3 Post alcohol L3'};
+
 for i = 1:numel(treatmentIDs_str)
     treatment_data{i} = fetchHealthDataTable(feature, treatmentIDs_str{i}, conn);
-    treatment_data{i} = cleanBadSessionsFromTable(treatment_data{i}, feature); % Remove bad sessions
+    if ~ismember(treatmentGroups{i}, trtGroupsToExclude)
+        treatment_data{i} = cleanBadSessionsFromTable(treatment_data{i}, feature); % Remove bad sessions
+    end
 end
 
 % Plotting

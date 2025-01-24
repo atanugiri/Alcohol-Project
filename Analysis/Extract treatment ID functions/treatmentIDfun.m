@@ -2,14 +2,12 @@
 % Date: 02/11/2024
 %
 % Returns the id list of the input health group.
-% 
-function id = treatmentIDfun(treatment, varargin)
+%
+function id = treatmentIDfun(treatment, conn)
 
-if numel(varargin) < 1
+if nargin < 2
     datasource = 'live_database';
     conn = database(datasource,'postgres','1234');
-else
-    conn =  varargin{1};
 end
 
 % Print all health groups
@@ -31,8 +29,9 @@ fprintf("P2L1 Baseline, P2L1L3 Baseline, P2L1 Food deprivation, Initial task, La
     "Sal repeat, Ghr repeat, \n" + ...
     "P2L1 Post alcohol, P2L1L3 Post alcohol, \n" + ...
     "P2L1 Alc injection, P2L1L3 Alc injection, \n" + ...
-    "P2L1_control_id_p1, P2L1_control_id_p2, P2L1_control_id_p3, \n" + ...
-    "P2L1L3_control_id_p1, P2L1L3_control_id_p2, P2L1L3_control_id_p3, \n");
+    "P2L1L3 BL for comb boost and alc L1, P2L1L3 BL for comb boost and alc L3, \n" + ...
+    "P2L1L3 Boost and alcohol L1, P2L1L3 Boost and alcohol L3, \n" + ...
+    "P2L1L3 Post alcohol L1, P2L1L3 Post alcohol L3\n");
 
 %% Output from extract_treatment_ids function
 if strcmpi(treatment, "P2L1 Baseline")
@@ -174,19 +173,19 @@ elseif strcmpi(treatment, "P2L1 Alc injection")
 elseif strcmpi(treatment, "P2L1L3 Alc injection")
     [~, id] = extract_alc_injection_ids(conn);
 
-    %% Output from extract_control_ids function
-elseif strcmpi(treatment, "P2L1_control_id_p1")
-    id = extract_control_ids(conn);
-elseif strcmpi(treatment, "P2L1_control_id_p2")
-    [~, id] = extract_control_ids(conn);
-elseif strcmpi(treatment, "P2L1_control_id_p3")
-    [~, ~, id] = extract_control_ids(conn);
-elseif strcmpi(treatment, "P2L1L3_control_id_p1")
-    [~, ~, ~, id] = extract_control_ids(conn);
-elseif strcmpi(treatment, "P2L1L3_control_id_p2")
-    [~, ~, ~, ~, id] = extract_control_ids(conn);
-elseif strcmpi(treatment, "P2L1L3_control_id_p3")
-    [~, ~, ~, ~, ~, id] = extract_control_ids(conn);
+    %% Output from extract_L1_VsL3_ids function
+elseif strcmpi(treatment, "P2L1L3 BL for comb boost and alc L1")
+    id = extract_L1_VsL3_ids(conn);
+elseif strcmpi(treatment, "P2L1L3 BL for comb boost and alc L3")
+    [~, id] = extract_L1_VsL3_ids(conn);
+elseif strcmpi(treatment, "P2L1L3 Boost and alcohol L1")
+    [~, ~, id] = extract_L1_VsL3_ids(conn);
+elseif strcmpi(treatment, "P2L1L3 Boost and alcohol L3")
+    [~, ~, ~, id] = extract_L1_VsL3_ids(conn);
+elseif strcmpi(treatment, "P2L1L3 Post alcohol L1")
+    [~, ~, ~, ~, id] = extract_L1_VsL3_ids(conn);
+elseif strcmpi(treatment, "P2L1L3 Post alcohol L3")
+    [~, ~, ~, ~, ~, id] = extract_L1_VsL3_ids(conn);
 
 else
     disp("Treatment group not found.\n")

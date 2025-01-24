@@ -4,6 +4,8 @@
 % This script calculates the alcohol consumption by sex in 
 % 'P2A Boost and alcohol' health group
 %
+
+% function alcohol_consumption(trtGroup, animalList)
 males = {'aladdin', 'carl', 'jafar', 'jimi', 'jr', 'kobe', 'mike', 'scar', ...
 'simba', 'sully'};
 females = {'alexis', 'fiona', 'harley', 'juana', 'kryssia', 'neftali', ...
@@ -24,6 +26,16 @@ treatmentIDs = treatmentIDfun('P2A Boost and alcohol', conn);
 treatmentIDs_str = strjoin(arrayfun(@num2str, treatmentIDs, 'UniformOutput', false), ',');
 treatment_data = fetchHealthDataTable('approachavoid', treatmentIDs_str, conn);
 treatment_data = cleanBadSessionsFromTable(treatment_data, 'approachavoid'); % Remove bad sessions
+
+% L1 and L3 task in L1L3 will naturally have 20 trials
+trtGroupsToExclude = {'P2L1L3 BL for comb boost and alc L1', ...
+    'P2L1L3 BL for comb boost and alc L3','P2L1L3 Boost and alcohol L1', ...
+    'P2L1L3 Boost and alcohol L3', 'P2L1L3 Post alcohol L1', ...
+    'P2L1L3 Post alcohol L3'};
+
+% if ~ismember(trtGroup,trtGroupsToExclude)
+%     treatment_data = cleanBadSessionsFromTable(treatment_data, 'approachavoid'); % Remove bad sessions
+% end
 
 totalAlcConsumPerSessionMale = zeros(25, 4);
 animalCtMale = zeros(25, 1);

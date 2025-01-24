@@ -24,7 +24,17 @@ if length(treatmentID) < 1
 end
 treatmentID = strjoin(arrayfun(@num2str, treatmentID, 'UniformOutput', false), ',');
 treatment_data = fetchHealthDataTable(feature, treatmentID, conn);
-treatment_data = cleanBadSessionsFromTable(treatment_data, feature); % Remove bad sessions
+
+% L1 and L3 task in L1L3 will naturally have 20 trials
+trtGroupsToExclude = {'P2L1L3 BL for comb boost and alc L1', ...
+    'P2L1L3 BL for comb boost and alc L3','P2L1L3 Boost and alcohol L1', ...
+    'P2L1L3 Boost and alcohol L3', 'P2L1L3 Post alcohol L1', ...
+    'P2L1L3 Post alcohol L3'};
+
+if ~ismember(treatment,trtGroupsToExclude)
+    treatment_data = cleanBadSessionsFromTable(treatment_data, feature); % Remove bad sessions
+end
+
 fprintf('Number of trials: %d\n', height(treatment_data));
 
 if height(treatment_data) < 1
