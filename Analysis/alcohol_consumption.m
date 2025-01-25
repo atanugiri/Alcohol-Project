@@ -1,15 +1,19 @@
 % Author: Atanu Giri
 % Date: 01/22/2025
 %
-% This script calculates the alcohol consumption by sex in 
-% 'P2A Boost and alcohol' health group
+% This script calculates the alcohol consumption by sex in input treatment 
+% group
 %
+function varargout = alcohol_consumption(trtGroup, wt_normalize)
 
-% function alcohol_consumption(trtGroup, animalList)
+if nargin < 2
+    wt_normalize = true;
+end
+
 males = {'aladdin', 'carl', 'jafar', 'jimi', 'jr', 'kobe', 'mike', 'scar', ...
-'simba', 'sully'};
+    'simba', 'sully'};
 females = {'alexis', 'fiona', 'harley', 'juana', 'kryssia', 'neftali', ...
-'raven', 'renata', 'sarah', 'shakira'};
+    'raven', 'renata', 'sarah', 'shakira'};
 
 % Get weights from Excel sheet
 maleWts = [578, 592, 529, 513, 486, 562, 534, 500, 518, 616];
@@ -22,10 +26,9 @@ alcVol = [20, 10, 4, 1] ./100;
 datasource = 'live_database';
 conn = database(datasource,'postgres','1234');
 
-treatmentIDs = treatmentIDfun('P2A Boost and alcohol', conn);
+treatmentIDs = treatmentIDfun(trtGroup, conn);
 treatmentIDs_str = strjoin(arrayfun(@num2str, treatmentIDs, 'UniformOutput', false), ',');
 treatment_data = fetchHealthDataTable('approachavoid', treatmentIDs_str, conn);
-treatment_data = cleanBadSessionsFromTable(treatment_data, 'approachavoid'); % Remove bad sessions
 
 % L1 and L3 task in L1L3 will naturally have 20 trials
 trtGroupsToExclude = {'P2L1L3 BL for comb boost and alc L1', ...
@@ -33,67 +36,74 @@ trtGroupsToExclude = {'P2L1L3 BL for comb boost and alc L1', ...
     'P2L1L3 Boost and alcohol L3', 'P2L1L3 Post alcohol L1', ...
     'P2L1L3 Post alcohol L3'};
 
-% if ~ismember(trtGroup,trtGroupsToExclude)
-%     treatment_data = cleanBadSessionsFromTable(treatment_data, 'approachavoid'); % Remove bad sessions
-% end
+if ~ismember(trtGroup,trtGroupsToExclude)
+    treatment_data = cleanBadSessionsFromTable(treatment_data, 'approachavoid'); % Remove bad sessions
+end
 
-totalAlcConsumPerSessionMale = zeros(25, 4);
-animalCtMale = zeros(25, 1);
+% Create placeholder
+animalList = {males, females};
+wts = {maleWts, femaleWts};
+totalAlcConsumPerSession = cell(1,2); % Placeholder for both sexes
+animalCt = cell(1,2); % Placeholder for both sexes
 
-totalAlcConsumPerSessionFemale = zeros(25, 4);
-animalCtFemale = zeros(25, 1);
+for sex = 1:2
+    totalAlcConsumPerSession{sex} = zeros(25, 4);
+    animalCt{sex} = zeros(25, 1);
+end
 
-for animal = 1:numel(males)
-    % Calculations for male
-    [featureForEachMale, ~, trialCtMale] = psychometricFunValuesPerSession(treatment_data, ...
-        'approachavoid', males{animal});
+for sex = 1:2
+    animals = animalList{sex};
+    animalWts = wts{sex};
 
-    approachNumMale = featureForEachMale.*trialCtMale;
-    alcoholConsumedMale = (approachNumMale .* alcVol)/(maleWts(animal)*0.001);
-    rowsMale = size(alcoholConsumedMale, 1);
+    for animal = 1:numel(animals)
+        % Calculations for male
+        [featureForEach, ~, trialCt] = psychometricFunValuesPerSession(treatment_data, ...
+            'approachavoid', animals{animal});
 
-    totalAlcConsumPerSessionMale(1:rowsMale, :) = totalAlcConsumPerSessionMale(1:rowsMale, :) + alcoholConsumedMale;
-    animalCtMale(1:rowsMale, :) = animalCtMale(1:rowsMale, :) + 1;
+        approachNum = featureForEach.*trialCt;
 
-    % Calculations for female
-    [featureForEachFemale, ~, trialCtFemale] = psychometricFunValuesPerSession(treatment_data, ...
-        'approachavoid', females{animal});
+        if wt_normalize
+            alcoholConsumed = (approachNum .* alcVol)/(animalWts(animal)*0.001);
+        else
+            alcoholConsumed = (approachNum .* alcVol);
+        end
 
-    approachNumFemale = featureForEachFemale.*trialCtFemale;
-    alcoholConsumedFemale = (approachNumFemale .* alcVol)/(femaleWts(animal)*0.001);
-    rowsFemale = size(alcoholConsumedFemale, 1);
-
-    totalAlcConsumPerSessionFemale(1:rowsFemale, :) = totalAlcConsumPerSessionFemale(1:rowsFemale, :) + alcoholConsumedFemale;
-    animalCtFemale(1:rowsFemale, :) = animalCtFemale(1:rowsFemale, :) + 1;
+        rows = size(alcoholConsumed, 1);
+        totalAlcConsumPerSession{sex}(1:rows, :) = totalAlcConsumPerSession{sex}(1:rows, :) + alcoholConsumed;
+        animalCt{sex}(1:rows, :) = animalCt{sex}(1:rows, :) + 1;
+    end
 end
 
 % Remove empty rows
-validRowMale = animalCtMale ~= 0;
-totalAlcConsumPerSessionMale = totalAlcConsumPerSessionMale(validRowMale, :);
-animalCtMale = animalCtMale(validRowMale);
-
-validRowFemale = animalCtFemale ~= 0;
-totalAlcConsumPerSessionFemale = totalAlcConsumPerSessionFemale(validRowFemale, :);
-animalCtFemale = animalCtFemale(validRowFemale);
-
-% Obtain average alcohol consumption per animal
-avAlcConsumPerSessionMale = totalAlcConsumPerSessionMale ./ animalCtMale;
-avAlcConsumPerSessionFemale = totalAlcConsumPerSessionFemale ./ animalCtFemale;
+for sex = 1:2
+   validRow = animalCt{sex} ~=0;
+   totalAlcConsumPerSession{sex} = totalAlcConsumPerSession{sex}(validRow,:);
+   animalCt{sex} = animalCt{sex}(validRow);
+end
 
 %% Canculate mean alcohol consumtion per animal per session accross 4 conc
-meanAlcConsumMale = mean(avAlcConsumPerSessionMale);
-meanAlcConsumFemale = mean(avAlcConsumPerSessionFemale);
+% Obtain average alcohol consumption per animal
+avAlcConsumPerSession = cell(1,2);
+meanAlcConsum = cell(1,2);
+stdErr = cell(1,2);
 
-stdErrMale = std(avAlcConsumPerSessionMale)/sqrt(length(animalCtMale));
-stdErrFemale = std(avAlcConsumPerSessionFemale)/sqrt(length(animalCtFemale));
+for sex = 1:2
+    avAlcConsumPerSession{sex} = totalAlcConsumPerSession{sex} ./animalCt{sex};
+    meanAlcConsum{sex} = mean(avAlcConsumPerSession{sex});
+    stdErr{sex} = std(avAlcConsumPerSession{sex})/sqrt(length(animalCt{sex}));
+end
 
 % Plot figure
 figure;
-errorbar(1:4, meanAlcConsumMale, stdErrMale, 'DisplayName', 'Male', ...
-    'LineWidth', 2, 'Color', 'b');
+sex_labels = {'Male', 'Female'};
+colors = {'b','r'};
+
+for sex = 1:2
+errorbar(1:4, meanAlcConsum{sex}, stdErr{sex}, 'DisplayName', sex_labels{sex}, ...
+    'LineWidth', 2, 'Color', colors{sex});
 hold on;
-errorbar(1:4, meanAlcConsumFemale, stdErrFemale, 'DisplayName', 'Female', ...
-    'LineWidth', 2, 'Color', 'r');
+end
+
 hold off;
 
 % Add label and legend
@@ -106,22 +116,19 @@ legend('show', 'Interpreter', 'none');
 
 
 %% Canculate mean alcohol consumtion per animal per session
-avAlcConsumOverAllConcMale = mean(avAlcConsumPerSessionMale, 2);
-avAlcConsumOverAllConcFemale = mean(avAlcConsumPerSessionFemale, 2);
+totalAlcConsumOverAllConc = cell(1,2);
+meanAlcConsumOverAllConc = zeros(1,2);
+stdErrOverAllConc = zeros(1,2);
 
-meanAlcConsumOverAllConcMale = mean(avAlcConsumOverAllConcMale);
-meanAlcConsumOverAllConcFemale = mean(avAlcConsumOverAllConcFemale);
-
-stdErrOverAllConcMale = std(avAlcConsumOverAllConcMale)/sqrt(length(animalCtMale));
-stdErrOverAllConcFemale = std(avAlcConsumOverAllConcFemale)/sqrt(length(animalCtFemale));
-
-% Data for plotting
-means = [meanAlcConsumOverAllConcMale, meanAlcConsumOverAllConcFemale];
-errors = [stdErrOverAllConcMale, stdErrOverAllConcFemale];
+for sex = 1:2
+    totalAlcConsumOverAllConc{sex} = sum(avAlcConsumPerSession{sex}, 2);
+    meanAlcConsumOverAllConc(sex) = mean(totalAlcConsumOverAllConc{sex});
+    stdErrOverAllConc(sex) = std(totalAlcConsumOverAllConc{sex})/sqrt(length(animalCt{sex}));
+end
 
 % Create a bar plot
 figure;
-barHandle = bar(means, 'FaceColor', 'flat'); % Bar plot
+barHandle = bar(meanAlcConsumOverAllConc, 'FaceColor', 'flat'); % Bar plot
 hold on;
 
 % Set bar colors: blue for male, red for female
@@ -130,14 +137,16 @@ barHandle.CData(2, :) = [1 0 0]; % RGB for red
 
 % Add error bars
 x = barHandle.XEndPoints; % Get x-coordinates of bar centers
-errorbar(x, means, errors, 'k', 'linestyle', 'none', 'LineWidth', 1.5); % Error bars
+errorbar(x, meanAlcConsumOverAllConc, stdErrOverAllConc, 'k', ...
+    'linestyle', 'none', 'LineWidth', 1.5); % Error bars
 
 % Customize the plot
 xticks([1 2]); % Set x-ticks
-xticklabels({'Male', 'Female'}); % Set x-tick labels
+xticklabels(sex_labels); % Set x-tick labels
 ylabel('Alcohol consumption (mL/kg)', 'Interpreter', 'latex', 'FontSize', 14);
 set(gca, 'FontSize', 12);
 hold off;
 
-% Statistics
-[~, p] = ttest2(avAlcConsumOverAllConcMale, avAlcConsumOverAllConcFemale);
+% Return output
+varargout{1} = totalAlcConsumOverAllConc{1};
+varargout{2} = totalAlcConsumOverAllConc{2};
