@@ -44,7 +44,7 @@ for animal = 1:length(animalList)
 
     for session = 1:length(sessionList)
         sessionData = animalData(animalData.referencetime == sessionList(session),:);
-        [featureList, ~, ~] = psychometricFunValues(sessionData, feature);
+        featureList = psychometricFunValues(sessionData, feature);
         %         fprintf('%.2f, ', featureList);
         %         fprintf('\n');
 

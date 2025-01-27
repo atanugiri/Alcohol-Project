@@ -1,40 +1,37 @@
 % Author: Atanu Giri
 % Date: 12/01/2023
 %
-% This function takes 'feature', splitByGender, and treatment group as input from
-% 'ghrelin_featuretable' and returns bar plot for that feature as
-% an average of all animals
+% This function takes feature, animalList, and treatment group as input
+% from 'ghrelin_featuretable' and returns bar plot for that feature as
+% an average. Use animalList input to extract male/female data.
 %
-% Example usage
-% masterFunForBarPlotOfFeature('distance_until_limiting_time_stamp', ...
-% 'y', 'Alcohol bl', 'Alcohol')
+% Example usage:
+% masterFunForBarPlotOfFeature('distance_until_limiting_time_stamp',
+% {}, 'Alcohol bl', 'Alcohol')
 %
-%% Invokes treatmentIDfun, fetchHealthDataTable, barPlotValues, cleanBadSessionsFromTable.
+% Invokes treatmentIDfun, fetchHealthDataTable, barPlotValues, cleanBadSessionsFromTable.
 %
-function varargout = masterFunForBarPlotOfFeature(feature, splitByGender, varargin)
-
+function varargout = masterFunForBarPlotOfFeature(feature, animalList, varargin)
 % feature = 'approachavoid';
 % splitByGender = 'n';
 % varargin = {'P2L1L3 Saline'};
 
-close all;
-
-% Connect to database
-datasource = 'live_database';
-conn = database(datasource,'postgres','1234');
-
-if numel(varargin) >= 1
-    treatmentGroups = cell(1, numel(varargin));
-    for i = 1:numel(varargin)
-        treatmentGroups{i} = varargin{i};
-    end
-else
-    treatmentGroups = input("Which health type do you want for treatment? ","s");
+% Set default animalList if not provided
+if nargin < 2 || isempty(animalList)
+    animalList = {};
 end
 
+treatmentGroups = varargin;
 treatmentIDs = cell(1, numel(treatmentGroups));
-for i = 1:numel(treatmentGroups)
+
+parfor i = 1:numel(treatmentGroups)
+    % Connect to database
+    datasource = 'live_database';
+    conn = database(datasource,'postgres','1234');
+
     treatmentIDs{i} = treatmentIDfun(treatmentGroups{i}, conn);
+
+    close(conn);
 end
 
 % Generate the idList from the filtered data
@@ -48,124 +45,77 @@ trtGroupsToExclude = {'P2L1L3 BL for comb boost and alc L1', ...
     'P2L1L3 Boost and alcohol L3', 'P2L1L3 Post alcohol L1', ...
     'P2L1L3 Post alcohol L3'};
 
-for i = 1:numel(treatmentIDs_str)
+parfor i = 1:numel(treatment_data)
+    datasource = 'live_database';
+    conn = database(datasource,'postgres','1234');
+
     treatment_data{i} = fetchHealthDataTable(feature, treatmentIDs_str{i}, conn);
     if ~ismember(treatmentGroups{i}, trtGroupsToExclude)
         treatment_data{i} = cleanBadSessionsFromTable(treatment_data{i}, feature); % Remove bad sessions
     end
+
+    close(conn);
 end
 
-h = figure;
-hold on;
-
-%% Plot without splitting gender
-if strcmpi(splitByGender, 'n')
-    featureForEach = cell(1, numel(treatmentIDs));
-    avFeature = zeros(1, numel(treatmentIDs));
-    stdErr = zeros(1, numel(treatmentIDs));
-    hBars = zeros(1, numel(treatmentIDs));
-
-    for grp = 1:numel(treatmentIDs)
-        [featureForEach{grp}, avFeature(grp), stdErr(grp)] = ...
-            barPlotValues(treatment_data{grp}, feature);
-        hBars(grp) = bar(grp, avFeature(grp));
-        errorbar(grp, avFeature(grp),stdErr(grp),'LineStyle', 'none', ...
-            'LineWidth', 1.5, 'CapSize', 0, 'Color','k');
+% Filter treatment_data if animalList is provided
+if ~isempty(animalList)
+    for i = 1:numel(treatment_data)
+        treatment_data{i} = treatment_data{i}(ismember(treatment_data{i}.subjectid, animalList), :);
     end
+end
 
-    legend_labels = treatmentGroups;
-    legend(hBars, legend_labels, 'Location', 'best');
-    ylabel(sprintf('%s', feature), 'Interpreter','none', 'FontSize', 25);
+% Extract bar plot values
+featureForEach = cell(1, numel(treatment_data));
+avFeature = zeros(1, numel(treatment_data));
+stdErr = zeros(1, numel(treatment_data));
 
-    %% Statistics
-    if numel(varargin) >= 2
-        p_value = zeros(1, numel(treatmentIDs) - 1);
-        for grp = 2:numel(treatmentIDs)
-            [~, p_value(grp-1)] = ttest2(featureForEach{1}, featureForEach{grp});
-            text(grp, max(ylim), sprintf("p = %.4f", p_value(grp-1)));
-        end
-    end
+% Plot figure
+figure;
+Colors = parula(numel(treatmentGroups));
 
-    % Output for statistics
-    varargout{1} = featureForEach;
+for grp = 1:numel(treatment_data)
+    %featureForEachSession = psychometricFunValuesPerSession(treatment_data{grp}, feature);
+    featureForEachSession = psychometricFunValues(treatment_data{grp}, feature);
+    featureForEach{grp} = mean(featureForEachSession, 2);
+    avFeature(grp) = mean(featureForEach{grp});
+    stdErr(grp) = std(featureForEach{grp})/sqrt(length(featureForEach{grp}));
 
-
-    %% Plot with splitting gender
-elseif strcmpi(splitByGender, 'y')
-    featureForEachMale = cell(1, numel(treatmentIDs));
-    avFeatureMale = zeros(1, numel(treatmentIDs));
-    stdErrMale = zeros(1, numel(treatmentIDs));
-    hBarsMale = zeros(1, numel(treatmentIDs));
-
-    featureForEachFemale = cell(1, numel(treatmentIDs));
-    avFeatureFemale = zeros(1, numel(treatmentIDs));
-    stdErrFemale = zeros(1, numel(treatmentIDs));
-    hBarsFemale = zeros(1, numel(treatmentIDs));
-
-    subplot(1,2,1); % For male data
+    bar(grp, avFeature(grp), 'FaceColor',Colors(grp,:));
     hold on;
-    subplot(1,2,2); % For female data
-    hold on;
-
-    for grp = 1:numel(treatmentIDs)
-        maleData = treatment_data{grp}(strcmpi(treatment_data{grp}.gender,"male"),:);
-        [featureForEachMale{grp}, avFeatureMale(grp), stdErrMale(grp)] = ...
-            barPlotValues(maleData, feature);
-        subplot(1,2,1);
-        hBarsMale(grp) = bar(grp, avFeatureMale(grp));
-        errorbar(grp, avFeatureMale(grp),stdErrMale(grp),'LineStyle', 'none', ...
-            'LineWidth', 1.5, 'CapSize', 0, 'Color','k');
-        title("Male", 'Interpreter','latex');
-        ylabel(sprintf('%s', feature), 'Interpreter','none', 'FontSize', 25);
-
-        femaleData = treatment_data{grp}(strcmpi(treatment_data{grp}.gender,"female"),:);
-        [featureForEachFemale{grp}, avFeatureFemale(grp), stdErrFemale(grp)] = ...
-            barPlotValues(femaleData, feature);
-        subplot(1,2,2);
-        hBarsFemale(grp) = bar(grp, avFeatureFemale(grp));
-        errorbar(grp, avFeatureFemale(grp),stdErrFemale(grp),'LineStyle', 'none', ...
-            'LineWidth', 1.5, 'CapSize', 0, 'Color','k');
-        title("Female", 'Interpreter','latex');
-
-    end
-
-    % Add legends
-    legend_labels = treatmentGroups;
-    legend(hBarsFemale, legend_labels, 'Location', 'best');
-
-    % Link axes to ensure the same scale
-    linkaxes([subplot(1,2,1), subplot(1,2,2)], 'y');
-
-    %% Statistics
-    if numel(varargin) >= 2
-        p_value_male = zeros(1, numel(treatmentIDs) - 1);
-        for grp = 2:numel(treatmentIDs)
-            [~, p_value_male(grp-1)] = ttest2(featureForEachMale{1}, featureForEachMale{grp});
-            subplot(1,2,1);
-            text(grp, max(ylim), sprintf("p = %.4f", p_value_male(grp-1)));
-        end
-
-        p_value_female = zeros(1, numel(treatmentIDs) - 1);
-        for grp = 2:numel(treatmentIDs)
-            [~, p_value_female(grp-1)] = ttest2(featureForEachFemale{1}, featureForEachFemale{grp});
-            subplot(1,2,2);
-            text(grp, max(ylim), sprintf("p = %.4f", p_value_female(grp-1)));
-        end
-    end
-
-    % Output for statistics
-    varargout{1} = featureForEachMale;
-    varargout{2} = featureForEachFemale;
+    errorbar(grp, avFeature(grp),stdErr(grp),'LineStyle', 'none', ...
+        'LineWidth', 1.5, 'Color','k');
 end
 
 hold off;
 
-% Save figure
-if strcmpi(splitByGender, 'n')
-    figname = sprintf('%s_%s_bar',[legend_labels{:}],string(feature));
+xticks(1:numel(treatment_data)); % Set x-ticks
+xticklabels(treatmentGroups); % Set x-tick labels
+% xtickangle(45); % Rotate the x-tick labels by 45 degrees
+ylabel(sprintf('%s', feature), 'Interpreter','none', 'FontSize', 25);
+
+% Return output
+if nargout <= 1
+    % Return a single cell array if only one output is requested
+    varargout{1} = featureForEach;
 else
-    figname = sprintf('%s_%s_MvF_bar',[legend_labels{:}],string(feature));
+    varargout = cell(1, numel(treatment_data));
+    % Return separate outputs for each group if multiple outputs are requested
+    for i = 1:numel(treatment_data)
+        varargout{i} = featureForEach{i};
+    end
 end
+
+%% Statistics
+if numel(varargin) >= 2
+    p_value = zeros(1, numel(treatment_data) - 1);
+    for grp = 2:numel(treatment_data)
+        [~, p_value(grp-1)] = ttest2(featureForEach{1}, featureForEach{grp});
+        text(grp, max(ylim), sprintf("p = %.4f", p_value(grp-1)));
+    end
+end
+
+% Save figure
+figname = sprintf('%s_%s_bar',[treatmentGroups{:}],string(feature));
 
 % Figure name
 scriptDir = fileparts(mfilename('fullpath'));
@@ -177,5 +127,3 @@ if ~exist(myPath, 'dir')
 end
 
 savefig(gcf, fullfile(myPath, figname));
-
-end

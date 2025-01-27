@@ -1,7 +1,7 @@
 % Author: Atanu Giri
 % Date: 01/22/2025
 %
-% This script calculates the alcohol consumption by sex in input treatment 
+% This script calculates the alcohol consumption by sex in input treatment
 % group
 %
 function varargout = alcohol_consumption(trtGroup, wt_normalize)
@@ -76,9 +76,9 @@ end
 
 % Remove empty rows
 for sex = 1:2
-   validRow = animalCt{sex} ~=0;
-   totalAlcConsumPerSession{sex} = totalAlcConsumPerSession{sex}(validRow,:);
-   animalCt{sex} = animalCt{sex}(validRow);
+    validRow = animalCt{sex} ~=0;
+    totalAlcConsumPerSession{sex} = totalAlcConsumPerSession{sex}(validRow,:);
+    animalCt{sex} = animalCt{sex}(validRow);
 end
 
 %% Canculate mean alcohol consumtion per animal per session accross 4 conc
@@ -99,16 +99,20 @@ sex_labels = {'Male', 'Female'};
 colors = {'b','r'};
 
 for sex = 1:2
-errorbar(1:4, meanAlcConsum{sex}, stdErr{sex}, 'DisplayName', sex_labels{sex}, ...
-    'LineWidth', 2, 'Color', colors{sex});
-hold on;
+    errorbar(1:4, meanAlcConsum{sex}, stdErr{sex}, 'DisplayName', sex_labels{sex}, ...
+        'LineWidth', 2, 'Color', colors{sex});
+    hold on;
 end
 
 hold off;
 
 % Add label and legend
 xlabel('Sucrose conc.', 'Interpreter','none', 'FontSize', 25);
-ylabel(sprintf('Alcohol consumption\n(mL/kg)'), 'Interpreter', 'latex', 'FontSize', 25);
+if wt_normalize
+    ylabel(sprintf('Alcohol consumption (mL/kg)'), 'Interpreter', 'latex', 'FontSize', 25);
+else
+    ylabel(sprintf('Alcohol consumption (mL)'), 'Interpreter', 'latex', 'FontSize', 25);
+end
 xticks(1:4);
 label = {'0.5','2','5','9'};
 set(gca,'xticklabel',label,'FontSize',15);
@@ -143,7 +147,11 @@ errorbar(x, meanAlcConsumOverAllConc, stdErrOverAllConc, 'k', ...
 % Customize the plot
 xticks([1 2]); % Set x-ticks
 xticklabels(sex_labels); % Set x-tick labels
-ylabel('Alcohol consumption (mL/kg)', 'Interpreter', 'latex', 'FontSize', 14);
+if wt_normalize
+    ylabel('Alcohol consumption (mL/kg)', 'Interpreter', 'latex', 'FontSize', 14);
+else
+    ylabel('Alcohol consumption (mL)', 'Interpreter', 'latex', 'FontSize', 14);
+end
 set(gca, 'FontSize', 12);
 hold off;
 

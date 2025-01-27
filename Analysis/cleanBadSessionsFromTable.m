@@ -24,7 +24,7 @@ for animal = 1:length(animalList)
         end
 
         if strcmpi(feature, 'approachavoid')
-            [featureList, ~, ~] = psychometricFunValues(sessionData, feature);
+            featureList = psychometricFunValues(sessionData, feature);
 
             % If all of approach rate = 0, sensor not working.
             if all(featureList == 0)

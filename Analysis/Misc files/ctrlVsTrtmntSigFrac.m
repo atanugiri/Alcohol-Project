@@ -97,7 +97,7 @@ for animal = 1:length(animalList)
 
     for session = 1:length(sessionList)
         sessionData = animalData(animalData.referencetime == sessionList(session),:);
-        [featureListSaline, ~, ~] = psychometricFunValues(sessionData, feature);
+        featureListSaline = psychometricFunValues(sessionData, feature);
         % Check for NaN values in y
         if any(isnan(featureListSaline))
             disp('Skipping iteration due to NaN values in y.');

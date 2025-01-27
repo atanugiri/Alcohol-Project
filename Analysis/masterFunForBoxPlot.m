@@ -73,7 +73,7 @@ if strcmpi(splitByGender, 'n')
     featureForEach = cell(1, numel(treatment_data));
 
     for grp = 1:numel(treatment_data)
-        [featureForEach{grp}, ~, ~] = psychometricFunValues(treatment_data{grp}, feature);
+        featureForEach{grp} = psychometricFunValues(treatment_data{grp}, feature);
 
         % Create box plot for each concentration
         for conc = 1:4
@@ -112,7 +112,7 @@ elseif strcmpi(splitByGender, 'y')
 
     for grp = 1:numel(treatment_data)
         maleData = treatment_data{grp}(strcmpi(treatment_data{grp}.gender,"male"),:);
-        [featureForEachMale{grp}, ~, ~] = psychometricFunValues(maleData, feature);
+        featureForEachMale{grp} = psychometricFunValues(maleData, feature);
         subplot(1,2,1);
         hold on;
 
@@ -134,7 +134,7 @@ elseif strcmpi(splitByGender, 'y')
         end
 
         femaleData = treatment_data{grp}(strcmpi(treatment_data{grp}.gender,"female"),:);
-        [featureForEachFemale{grp}, ~, ~] = psychometricFunValues(femaleData, feature);
+        featureForEachFemale{grp} = psychometricFunValues(femaleData, feature);
         subplot(1,2,2);
         hold on;
 

@@ -59,8 +59,10 @@ if strcmpi(splitByGender, 'n')
     hLines = zeros(1, numel(treatmentIDs));
 
     for grp = 1:numel(treatmentIDs)
-        [featureForEach{grp}, avFeature{grp}, stdErr{grp}] = ...
-            psychometricFunValues(treatment_data{grp}, feature);
+        featureForEach{grp} = psychometricFunValues(treatment_data{grp}, feature);
+        avFeature{grp} = mean(featureForEach{grp});
+        stdErr{grp} = std(featureForEach{grp}) ./sqrt(size(featureForEach{grp}, 1));
+
         hLines(grp) = plot(x, avFeature{grp}, 'LineWidth', 2, 'Color', Colors(grp,:));
 
         errorbar(x, avFeature{grp},stdErr{grp},'LineStyle', 'none', ...

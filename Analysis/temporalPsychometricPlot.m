@@ -132,7 +132,9 @@ savefig(gcf, fullfile(myPath, figname));
         legend_labels = cell(1, numel(sessionData));
 
         for session = 1:numel(sessionData)
-            [featureForEach, avFeature, stdErr] = psychometricFunValues(sessionData{session}, feature);
+            featureForEach = psychometricFunValues(sessionData{session}, feature);
+            avFeature = mean(featureForEach);
+            stdErr = std(featureForEach) ./sqrt(size(featureForEach, 1));
 
             try % If more featureForEach has more than 1 rows.
                 h(session) = plot(x, avFeature, 'LineWidth', 2, 'Color', Colors(session,:));
