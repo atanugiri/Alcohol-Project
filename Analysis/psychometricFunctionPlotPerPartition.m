@@ -32,7 +32,6 @@ if ~isempty(animalList)
     treatment_data = treatment_data(ismember(treatment_data.subjectid, animalList), :);
 end
 
-
 if strcmpi(splitType, 'trial')
     featureForEach = cell(1,4); 
 
@@ -48,7 +47,7 @@ if strcmpi(splitType, 'trial')
         splitData = treatment_data(ismember(treatment_data.trialname, trialRange), :);
 
         featurePerSession = psychometricFunValuesPerSession(splitData, feature);
-        avFeature = mean(featurePerSession,1);
+        avFeature = mean(featurePerSession);
         std_dev = std(featurePerSession);
         stdErr = std_dev ./sqrt(size(featurePerSession, 1));
 
@@ -62,7 +61,16 @@ if strcmpi(splitType, 'trial')
 
     end
 
-    varargout{1} = featureForEach;
+    % Return output
+    if nargout <= 1
+        % Return a single cell array if only one output is requested
+        varargout{1} = featureForEach;
+    else
+        % Return separate outputs for each cell
+        for i = 1:min(nargout, 4) % Ensure it doesn't exceed the number of cells
+            varargout{i} = featureForEach{i};
+        end
+    end
 
 elseif strcmpi(splitType, 'session')
     [featureForEach, stdErr, trialCt] = psychometricFunValuesPerSession(treatment_data, feature);

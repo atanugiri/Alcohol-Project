@@ -1,30 +1,34 @@
 % Author: Atanu Giri
 % Date: 12/04/2023
 %
-% This function takes 'feature', splitByGender('y' or 'n') and treatment
+% This function takes 'feature', animalList, and treatment
 % group/s as input from and returns psychometric plot for that feature as
 % an average of all animals
 %
 % Example usage
-% masterPsychometricFunctionPlot('distance_until_limiting_time_stamp','y','P2L1 Saline','P2L1 Ghrelin')
+% masterPsychometricFunctionPlot('distance_until_limiting_time_stamp',{},'P2L1 Saline','P2L1 Ghrelin')
 %
 %% Invokes treatmentIDfun, fetchHealthDataTable, psychometricFunValues,
 %% cleanBadSessionsFromTable.
 %
-function varargout = masterPsychometricFunctionPlot(feature, splitByGender, varargin)
+function varargout = masterPsychometricFunctionPlot(feature, animalList, varargin)
 
-% feature = 'stoppingpts_per_unittravel_method6';
-% splitByGender = 'n';
-% varargin = {'P2L1L3 Post alcohol'};
-
-% Connect to database
-datasource = 'live_database';
-conn = database(datasource,'postgres','1234');
+% Set default animalList if not provided
+if nargin < 2 || isempty(animalList)
+    animalList = {};
+end
 
 treatmentGroups = varargin;
 treatmentIDs = cell(1, numel(treatmentGroups));
-for i = 1:numel(treatmentGroups)
+
+parfor i = 1:numel(treatmentGroups)
+    % Connect to database
+    datasource = 'live_database';
+    conn = database(datasource,'postgres','1234');
+
     treatmentIDs{i} = treatmentIDfun(treatmentGroups{i}, conn);
+
+    close(conn);
 end
 
 % Generate the idList from the filtered data
@@ -38,118 +42,69 @@ trtGroupsToExclude = {'P2L1L3 BL for comb boost and alc L1', ...
     'P2L1L3 Boost and alcohol L3', 'P2L1L3 Post alcohol L1', ...
     'P2L1L3 Post alcohol L3'};
 
-for i = 1:numel(treatmentIDs_str)
+parfor i = 1:numel(treatment_data)
+    datasource = 'live_database';
+    conn = database(datasource,'postgres','1234');
+
     treatment_data{i} = fetchHealthDataTable(feature, treatmentIDs_str{i}, conn);
     if ~ismember(treatmentGroups{i}, trtGroupsToExclude)
         treatment_data{i} = cleanBadSessionsFromTable(treatment_data{i}, feature); % Remove bad sessions
     end
+
+    close(conn);
 end
 
-% Plotting
+% Filter treatment_data if animalList is provided
+if ~isempty(animalList)
+    for i = 1:numel(treatment_data)
+        treatment_data{i} = treatment_data{i}(ismember(treatment_data{i}.subjectid, animalList), :);
+    end
+end
+
+% Extract psychometric plot values
+featureForEach = cell(1, numel(treatment_data));
+avFeature = zeros(1, numel(treatment_data));
+stdErr = zeros(1, numel(treatment_data));
+
+% Plot figure
 x = 1:4;
 figure;
-hold on;
-Colors = parula(numel(treatmentIDs));
+Colors = parula(numel(treatment_data));
 
-%% Plot without splitting gender
-if strcmpi(splitByGender, 'n')
-    featureForEach = cell(1, numel(treatmentIDs));
-    avFeature = cell(1, numel(treatmentIDs));
-    stdErr = cell(1, numel(treatmentIDs));
-    hLines = zeros(1, numel(treatmentIDs));
+for grp = 1:numel(treatment_data)
+    featureForEach{grp} = psychometricFunValues(treatment_data{grp}, feature);
+    avFeature{grp} = mean(featureForEach{grp});
+    stdErr{grp} = std(featureForEach{grp}) ./sqrt(size(featureForEach{grp}, 1));
 
-    for grp = 1:numel(treatmentIDs)
-        featureForEach{grp} = psychometricFunValues(treatment_data{grp}, feature);
-        avFeature{grp} = mean(featureForEach{grp});
-        stdErr{grp} = std(featureForEach{grp}) ./sqrt(size(featureForEach{grp}, 1));
-
-        hLines(grp) = plot(x, avFeature{grp}, 'LineWidth', 2, 'Color', Colors(grp,:));
-
-        errorbar(x, avFeature{grp},stdErr{grp},'LineStyle', 'none', ...
-            'LineWidth', 1.5, 'Color','k');
-    end
-
-    legend_labels = treatmentGroups;
-    legend(hLines, legend_labels, 'Location', 'best');
-    ylabel(sprintf('%s', feature), 'Interpreter','none', 'FontSize', 25);
-    xlabel('Sucrose conc.', 'Interpreter','none', 'FontSize', 25);
-
-    xticks(1:4);
-    label = {'0.5','2','5','9'};
-    set(gca,'xticklabel',label,'FontSize',15);
-
-    % Output for statistics
-    varargout{1} = featureForEach;
-
-    %% Plot with splitting gender
-elseif strcmpi(splitByGender, 'y')
-    featureForEachMale = cell(1, numel(treatmentIDs));
-    avFeatureMale = cell(1, numel(treatmentIDs));
-    stdErrMale = cell(1, numel(treatmentIDs));
-    hLinesMale = zeros(1, numel(treatmentIDs));
-
-    featureForEachFemale = cell(1, numel(treatmentIDs));
-    avFeatureFemale = cell(1, numel(treatmentIDs));
-    stdErrFemale = cell(1, numel(treatmentIDs));
-    hLinesFemale = zeros(1, numel(treatmentIDs));
-
-    subplot(1,2,1); % For male data
+    plot(x, avFeature{grp}, 'LineWidth', 2, 'Color', Colors(grp,:), ...
+        'DisplayName',sprintf('%s', treatmentGroups{grp}));
     hold on;
-    subplot(1,2,2); % For female data
-    hold on;
-
-    for grp = 1:numel(treatmentIDs)
-        maleData = treatment_data{grp}(strcmpi(treatment_data{grp}.gender,"male"),:);
-        [featureForEachMale{grp}, avFeatureMale{grp}, stdErrMale{grp}] = ...
-            psychometricFunValues(maleData, feature);
-        subplot(1,2,1);
-        hLinesMale(grp) = plot(x, avFeatureMale{grp}, 'LineWidth', 2, 'Color', Colors(grp,:));
-        errorbar(x, avFeatureMale{grp},stdErrMale{grp},'LineStyle', 'none', ...
-            'LineWidth', 1.5, 'Color','k');
-        title("Male", 'Interpreter','latex', 'FontSize', 25);
-        ylabel(sprintf('%s', feature), 'Interpreter','none');
-        xlabel('Sucrose conc.', 'Interpreter','none', 'FontSize', 25);
-
-        femaleData = treatment_data{grp}(strcmpi(treatment_data{grp}.gender,"female"),:);
-        [featureForEachFemale{grp}, avFeatureFemale{grp}, stdErrFemale{grp}] = ...
-            psychometricFunValues(femaleData, feature);
-        subplot(1,2,2);
-        hLinesFemale(grp) = plot(x, avFeatureFemale{grp}, 'LineWidth', 2, 'Color', Colors(grp,:));
-        errorbar(x, avFeatureFemale{grp},stdErrFemale{grp},'LineStyle', 'none', ...
-            'LineWidth', 1.5, 'Color','k');
-        title("Female", 'Interpreter','latex','FontSize',25);
-        xlabel('Sucrose conc.', 'Interpreter','none', 'FontSize', 25);
-
-    end
-
-    for i = 1:2
-        subplot(1,2,i);
-        xticks(1:4);
-        label = {'0.5','2','5','9'};
-        set(gca,'xticklabel',label,'FontSize',15);
-    end
-
-    % Add legends
-    legend_labels = treatmentGroups;
-    legend(hLinesFemale, legend_labels, 'Location', 'best');
-
-    % Link axes to ensure the same scale
-    linkaxes([subplot(1,2,1), subplot(1,2,2)], 'y');
-
-    % Output for statistics
-    varargout{1} = featureForEachMale;
-    varargout{2} = featureForEachFemale;
-
+    errorbar(x, avFeature{grp},stdErr{grp},'LineStyle', 'none', ...
+        'LineWidth', 1.5, 'Color','k','HandleVisibility', 'off');
 end
 
 hold off;
+legend('show', 'Interpreter', 'none');
+ylabel(sprintf('%s', feature), 'Interpreter','none', 'FontSize', 25);
+xlabel('Sucrose conc.', 'Interpreter','none', 'FontSize', 25);
+xticks(1:4);
+label = {'0.5','2','5','9'};
+set(gca,'xticklabel',label,'FontSize',15);
+
+% Return output
+if nargout <= 1
+    % Return a single cell array if only one output is requested
+    varargout{1} = featureForEach;
+else
+    varargout = cell(1, numel(treatment_data));
+    % Return separate outputs for each group if multiple outputs are requested
+    for i = 1:numel(treatment_data)
+        varargout{i} = featureForEach{i};
+    end
+end
 
 % Figure name
-if strcmpi(splitByGender, 'n')
-    figname = sprintf('%s_%s_psychometric',[legend_labels{:}],string(feature));
-else
-    figname = sprintf('%s_%s_MvF_psychometric',[legend_labels{:}],string(feature));
-end
+figname = sprintf('%s_%s_psychometric',[treatmentGroups{:}],string(feature));
 
 % Save figure
 scriptDir = fileparts(mfilename('fullpath'));
@@ -161,5 +116,3 @@ if ~exist(myPath, 'dir')
 end
 
 savefig(gcf, fullfile(myPath, figname));
-
-end

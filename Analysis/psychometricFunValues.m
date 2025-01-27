@@ -1,10 +1,9 @@
 % Author: Atanu Giri
 % Date: 04/12/2024
 %
-% This function calculates the average value, standatrd error of a 
-% psychometric function based on each animal and and each session.
+% This function calculates the featureForEach and related information based
+% on each animal and and each session.
 %
-
 function [featureForEach, animalName, dateList, trialCt] = psychometricFunValues(dataTable, feature)
 
 animalList = unique(dataTable.subjectid);

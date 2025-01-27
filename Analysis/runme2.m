@@ -96,11 +96,11 @@ disp(['Combined P-value using Fisher''s method: ', num2str(combined_p)]);
 
 
 %% Trial progression in P2L1 alcohol
-featureForEach = psychometricFunctionPlotPerPartition('approachavoid', 'trial', ...
+[t1, t2, t3, t4] = psychometricFunctionPlotPerPartition('approachavoid', 'trial', ...
     'P2L1 Boost and alcohol');
-for col = 1:4
-    for grp = 1:numel(featureForEach)
-        tempData = 
-    end
-end
-tempData = 
+
+[p, tbl, stats] = kruskalWallisMultiple(t2(:,1), t3(:,1), t4(:,1));
+[p, tbl, stats] = kruskalWallisMultiple(t1(:,1), t2(:,1), t3(:,1), t4(:,1));
+
+[p, tbl, stats] = kruskalWallisMultiple(t2(:,2), t3(:,2), t4(:,2));
+[p, tbl, stats] = kruskalWallisMultiple(t1(:,2), t2(:,2), t3(:,2), t4(:,2));
