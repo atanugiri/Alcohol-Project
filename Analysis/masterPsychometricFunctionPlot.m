@@ -6,7 +6,8 @@
 % an average of all animals
 %
 % Example usage
-% masterPsychometricFunctionPlot('distance_until_limiting_time_stamp',{},'P2L1 Saline','P2L1 Ghrelin')
+% [T1, T2] = masterPsychometricFunctionPlot( ...
+% 'distance_until_limiting_time_stamp', {},'P2L1 Saline','P2L1 Ghrelin')
 %
 %% Invokes treatmentIDfun, fetchHealthDataTable, psychometricFunValues,
 %% cleanBadSessionsFromTable.
@@ -37,10 +38,10 @@ treatmentIDs_str = cellfun(@(x) strjoin(arrayfun(@num2str, x, 'UniformOutput', .
 treatment_data = cell(1, numel(treatmentIDs_str));
 
 % L1 and L3 task in L1L3 will naturally have 20 trials
-trtGroupsToExclude = {'P2L1L3 BL for comb boost and alc L1', ...
-    'P2L1L3 BL for comb boost and alc L3','P2L1L3 Boost and alcohol L1', ...
-    'P2L1L3 Boost and alcohol L3', 'P2L1L3 Post alcohol L1', ...
-    'P2L1L3 Post alcohol L3'};
+trtGroupsToExclude = {'P2L1L3 Baseline L1','P2L1L3 Baseline L3', ...
+    'P2L1L3 BL for comb boost and alc L1', 'P2L1L3 BL for comb boost and alc L3', ...
+    'P2L1L3 Boost and alcohol L1', 'P2L1L3 Boost and alcohol L3', ...
+    'P2L1L3 Post alcohol L1', 'P2L1L3 Post alcohol L3'};
 
 parfor i = 1:numel(treatment_data)
     datasource = 'live_database';
@@ -63,8 +64,8 @@ end
 
 % Extract psychometric plot values
 featureForEach = cell(1, numel(treatment_data));
-avFeature = zeros(1, numel(treatment_data));
-stdErr = zeros(1, numel(treatment_data));
+avFeature = cell(1, numel(treatment_data));
+stdErr = cell(1, numel(treatment_data));
 
 % Plot figure
 x = 1:4;

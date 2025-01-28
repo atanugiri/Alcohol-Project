@@ -29,6 +29,7 @@ fprintf("P2L1 Baseline, P2L1L3 Baseline, P2L1 Food deprivation, Initial task, La
     "Sal repeat, Ghr repeat, \n" + ...
     "P2L1 Post alcohol, P2L1L3 Post alcohol, \n" + ...
     "P2L1 Alc injection, P2L1L3 Alc injection, \n" + ...
+    "P2L1L3 Baseline L1, P2L1L3 Baseline L3, \n" + ...
     "P2L1L3 BL for comb boost and alc L1, P2L1L3 BL for comb boost and alc L3, \n" + ...
     "P2L1L3 Boost and alcohol L1, P2L1L3 Boost and alcohol L3, \n" + ...
     "P2L1L3 Post alcohol L1, P2L1L3 Post alcohol L3\n");
@@ -174,18 +175,22 @@ elseif strcmpi(treatment, "P2L1L3 Alc injection")
     [~, id] = extract_alc_injection_ids(conn);
 
     %% Output from extract_L1_VsL3_ids function
-elseif strcmpi(treatment, "P2L1L3 BL for comb boost and alc L1")
+elseif strcmpi(treatment, "P2L1L3 Baseline L1")
     id = extract_L1_VsL3_ids(conn);
-elseif strcmpi(treatment, "P2L1L3 BL for comb boost and alc L3")
+elseif strcmpi(treatment, "P2L1L3 Baseline L3")
     [~, id] = extract_L1_VsL3_ids(conn);
-elseif strcmpi(treatment, "P2L1L3 Boost and alcohol L1")
+elseif strcmpi(treatment, "P2L1L3 BL for comb boost and alc L1")
     [~, ~, id] = extract_L1_VsL3_ids(conn);
-elseif strcmpi(treatment, "P2L1L3 Boost and alcohol L3")
+elseif strcmpi(treatment, "P2L1L3 BL for comb boost and alc L3")
     [~, ~, ~, id] = extract_L1_VsL3_ids(conn);
-elseif strcmpi(treatment, "P2L1L3 Post alcohol L1")
+elseif strcmpi(treatment, "P2L1L3 Boost and alcohol L1")
     [~, ~, ~, ~, id] = extract_L1_VsL3_ids(conn);
-elseif strcmpi(treatment, "P2L1L3 Post alcohol L3")
+elseif strcmpi(treatment, "P2L1L3 Boost and alcohol L3")
     [~, ~, ~, ~, ~, id] = extract_L1_VsL3_ids(conn);
+elseif strcmpi(treatment, "P2L1L3 Post alcohol L1")
+    [~, ~, ~, ~, ~, ~, id] = extract_L1_VsL3_ids(conn);
+elseif strcmpi(treatment, "P2L1L3 Post alcohol L3")
+    [~, ~, ~, ~, ~, ~, ~, id] = extract_L1_VsL3_ids(conn);
 
 else
     disp("Treatment group not found.\n")
