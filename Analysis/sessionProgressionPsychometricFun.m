@@ -3,21 +3,26 @@
 %
 % 'feature' can be any column from ghrelin_featuretable.
 % Example usage:
-% featureForEach = sessionProgression('approachavoid', 
-% 'P2A Boost and alcohol')
+% featureForEach = sessionProgressionPsychometricFun('approachavoid', ...
+% 'P2A Boost and alcohol', 'n')
 %
 % OR
 %
 % animalList = {'aladdin', 'jafar', 'jimi', 'jr', 'mike', 'scar', 'sully'};
-% featureForEach = psychometricFunctionPlotPerPartition('approachavoid', 
-% 'P2A Boost and alcohol', animalList)
+% featureForEach = sessionProgressionPsychometricFun('approachavoid', ...
+% 'P2A Boost and alcohol', 'n', animalList)
 %
-function varargout = sessionProgressionPsychometricFun(feature, treatmentGroup, animalList)
+function varargout = sessionProgressionPsychometricFun(feature, ...
+treatmentGroup, combineSections, animalList)
 
-if nargin < 3
+% feature = 'entry_time_25'; treatmentGroup = 'P2A Boost and alcohol'; 
+% combineSections = 'y'; animalList = {};
+
+if nargin < 4
     animalList = {};
 end
 
+% Connect to database
 datasource = 'live_database';
 conn = database(datasource, 'postgres', '1234');
 
@@ -37,12 +42,6 @@ if ~ismember(treatmentGroup,trtGroupsToExclude)
     treatment_data = cleanBadSessionsFromTable(treatment_data, feature); % Remove bad sessions
 end
 
-% Convert referencetime to datetime format
-treatment_data.referencetime = datetime(treatment_data.referencetime, ...
-    'InputFormat', 'MM/dd/yyyy');
-% Sort the table by referencetime
-treatment_data = sortrows(treatment_data, 'referencetime');
-
 % Filter treatment_data if animalList is provided
 if ~isempty(animalList)
     treatment_data = treatment_data(ismember(treatment_data.subjectid, animalList), :);
@@ -51,7 +50,7 @@ end
 [featureForEach, stdErr, trialCt] = psychometricFunValuesPerSession(treatment_data, feature);
 
 % Special for 'P2A Boost and alcohol'
-if strcmpi(treatmentGroup, 'P2A Boost and alcohol')
+if strcmpi(treatmentGroup, 'P2A Boost and alcohol') & ~strcmpi(feature, 'entry_time_25')
     validSessions = trialCt(:,1) > 80;
     featureForEach = featureForEach(validSessions, :);
     stdErr = stdErr(validSessions, :);
@@ -62,17 +61,64 @@ if strcmpi(treatmentGroup, 'P2A Boost and alcohol')
     stdErr(1, :) = [];
 end
 
+if strcmpi(combineSections, 'y')
+    % Calculate the approximate size of each section
+    numUniqueDates = size(featureForEach, 1);
+    sectionSize = floor(numUniqueDates / 3);
+    numEarlyDates = sectionSize;
+    numLateDates = sectionSize;
+    numMiddleDates = numUniqueDates - (numEarlyDates + numLateDates);
+
+    % Partition the dates into 3 sections
+    earlyDates = 1:numEarlyDates;
+    middleDates = numEarlyDates + 1:numEarlyDates + numMiddleDates;
+    lateDates = numEarlyDates + numMiddleDates + 1:numUniqueDates;
+
+    dateFilter = {earlyDates, middleDates, lateDates};
+    sessionSectionData = cell(1, 3);
+    avgSectionData = zeros(3,4);  % 3 section x 4 conc
+    stdErrSectionData = zeros(3,4);
+
+for section = 1:numel(dateFilter)
+    sessionSectionData{section} = featureForEach(dateFilter{section}, :);
+    avgSectionData(section,:) = mean(sessionSectionData{section});
+    stdErrSectionData(section,:) = std(sessionSectionData{section}) ./ ...
+        size(sessionSectionData{section}, 1);
+end
+end
+
+% Return output and select data to plot
+if strcmpi(combineSections, 'y')
+    dataToPlot = avgSectionData;
+    stdErrToPlot = stdErrSectionData;
+    
+    if nargout <= 1
+        varargout{1} = sessionSectionData;
+    else
+        varargout = cell(1, numel(sessionSectionData));
+        % Return separate outputs for each cell
+        for i = 1:min(nargout, 3) % Ensure it doesn't exceed the number of cells
+            varargout{i} = sessionSectionData{i};
+        end
+    end
+
+else
+    dataToPlot = featureForEach;
+    stdErrToPlot = stdErr;
+    varargout{1} = featureForEach;
+end
+
 % Plot Psychometric function
 x = 1:4;
 figure;
-Colors = parula(size(featureForEach,1));
+Colors = parula(size(dataToPlot,1));
 
-for session = 1:size(featureForEach,1)
+for session = 1:size(dataToPlot,1)
     % Plot sessions
-    plot(x, featureForEach(session,:), '.-', 'LineWidth', 2, 'Color', Colors(session, :), ...
+    plot(x, dataToPlot(session,:), '.-', 'LineWidth', 2, 'Color', Colors(session, :), ...
         'DisplayName',sprintf('Session_%d', session));
     hold on;
-    errorbar(x, featureForEach(session,:), stdErr(session,:),'LineStyle', 'none', ...
+    errorbar(x, dataToPlot(session,:), stdErrToPlot(session,:),'LineStyle', 'none', ...
         'LineWidth', 1.5, 'Color','k', 'HandleVisibility', 'off');
 end
 
@@ -86,6 +132,3 @@ set(gca,'xticklabel',label,'FontSize',15);
 legend('show', 'Interpreter', 'none');
 
 title(sprintf('%s', treatmentGroup), 'Interpreter','latex','FontSize',25);
-
-% Return output
-varargout{1} = featureForEach;

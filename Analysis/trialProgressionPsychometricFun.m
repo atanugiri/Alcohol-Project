@@ -3,13 +3,13 @@
 %
 % 'feature' can be any column from ghrelin_featuretable.
 % Example usage:
-% [t1, t2, t3, t4] = trialProgression('approachavoid', 
+% [t1, t2, t3, t4] = trialProgressionPsychometricFun('approachavoid', ...
 % 'P2A Boost and alcohol')
 %
 % OR
 %
 % animalList = {'aladdin', 'jafar', 'jimi', 'jr', 'mike', 'scar', 'sully'};
-% [t1, t2, t3, t4] = psychometricFunctionPlotPerPartition('approachavoid', 
+% [T1, T2, T3, T4] = trialProgressionPsychometricFun('approachavoid', ...
 % 'P2A Boost and alcohol', animalList)
 %
 function varargout = trialProgressionPsychometricFun(feature, treatmentGroup, animalList)

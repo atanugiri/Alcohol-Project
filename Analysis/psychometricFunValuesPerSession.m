@@ -17,7 +17,10 @@ if ~isempty(specificAnimals)
 end
 
 % Initiate placeholders
-sessionList = unique(dataTable.referencetime);
+dates = datetime(dataTable.referencetime, 'InputFormat', 'MM/dd/yyyy');
+dates = datetime(dates, 'Format', 'MM/dd/uuuu');
+dates = string(sort(dates));
+sessionList = unique(dates);
 featureForEach = zeros(length(sessionList), 4);
 stdErr = zeros(length(sessionList), 4);
 trialCt = zeros(length(sessionList), 4);
@@ -42,11 +45,13 @@ for session = 1:length(sessionList)
         end % end of conc 1
     end % end of animal 1
 
-    % Remove rows if there is any nan
-    tf = arrayfun(@(x) any(isnan(tempFeature(x, :))), 1:size(tempFeature, 1));
-    tempFeature(tf', :) = [];
-
-    featureForEach(session, :) = mean(tempFeature, 1);
-    std_dev = std(tempFeature);
+    featureForEach(session, :) = mean(tempFeature, 'omitmissing');
+    std_dev = std(tempFeature, 'omitmissing');
     stdErr(session, :) = std_dev ./sqrt(size(tempFeature, 1));
 end % end of session 1
+
+% Remove rows if there is any nan
+tf = arrayfun(@(x) any(isnan(featureForEach(x, :))), 1:size(featureForEach, 1));
+featureForEach(tf', :) = [];
+stdErr(tf', :) = [];
+trialCt(tf', :) = [];
