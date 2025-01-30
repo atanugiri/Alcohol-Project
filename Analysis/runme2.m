@@ -104,3 +104,10 @@ disp(['Combined P-value using Fisher''s method: ', num2str(combined_p)]);
 
 [p, tbl, stats] = kruskalWallisMultiple(t2(:,2), t3(:,2), t4(:,2));
 [p, tbl, stats] = kruskalWallisMultiple(t1(:,2), t2(:,2), t3(:,2), t4(:,2));
+
+%% L1 vs L3 
+[T1, T2, T3, T4] = masterPsychometricFunctionPlot('approachavoid', {}, ...
+'P2L1L3 Baseline L1', 'P2L1L3 Baseline L3', 'P2L1L3 Boost and alcohol L1', ...
+'P2L1L3 Boost and alcohol L3');
+result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T2));
+result = py.manovaTest.manovaTest(py.numpy.array(T3), py.numpy.array(T4));

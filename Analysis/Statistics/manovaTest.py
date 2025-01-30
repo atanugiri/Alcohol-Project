@@ -4,7 +4,7 @@ from statsmodels.multivariate.manova import MANOVA
 
 def manovaTest(group1_data, group2_data):
     """
-    Perform MANOVA on two groups and return Wilks' Lambda and p-value.
+    Perform MANOVA on two groups and return Wilks' Lambda, p-value, F-statistic, and degrees of freedom.
     """
     # Combine data and create group labels
     data = np.vstack([group1_data, group2_data])
@@ -18,13 +18,14 @@ def manovaTest(group1_data, group2_data):
     manova = MANOVA.from_formula('Conc1 + Conc2 + Conc3 + Conc4 ~ Group', data=df)
     result = manova.mv_test()
 
-    # Extract Wilks' Lambda and p-value
+    # Extract Wilks' Lambda, p-value, and F-statistic details
     wilks_lambda = result.results['Group']['stat'].loc["Wilks' lambda", 'Value']
     p_value = result.results['Group']['stat'].loc["Wilks' lambda", 'Pr > F']
+    f_stat = result.results['Group']['stat'].loc["Wilks' lambda", 'F Value']
+    df1 = int(result.results['Group']['stat'].loc["Wilks' lambda", 'Num DF'])  # Numerator DF
+    df2 = int(result.results['Group']['stat'].loc["Wilks' lambda", 'Den DF'])  # Denominator DF
 
-    # Print the results
-    print(f"Wilks' Lambda: {wilks_lambda:.4f}")
-    print(f"P-value: {p_value:.4f}")
+    # Print formatted results
+    print(f"(MANOVA, Wilks' Λ = {wilks_lambda:.4f}, F({df1}, {df2}) = {f_stat:.2f}, p = {p_value:.4f})")
 
-    return wilks_lambda, p_value, result
-
+    return wilks_lambda, p_value, f_stat, df1, df2, result
