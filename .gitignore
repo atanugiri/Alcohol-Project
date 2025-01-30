@@ -4,6 +4,8 @@
 *.fig
 *.pdf
 *.xlsx
+__pycache__/
+.ipynb_checkpoints/
 .DS_Store
 Literature/ search\
 Analysis/.DS_Store
