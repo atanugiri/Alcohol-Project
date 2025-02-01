@@ -45,8 +45,8 @@ for session = 1:length(sessionList)
         end % end of conc 1
     end % end of animal 1
 
-    featureForEach(session, :) = mean(tempFeature, 'omitmissing');
-    std_dev = std(tempFeature, 'omitmissing');
+    featureForEach(session, :) = mean(tempFeature, 1, 'omitmissing');
+    std_dev = std(tempFeature, 1, 'omitmissing');
     stdErr(session, :) = std_dev ./sqrt(size(tempFeature, 1));
 end % end of session 1
 

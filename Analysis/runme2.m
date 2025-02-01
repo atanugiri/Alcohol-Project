@@ -111,3 +111,40 @@ disp(['Combined P-value using Fisher''s method: ', num2str(combined_p)]);
 'P2L1L3 Boost and alcohol L3');
 result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T2));
 result = py.manovaTest.manovaTest(py.numpy.array(T3), py.numpy.array(T4));
+
+[T1, T2, T3, T4, T5, T6] = masterPsychometricFunctionPlot('approachavoid', {}, ...
+'P2L1 Baseline','P2L1L3 Baseline L1', 'P2L1L3 Baseline L3', 'P2L1 Boost and alcohol', ...
+'P2L1L3 Boost and alcohol L1', 'P2L1L3 Boost and alcohol L3');
+
+%% Session number comparison between male and female
+session_label = {'NCCB', 'CCB', 'AA', 'PNC', 'PC', 'NCPA', 'CPA'};
+male_session = [54,63,77,51,30,30,34]; 
+female_session = [61,62,81,64,26,30,17];
+p = chi2test([male_session; female_session]);
+
+%% Trial count
+males = {'aladdin', 'carl', 'jafar', 'jimi', 'jr', 'kobe', 'mike', 'scar', ...
+'simba', 'sully'};
+females = {'alexis', 'fiona', 'harley', 'juana', 'kryssia', 'neftali', ...
+'raven', 'renata', 'sarah', 'shakira'};
+
+treatmentGrp = {'P2L1 BL for comb boost and alc', 'P2L1L3 BL for comb boost and alc', ...
+    'P2A Boost and alcohol', 'P2L1 Boost and alcohol', 'P2L1L3 Boost and alcohol', ...
+    'P2L1 Post alcohol', 'P2L1L3 Post alcohol'};
+
+totalMaleTrialCt = zeros(1, numel(treatmentGrp));
+totalFemaleTrialCt = zeros(1, numel(treatmentGrp));
+
+for grp = 1:numel(treatmentGrp)
+    maleTrialCt = countSessionAndTrial('approachavoid', treatmentGrp{grp}, males, conn);
+    totalMaleTrialCt(grp) = sum(maleTrialCt(:));
+
+    femaleTrialCt = countSessionAndTrial('approachavoid', treatmentGrp{grp}, females, conn);
+    totalFemaleTrialCt(grp) = sum(femaleTrialCt(:));
+end
+
+%% Trial per session
+trial_per_session_male = totalMaleTrialCt ./male_session;
+trial_per_session_female = totalFemaleTrialCt ./female_session;
+
+chi2test([trial_per_session_male; trial_per_session_female]);

@@ -9,10 +9,12 @@
 
 %% Invokes individualPsychValuesPerSession
 
-function individualPsychPlotPerSession(feature, trtGroup, animalList)
+function individualPsychPlotPerSession(feature, trtGroup, animalList, conn)
 
-datasource = 'live_database';
-conn = database(datasource, 'postgres', '1234');
+if nargin < 4
+    datasource = 'live_database';
+    conn = database(datasource, 'postgres', '1234');
+end
 
 treatmentIDs = treatmentIDfun(trtGroup, conn);
 treatmentIDs_str = strjoin(arrayfun(@num2str, treatmentIDs, 'UniformOutput', false), ',');
