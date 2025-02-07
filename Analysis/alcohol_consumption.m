@@ -156,5 +156,8 @@ set(gca, 'FontSize', 12);
 hold off;
 
 % Return output
-varargout{1} = totalAlcConsumOverAllConc{1};
-varargout{2} = totalAlcConsumOverAllConc{2};
+varargout{1} = avAlcConsumPerSession{1};
+varargout{2} = avAlcConsumPerSession{2};
+
+varargout{3} = totalAlcConsumOverAllConc{1};
+varargout{4} = totalAlcConsumOverAllConc{2};

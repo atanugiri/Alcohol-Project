@@ -47,7 +47,7 @@ trtGroupsToExclude = {'P2L1L3 BL for comb boost and alc L1', ...
     'P2L1L3 Post alcohol L3'};
 
 if ~ismember(treatmentGroup,trtGroupsToExclude)
-    treatment_data = cleanBadSessionsFromTable(treatment_data, feature); % Remove bad sessions
+    treatment_data = cleanBadSessionsFromTable(treatment_data, 'approachavoid'); % Remove bad sessions
 end
 
 % Filter treatment_data if animalList is provided
@@ -91,7 +91,7 @@ for maze = unique(treatment_data.mazenumber)'
         if strcmpi(tonePhase, 'post')
             filter = tempT > 12 & tempT <= 20;
         elseif strcmpi(tonePhase, 'pre')
-            filter = tempT <= 12;
+            filter = tempT <= 5;
         end
 
         tempX = tempX(filter); tempY = tempY(filter); tempT = tempT(filter);
