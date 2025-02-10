@@ -173,4 +173,17 @@ chi2test([trial_per_session_male; trial_per_session_female]);
 
 %% Cognitive deficit
 [T1, T2, T3] = sessionProgressionPsychometricFun('distance_until_limiting_time_stamp', ...
+    'P2L1 BL for comb boost and alc', 'y');
+[p, tbl, stats] = kruskalWallisMultiple(T1(:), T2(:), T3(:));
+
+[T1, T2, T3] = sessionProgressionPsychometricFun('distance_until_limiting_time_stamp', ...
     'P2A Boost and alcohol', 'y');
+[p, tbl, stats] = kruskalWallisMultiple(T1(:), T2(:), T3(:));
+
+[T1, T2, T3] = sessionProgressionPsychometricFun('time_in_center_50', ...
+    'P2L1 BL for comb boost and alc', 'y');
+[p, tbl, stats] = kruskalWallisMultiple(T1(:), T2(:), T3(:));
+
+[T1, T2, T3] = sessionProgressionPsychometricFun('time_in_center_50', ...
+    'P2A Boost and alcohol', 'y');
+[p, tbl, stats] = kruskalWallisMultiple(T1(:), T2(:), T3(:));
