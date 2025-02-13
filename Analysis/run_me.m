@@ -1,7 +1,10 @@
 % Author: Atanu Giri
 % Date: 02/15/2024
 
-fig_directory = '/Users/atanugiri/Downloads/Alcohol Project/Analysis/Fig files/';
+males = {'aladdin', 'carl', 'jafar', 'jimi', 'jr', 'kobe', 'mike', 'scar', ...
+'simba', 'sully'};
+females = {'alexis', 'fiona', 'harley', 'juana', 'kryssia', 'neftali', ...
+'raven', 'renata', 'sarah', 'shakira'};
 
 %% Figure 1
 % Sigmoid fitting
@@ -18,23 +21,13 @@ param_array = fitParamKernelDensity('shift', 'approachavoid', 2, 'n', ...
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000, 42);
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000, 42);
 
-power = estimateKStest2Power(param_array{1}, param_array{2}, 1000);
-power = estimateKStest2Power(param_array{1}, param_array{3}, 1000);
-
 % Increased approach rate during conflict task
-featureForEach = masterPsychometricFunctionPlot('approachavoid', 'n', ...
+[T1, T2, T3] = masterPsychometricFunctionPlot('approachavoid', {}, ...
     'P2L1 BL for comb boost and alc','P2A Boost and alcohol', 'P2L1 Post alcohol');
 
-group_1_data = py.numpy.array(featureForEach{1});
-group_2_data = py.numpy.array(featureForEach{2});
-group_3_data = py.numpy.array(featureForEach{3});
-result = py.manovaTest.manovaTest(group_1_data, group_2_data);
-power = py.manova_power.compute_manova_power(result{1}, ...
-    size(featureForEach{1}, 1), size(featureForEach{2}, 1), 4, 0.05);
+result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T2));
+result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T3));
 
-result = py.manovaTest.manovaTest(group_1_data, group_3_data);
-power = py.manova_power.compute_manova_power(result{1}, ...
-    size(featureForEach{1}, 1), size(featureForEach{3}, 1), 4, 0.05);
 
 %% Figure 2
 % Gender-specific psychometric plots of individual sessions
@@ -47,93 +40,22 @@ individualPsychometricPlotOverlay('approachavoid', 'y', 'P2A Boost and alcohol')
 
 [h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000, 42);
 [h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000, 42);
-power = estimateKStest2Power(maleParam{1}, maleParam{2}, 1000);
-power = estimateKStest2Power(maleParam{1}, maleParam{3}, 1000);
 
 [h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000, 42);
 [h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000, 42);
-power = estimateKStest2Power(femaleParam{1}, femaleParam{2}, 1000);
-power = estimateKStest2Power(femaleParam{1}, femaleParam{3}, 1000);
 
 % AA influencesapproach rate in males
-[featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot( ...
-    'approachavoid', 'y', 'P2L1 BL for comb boost and alc','P2A Boost and alcohol', ...
-    'P2L1 Post alcohol');
+[T1, T2, T3] = masterPsychometricFunctionPlot('approachavoid', males, ...
+    'P2L1 BL for comb boost and alc','P2A Boost and alcohol', 'P2L1 Post alcohol');
+result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T2));
+result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T3));
 
-group_1_data = py.numpy.array(featureForEachMale{1});
-group_2_data = py.numpy.array(featureForEachMale{2});
-group_3_data = py.numpy.array(featureForEachMale{3});
-result = py.manovaTest.manovaTest(group_1_data, group_2_data);
-power = py.manova_power.compute_manova_power(result{1}, ...
-    size(featureForEachMale{1}, 1), size(featureForEachMale{2}, 1), 4, 0.05);
-result = py.manovaTest.manovaTest(group_1_data, group_3_data);
-power = py.manova_power.compute_manova_power(result{1}, ...
-    size(featureForEachMale{1}, 1), size(featureForEachMale{3}, 1), 4, 0.05);
+[T1, T2, T3] = masterPsychometricFunctionPlot('approachavoid', females, ...
+    'P2L1 BL for comb boost and alc','P2A Boost and alcohol', 'P2L1 Post alcohol');
+result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T2));
+result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T3));
 
-group_1_data = py.numpy.array(featureForEachFemale{1});
-group_2_data = py.numpy.array(featureForEachFemale{2});
-group_3_data = py.numpy.array(featureForEachFemale{3});
-result = py.manovaTest.manovaTest(group_1_data, group_2_data);
-power = py.manova_power.compute_manova_power(result{1}, ...
-    size(featureForEachFemale{1}, 1), size(featureForEachFemale{2}, 1), 4, 0.05);
-result = py.manovaTest.manovaTest(group_1_data, group_3_data);
-power = py.manova_power.compute_manova_power(result{1}, ...
-    size(featureForEachFemale{1}, 1), size(featureForEachFemale{3}, 1), 4, 0.05);
 
-% Unchanged variance in approach rates
-[maleData,femaleData] = varianceAnalysis('approachavoid', 'y', ...
-    'P2L1 BL for comb boost and alc', 'P2A Boost and alcohol', 'P2L1 Post alcohol');
-
-[p_values, combined_p] = FisherMethod(maleData);
-[p_values, combined_p] = FisherMethod(femaleData);
-
-% Gender-specificpsychometric plots
-individualPsychometricPlotOverlay('approachavoid', 'y', 'P2L1L3 BL for comb boost and alc');
-
-% Inflection pointshift observed in males
-[maleParam, femaleParam] = fitParamKernelDensity('shift', 'approachavoid', 2, 'y', ...
-    'P2L1L3 BL for comb boost and alc', 'P2A Boost and alcohol', 'P2L1L3 Post alcohol');
-
-[h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000, 42);
-[h_male, p_male] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000, 42);
-power = estimateKStest2Power(maleParam{1}, maleParam{2}, 1000);
-power = estimateKStest2Power(maleParam{1}, maleParam{3}, 1000);
-
-[h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000, 42);
-[h_female, p_female] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000, 42);
-power = estimateKStest2Power(femaleParam{1}, femaleParam{2}, 1000);
-power = estimateKStest2Power(femaleParam{1}, femaleParam{3}, 1000);
-
-% AA exerts stronger influenceon male approach rate
-[featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot( ...
-    'approachavoid', 'y', 'P2L1L3 BL for comb boost and alc','P2A Boost and alcohol', ...
-    'P2L1L3 Post alcohol');
-
-group_1_data = py.numpy.array(featureForEachMale{1});
-group_2_data = py.numpy.array(featureForEachMale{2});
-group_3_data = py.numpy.array(featureForEachMale{3});
-result = py.manovaTest.manovaTest(group_1_data, group_2_data);
-power = py.manova_power.compute_manova_power(result{1}, ...
-    size(featureForEachMale{1}, 1), size(featureForEachMale{2}, 1), 4, 0.05);
-result = py.manovaTest.manovaTest(group_1_data, group_3_data);
-power = py.manova_power.compute_manova_power(result{1}, ...
-    size(featureForEachMale{1}, 1), size(featureForEachMale{3}, 1), 4, 0.05);
-
-group_1_data = py.numpy.array(featureForEachFemale{1});
-group_2_data = py.numpy.array(featureForEachFemale{2});
-group_3_data = py.numpy.array(featureForEachFemale{3});
-result = py.manovaTest.manovaTest(group_1_data, group_2_data);
-power = py.manova_power.compute_manova_power(result{1}, ...
-    size(featureForEachFemale{1}, 1), size(featureForEachFemale{2}, 1), 4, 0.05);
-result = py.manovaTest.manovaTest(group_1_data, group_3_data);
-power = py.manova_power.compute_manova_power(result{1}, ...
-    size(featureForEachFemale{1}, 1), size(featureForEachFemale{3}, 1), 4, 0.05);
-
-% Males exhibitvariance change
-[maleData,femaleData] = varianceAnalysis('approachavoid', 'y', ...
-    'P2L1L3 BL for comb boost and alc', 'P2A Boost and alcohol', 'P2L1L3 Post alcohol');
-[p_values, combined_p] = FisherMethod(maleData);
-[p_values, combined_p] = FisherMethod(femaleData);
 
 %% Figure 3
 % Psychometric plots of individual sessions
@@ -148,48 +70,77 @@ param_array = fitParamKernelDensity('shift', 'approachavoid', 2, 'n', ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000, 42);
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000, 42);
-power = estimateKStest2Power(param_array{1}, param_array{2}, 1000);
-power = estimateKStest2Power(param_array{1}, param_array{3}, 1000);
 
 param_array = fitParamKernelDensity('shift', 'approachavoid', 2, 'n', ...
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{2}, 1000, 42);
 [h, p] = bootstrap_kstest2(param_array{1}, param_array{3}, 1000, 42);
-power = estimateKStest2Power(param_array{1}, param_array{2}, 1000);
-power = estimateKStest2Power(param_array{1}, param_array{3}, 1000);
 
-% Greater influence onapproach rate in conflict task
-featureForEach = masterPsychometricFunctionPlot('approachavoid', 'n', ...
+% Increased approach rate during conflict task
+[T1, T2, T3] = masterPsychometricFunctionPlot('approachavoid', {}, ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
 
-group_1_data = py.numpy.array(featureForEach{1});
-group_2_data = py.numpy.array(featureForEach{2});
-group_3_data = py.numpy.array(featureForEach{3});
-result = py.manovaTest.manovaTest(group_1_data, group_2_data);
-disp(result);
-result = py.manovaTest.manovaTest(group_1_data, group_3_data);
-disp(result);
+result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T2));
+result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T3));
 
-
-featureForEach = masterPsychometricFunctionPlot('approachavoid', 'n', ...
+[T1, T2, T3] = masterPsychometricFunctionPlot('approachavoid', {}, ...
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
 
-group_1_data = py.numpy.array(featureForEach{1});
-group_2_data = py.numpy.array(featureForEach{2});
-group_3_data = py.numpy.array(featureForEach{3});
-result = py.manovaTest.manovaTest(group_1_data, group_2_data);
-disp(result);
-result = py.manovaTest.manovaTest(group_1_data, group_3_data);
-disp(result);
+result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T2));
+result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T3));
 
-% Conflict task exhibits greater variance change
-data = varianceAnalysis('approachavoid', 'n', ...
-    'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
-[p_values, combined_p] = FisherMethod(data);
+% L1 vs L3 
+[T1, T2] = masterPsychometricFunctionPlot('approachavoid', {}, ...
+'P2L1L3 Baseline L1', 'P2L1L3 Baseline L3');
+[T3, T4] = masterPsychometricFunctionPlot('approachavoid', {}, ...
+'P2L1L3 Boost and alcohol L1','P2L1L3 Boost and alcohol L3');
 
-data = varianceAnalysis('approachavoid', 'n', ...
-    'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
-[p_values, combined_p] = FisherMethod(data);
+% Compute means
+mean_T1 = mean(T1(:));
+mean_T2 = mean(T2(:));
+
+% Compute standard errors
+se_T1 = std(T1(:)) / sqrt(numel(T1(:)));
+se_T2 = std(T2(:)) / sqrt(numel(T2(:)));
+
+% Compute mean difference and its standard error
+diff_1 = mean_T2 - mean_T1;
+se_diff_1 = sqrt(se_T1^2 + se_T2^2);  % Standard error of the difference
+
+mean_T3 = mean(T3(:));
+mean_T4 = mean(T4(:));
+
+se_T3 = std(T3(:)) / sqrt(numel(T3(:)));
+se_T4 = std(T4(:)) / sqrt(numel(T4(:)));
+
+diff_2 = mean_T4 - mean_T3;
+se_diff_2 = sqrt(se_T3^2 + se_T4^2);  % Standard error of the difference
+
+% Create bar plot
+figure;
+bar_handle = bar(1:2, [diff_1, diff_2]);
+hold on;
+% Add error bars
+errorbar(1:2, [diff_1, diff_2], [se_diff_1, se_diff_2], 'k', 'linestyle', ...
+    'none', 'linewidth', 1.5);
+
+hold off;
+
+% Statistics
+mean_T1_sessions = mean(T1, 2); % Mean across columns (concentrations)
+mean_T2_sessions = mean(T2, 2);
+mean_T3_sessions = mean(T3, 2);
+mean_T4_sessions = mean(T4, 2);
+
+% Compute difference within each group
+diff_baseline = mean_T2_sessions - mean(mean_T1_sessions); % Baseline difference
+diff_alcohol = mean_T4_sessions - mean(mean_T3_sessions);  % Alcohol difference
+
+% Perform Wilcoxon rank-sum test
+p_diff = ranksum(diff_baseline, diff_alcohol);
+
+% Display results
+disp(['p-value for group difference: ', num2str(p_diff)]);
 
 
 %% Figure 4
@@ -211,32 +162,17 @@ power = estimateKStest2Power(femaleParam{1}, femaleParam{2}, 1000);
 power = estimateKStest2Power(femaleParam{1}, femaleParam{3}, 1000);
 
 % PNC influences approach rate in males
-[featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot('approachavoid', 'y', ...
+[T1, T2, T3] = masterPsychometricFunctionPlot('approachavoid', males, ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
 
-group_1_data = py.numpy.array(featureForEachMale{1});
-group_2_data = py.numpy.array(featureForEachMale{2});
-group_3_data = py.numpy.array(featureForEachMale{3});
-result = py.manovaTest.manovaTest(group_1_data, group_2_data);
-disp(result);
-result = py.manovaTest.manovaTest(group_1_data, group_3_data);
-disp(result);
+result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T2));
+result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T3));
 
-group_1_data = py.numpy.array(featureForEachFemale{1});
-group_2_data = py.numpy.array(featureForEachFemale{2});
-group_3_data = py.numpy.array(featureForEachFemale{3});
-result = py.manovaTest.manovaTest(group_1_data, group_2_data);
-disp(result);
-result = py.manovaTest.manovaTest(group_1_data, group_3_data);
-disp(result);
-
-% Slight variance change observed for both genders
-[maleData,femaleData] = varianceAnalysis('approachavoid', 'y', ...
+[T1, T2, T3] = masterPsychometricFunctionPlot('approachavoid', females, ...
     'P2L1 BL for comb boost and alc', 'P2L1 Boost and alcohol', 'P2L1 Post alcohol');
 
-[p_values, combined_p] = FisherMethod(maleData);
-[p_values, combined_p] = FisherMethod(femaleData);
-
+result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T2));
+result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T3));
 
 % Gender-specific psychometric plots of individual sessions
 individualPsychometricPlotOverlay('approachavoid', 'y', 'P2L1L3 Boost and alcohol');
@@ -247,63 +183,114 @@ individualPsychometricPlotOverlay('approachavoid', 'y', 'P2L1L3 Post alcohol');
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
 [h_male1, p_male1] = bootstrap_kstest2(maleParam{1}, maleParam{2}, 1000, 42);
 [h_male2, p_male2] = bootstrap_kstest2(maleParam{1}, maleParam{3}, 1000, 42);
-power = estimateKStest2Power(maleParam{1}, maleParam{2}, 1000);
-power = estimateKStest2Power(maleParam{1}, maleParam{3}, 1000);
 
 [h_female1, p_female1] = bootstrap_kstest2(femaleParam{1}, femaleParam{2}, 1000, 42);
 [h_female2, p_female2] = bootstrap_kstest2(femaleParam{1}, femaleParam{3}, 1000, 42);
-power = estimateKStest2Power(femaleParam{1}, femaleParam{2}, 1000);
-power = estimateKStest2Power(femaleParam{1}, femaleParam{3}, 1000);
 
 % Greater influence on maleapproach rate in PC task
-[featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot('approachavoid', 'y', ...
+[T1, T2, T3] = masterPsychometricFunctionPlot('approachavoid', males, ...
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
 
-group_1_data = py.numpy.array(featureForEachMale{1});
-group_2_data = py.numpy.array(featureForEachMale{2});
-group_3_data = py.numpy.array(featureForEachMale{3});
-result = py.manovaTest.manovaTest(group_1_data, group_2_data);
-disp(result);
-result = py.manovaTest.manovaTest(group_1_data, group_3_data);
-disp(result);
+result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T2));
+result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T3));
 
-group_1_data = py.numpy.array(featureForEachFemale{1});
-group_2_data = py.numpy.array(featureForEachFemale{2});
-group_3_data = py.numpy.array(featureForEachFemale{3});
-result = py.manovaTest.manovaTest(group_1_data, group_2_data);
-disp(result);
-result = py.manovaTest.manovaTest(group_1_data, group_3_data);
-disp(result);
-
-% Strong variance change observed in males
-[maleData,femaleData] = varianceAnalysis('approachavoid', 'y', ...
+[T1, T2, T3] = masterPsychometricFunctionPlot('approachavoid', females, ...
     'P2L1L3 BL for comb boost and alc', 'P2L1L3 Boost and alcohol', 'P2L1L3 Post alcohol');
 
-[p_values, combined_p] = FisherMethod(maleData);
-[p_values, combined_p] = FisherMethod(femaleData);
+result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T2));
+result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T3));
 
 
 %% SI 1
 % Psychometric mean analysisof approach rate
-featureForEach = masterPsychometricFunctionPlot('approachavoid', 'n', ...
+[T1, T2, T3] = masterPsychometricFunctionPlot('approachavoid', {}, ...
     'P2L1 BL for comb boost and alc','P2A Boost and alcohol', 'P2L1 Post alcohol');
 
-% Gender-specific psychometric meananalysis
-[featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot( ...
-    'approachavoid', 'y', 'P2L1 BL for comb boost and alc','P2A Boost and alcohol', ...
-    'P2L1 Post alcohol');
+% Session number comparison between male and female
+session_label = {'NCCB', 'CCB', 'AA', 'PNC', 'PC', 'NCPA', 'CPA'};
+male_session = [54,63,77,51,30,30,34]; 
+female_session = [61,62,81,64,26,30,17];
+p = chi2test([male_session; female_session]);
+figure;
+male_labels = strcat(session_label, " (", string(male_session), ")");
+pie(male_session, male_labels); title("Male");
+figure;
+female_labels = strcat(session_label, " (", string(female_session), ")");
+pie(female_session, female_labels); title("Female");
 
-% Psychometric mean analysisof approach rate
-featureForEach = masterPsychometricFunctionPlot('approachavoid', 'n', ...
-    'P2L1L3 BL for comb boost and alc','P2A Boost and alcohol', 'P2L1L3 Post alcohol');
+% Trial count
+males = {'aladdin', 'carl', 'jafar', 'jimi', 'jr', 'kobe', 'mike', 'scar', ...
+'simba', 'sully'};
+females = {'alexis', 'fiona', 'harley', 'juana', 'kryssia', 'neftali', ...
+'raven', 'renata', 'sarah', 'shakira'};
 
-% Gender-specific psychometric meananalysis
-[featureForEachMale, featureForEachFemale] = masterPsychometricFunctionPlot( ...
-    'approachavoid', 'y', 'P2L1L3 BL for comb boost and alc','P2A Boost and alcohol', ...
-    'P2L1L3 Post alcohol');
+treatmentGrp = {'P2L1 BL for comb boost and alc', 'P2L1L3 BL for comb boost and alc', ...
+    'P2A Boost and alcohol', 'P2L1 Boost and alcohol', 'P2L1L3 Boost and alcohol', ...
+    'P2L1 Post alcohol', 'P2L1L3 Post alcohol'};
+
+totalMaleTrialCt = zeros(1, numel(treatmentGrp));
+totalFemaleTrialCt = zeros(1, numel(treatmentGrp));
+
+for grp = 1:numel(treatmentGrp)
+    maleTrialCt = countSessionAndTrial('approachavoid', treatmentGrp{grp}, males, conn);
+    totalMaleTrialCt(grp) = sum(maleTrialCt(:));
+
+    femaleTrialCt = countSessionAndTrial('approachavoid', treatmentGrp{grp}, females, conn);
+    totalFemaleTrialCt(grp) = sum(femaleTrialCt(:));
+end
+
+% Trial per session
+trial_per_session_male = totalMaleTrialCt ./male_session;
+trial_per_session_female = totalFemaleTrialCt ./female_session;
+
+figure;
+male_labels = strcat(session_label, " (", ...
+    string(round(trial_per_session_male)), ")");
+pie(trial_per_session_male, male_labels); title("Male");
+figure;
+female_labels = strcat(session_label, " (", ...
+    string(round(trial_per_session_female)), ")");
+pie(trial_per_session_female, female_labels); title("Female");
+
+chi2test([trial_per_session_male; trial_per_session_female]);
+
+% Session progression in P2A alcohol
+featureForEach = sessionProgressionPsychometricFun('approachavoid', ...
+'P2A Boost and alcohol', 'n', {});
+
+% non-parametric test for small variance: Kruskal-Wallis test
+group = (1:size(featureForEach, 1))'; % Group each row as a session
+for col = 1:size(featureForEach, 2)
+    disp(['Analyzing concentration ', num2str(col), ' using Kruskal-Wallis test']);
+    p = kruskalwallis(featureForEach(:, col), group, 'off'); % Include group variable
+    disp(['P-value: ', num2str(p)]);
+end
+
+% Individual p-values from the Kruskal-Wallis test
+p_values = [0.42888, 0.42888, 0.42888, 0.42888];
+
+% Fisher's combined test statistic
+chi_square_stat = -2 * sum(log(p_values));
+
+% Degrees of freedom
+df = 2 * length(p_values);
+
+% combined p-value
+combined_p = 1 - chi2cdf(chi_square_stat, df);
+
+disp(['Combined P-value using Fisher''s method: ', num2str(combined_p)]);
+
+% Gender -specific psychometric meananalysis
+[T1, T2, T3] = masterPsychometricFunctionPlot('approachavoid', males, ...
+    'P2L1 BL for comb boost and alc','P2A Boost and alcohol', 'P2L1 Post alcohol');
+
+[T1, T2, T3] = masterPsychometricFunctionPlot('approachavoid', females, ...
+    'P2L1 BL for comb boost and alc','P2A Boost and alcohol', 'P2L1 Post alcohol');
+
+individualPsychometricPlotOverlay('approachavoid', 'y', 'P2L1L3 BL for comb boost and alc');
 
 
-%% SI 2
+%% SI 3
 % Sample plots illustrating time in reward zone
 trajectoryPlot(77530);
 trajectoryPlot(77401);
