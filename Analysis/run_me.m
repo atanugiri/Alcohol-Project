@@ -55,6 +55,14 @@ result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T3));
 result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T2));
 result = py.manovaTest.manovaTest(py.numpy.array(T1), py.numpy.array(T3));
 
+% Sex difference in alcohol consumption
+[male_psych, female_psych, male_total, female_total] = alcohol_consumption('P2A Boost and alcohol',false);
+result = py.manovaTest.manovaTest(py.numpy.array(male_psych), py.numpy.array(female_psych));
+[h, p] = ttest2(male_total, female_total);
+
+[male_psych, female_psych, male_total, female_total] = alcohol_consumption('P2A Boost and alcohol');
+result = py.manovaTest.manovaTest(py.numpy.array(male_psych), py.numpy.array(female_psych));
+[h, p] = ttest2(male_total, female_total);
 
 
 %% Figure 3

@@ -2,7 +2,10 @@
 % Date: 01/22/2025
 %
 % This script calculates the alcohol consumption by sex in input treatment
-% group
+% group. Use 'false' if you don't want to normalize by weight.
+%
+% Example usage:
+% [male_psych, female_psych, male_total, female_total] = alcohol_consumption('P2A Boost and alcohol',false);
 %
 function varargout = alcohol_consumption(trtGroup, wt_normalize)
 
@@ -61,11 +64,12 @@ for sex = 1:2
             'approachavoid', animals{animal});
 
         approachNum = featureForEach.*trialCt;
+        alcConc = 0.789;
 
         if wt_normalize
-            alcoholConsumed = (approachNum .* alcVol)/(animalWts(animal)*0.001);
+            alcoholConsumed = (approachNum .*alcVol*alcConc)/(animalWts(animal)*0.001);
         else
-            alcoholConsumed = (approachNum .* alcVol);
+            alcoholConsumed = (approachNum .*alcVol*alcConc);
         end
 
         rows = size(alcoholConsumed, 1);
@@ -109,9 +113,9 @@ hold off;
 % Add label and legend
 xlabel('Sucrose conc.', 'Interpreter','none', 'FontSize', 25);
 if wt_normalize
-    ylabel(sprintf('Alcohol consumption (mL/kg)'), 'Interpreter', 'latex', 'FontSize', 25);
+    ylabel(sprintf('Alcohol consumption (g/kg)'), 'Interpreter', 'latex', 'FontSize', 25);
 else
-    ylabel(sprintf('Alcohol consumption (mL)'), 'Interpreter', 'latex', 'FontSize', 25);
+    ylabel(sprintf('Alcohol consumption (g)'), 'Interpreter', 'latex', 'FontSize', 25);
 end
 xticks(1:4);
 label = {'0.5','2','5','9'};
@@ -148,9 +152,9 @@ errorbar(x, meanAlcConsumOverAllConc, stdErrOverAllConc, 'k', ...
 xticks([1 2]); % Set x-ticks
 xticklabels(sex_labels); % Set x-tick labels
 if wt_normalize
-    ylabel('Alcohol consumption (mL/kg)', 'Interpreter', 'latex', 'FontSize', 14);
+    ylabel('Alcohol consumption (g/kg)', 'Interpreter', 'latex', 'FontSize', 14);
 else
-    ylabel('Alcohol consumption (mL)', 'Interpreter', 'latex', 'FontSize', 14);
+    ylabel('Alcohol consumption (g)', 'Interpreter', 'latex', 'FontSize', 14);
 end
 set(gca, 'FontSize', 12);
 hold off;
