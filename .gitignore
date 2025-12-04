@@ -35,6 +35,20 @@ codegen/
 *.txt
 *.dat
 
+# LaTeX files
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.nav
+*.snm
+*.vrb
+
 # Python files
 __pycache__/
 *.py[cod]

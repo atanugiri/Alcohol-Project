@@ -1,0 +1,390 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath} % Required for align* environment
+\usepackage{siunitx}
+\usepackage{geometry}
+\usepackage{csvsimple}
+\usepackage{float}
+\newgeometry{
+top = 0.75in,
+bottom = 0.75in,
+outer = 0.75in,
+inner = 1.5in,
+}
+
+\title{Detailed statistical document}
+% \author{Atanu Giri}
+
+\begin{document}
+
+\maketitle
+% \tableofcontents
+% \break
+
+All statistical analyses were performed using MATLAB (R2022a) software. The kernel probability density of inflection points between groups was compared using the two-sample Kolmogorov-Smirnov (KS) test. To address the issue of unbalanced sample sizes across different health groups, a non-parametric bootstrapping method with 1,000 iterations was employed during the KS test. Approach rates between groups were compared using multivariate analysis of variance (MANOVA).\\
+
+The F-test was conducted to determine whether the variances of two populations were equal. F-test results at four different reward levels were combined using Fisher's method to obtain a combined p-value. A psychometric function for a session was classified as sigmoid if the coefficient of determination (R\textsuperscript{2}) was $\geq 0.9$. The `fraction of sigmoid' for an animal within a particular health group was calculated by dividing the number of sigmoid sessions by the total number of sessions. An animal was designated as a `strong sigmoid responder' if this fraction met or exceeded a threshold of 0.7. Otherwise, the animal was classified as a `weak sigmoid responder'. A chi-square test was performed to assess whether there was a significant difference in the proportion of weak and strong sigmoid responders between the two genders within the same health group.\\
+
+\section{Figure 1}
+\subsection{1d.}
+\emph{individualPsychometricPlotOverlay}(\texttt{`approachavoid'}, \texttt{`n'}, \texttt{`P2L1 BL for comb boost and alc'});\\
+n\textsubscript{animal} = 20, n\textsubscript{session} = 115.
+
+\subsection{1e.}
+\emph{extractFittingParam}(\texttt{`P2L1 BL for comb boost and alc'}, \texttt{`approachavoid'}, 2);
+
+\subsection{1f.}
+\texttt{param\_array} = \emph{fitParamKernelDensity}(\texttt{`shift'}, \texttt{`approachavoid'}, 2, \texttt{`n'}, \texttt{`P2L1 BL for comb boost and alc'}, \texttt{`P2A Boost and alcohol'});\\
+\texttt{param\_array} = \emph{fitParamKernelDensity}(\texttt{`shift'}, \texttt{`approachavoid'}, 2, \texttt{`n'}, \texttt{`P2L1L3 BL for comb boost and alc'}, \texttt{`P2A Boost and alcohol'});\\
+
+The distribution of kernel probability densities of the fitting parameter \emph{c} (inflection point) show significant difference between NCCB and AA tasks (KS test, p = 0.0320), and CCB and AA tasks (KS test, p = 0.0000).\\
+
+\subsection{1g.}
+\texttt{featureForEach} = \emph{masterFunForBoxPlot}(\texttt{`approachavoid'}, \texttt{`n'}, \texttt{`P2L1 BL for comb boost and alc'},\texttt{`P2A Boost and alcohol'});\\
+\texttt{featureForEach} = \emph{masterFunForBoxPlot}(\texttt{`approachavoid'}, \texttt{`n'}, \texttt{`P2L1L3 BL for comb boost and alc'},\texttt{`P2A Boost and alcohol'});\\
+
+
+The difference in approach rates is more pronounced between CCB and AA tasks (MANOVA, p = 3.9096e-07) than between NCCB and AA tasks (MANOVA, p = 0.0010).
+
+\subsection{1h.}
+\texttt{data} = \emph{varianceAnalysis}(\texttt{`approachavoid'}, \texttt{`n'}, \texttt{`P2L1 BL for comb boost and alc'}, \texttt{`P2A Boost and alcohol'});\\
+\texttt{data} = \emph{varianceAnalysis}(\texttt{`approachavoid'}, \texttt{`n'}, \texttt{`P2L1L3 BL for comb boost and alc'}, \texttt{`P2A Boost and alcohol'});\\
+
+Variances in approach rates at four different concentrations of sucrose solutions show significant difference between both NCCB and AA tasks (F-test, p = 0.0096), and CCB and AA tasks (F-test, p = 0.0001). Error bars are shown with lower and upper confidence intervals with 95\% significance.
+
+\subsection{1i.}
+\emph{individualPsychometricPlotOverlay}(\texttt{`approachavoid'}, \texttt{`n'}, \texttt{`P2L1L3 BL for comb boost and alc'});\\
+n\textsubscript{animal} = 20, n\textsubscript{session} = 125.
+
+\subsection{1j.}
+\emph{individualPsychometricPlotOverlay}(\texttt{`approachavoid'}, \texttt{`n'}, \texttt{`P2A Boost and alcohol'});\\
+n\textsubscript{animal} = 20, n\textsubscript{session} = 158.
+
+
+\section{Figure 2}
+\subsection{2a.}
+\emph{individualPsychometricPlotOverlay}(\texttt{`approachavoid'}, \texttt{`y'}, \texttt{`P2L1 BL for comb boost and alc'});\\
+Male: n\textsubscript{animal} = 10, n\textsubscript{session} = 54.\\
+Female: n\textsubscript{animal} = 10, n\textsubscript{session} = 61.\\
+
+\subsection{2b.}
+\emph{individualPsychometricPlotOverlay}(\texttt{`approachavoid'}, \texttt{`y'}, \texttt{`P2A Boost and alcohol'});\\
+Male: n\textsubscript{animal} = 10, n\textsubscript{session} = 77.\\
+Female: n\textsubscript{animal} = 10, n\textsubscript{session} = 81.\\
+
+\subsection{2c.}
+\texttt{[maleParam, femaleParam]} = \emph{fitParamKernelDensity}(\texttt{`shift'}, \texttt{`approachavoid'}, 2, \texttt{`y'}, \texttt{`P2L1 BL for comb boost and alc'}, \texttt{`P2A Boost and alcohol'});\\
+
+The distribution kernel probability density of inflection point has significantly shifted to left for AA tasks in males (KS test, p = 0.0010) but not in females (KS test, p = 0.9860) when compared to NCCB tasks.
+
+\subsection{2d.}
+\texttt{[featureForEachMale, featureForEachFemale]} = \emph{masterFunForBoxPlot}(\texttt{`approachavoid'}, \texttt{`y'}, \texttt{`P2L1 BL for comb boost and alc'},\texttt{`P2A Boost and alcohol'});\\
+
+The difference in approach rates is statistically significant between NCCB and acute alcohol tasks for males (MANOVA, p = 3.3390e-05) but not for females (MANOVA, p = 0.4701).\\
+
+\subsection{2e.}
+\texttt{[maleData,femaleData]} = \emph{varianceAnalysis}(\texttt{`approachavoid'}, \texttt{`y'}, \texttt{`P2L1 BL for comb boost and alc'}, \texttt{`P2A Boost and alcohol'});\\
+
+Variance in approach rates at four different concentrations shows no significant difference between NCCB and acute alcohol tasks for both males (F-test, p = 0.1209) and females (F-test, p = 0.0530).
+
+\subsection{2f.}
+\emph{individualPsychometricPlotOverlay}(\texttt{`approachavoid'}, \texttt{`y'}, \texttt{`P2L1L3 BL for comb boost and alc'});\\
+Male: n\textsubscript{animal} = 10, n\textsubscript{session} = 63.\\
+Female: n\textsubscript{animal} = 10, n\textsubscript{session} = 62.\\
+
+\subsection{2g.}
+\texttt{[maleParam, femaleParam]} = \emph{fitParamKernelDensity}(\texttt{`shift'}, \texttt{`approachavoid'}, 2, \texttt{`y'}, \texttt{`P2L1L3 BL for comb boost and alc'}, \texttt{`P2A Boost and alcohol'});\\
+
+The distribution kernel probability density of inflection point has significantly shifted to left AA tasks compared to CCB task in males (KS test, p = 0.0000) but not in females (KS test, p = 0.1580).
+
+\subsection{2h.}
+\texttt{[featureForEachMale, featureForEachFemale]} = \emph{masterFunForBoxPlot}(\texttt{`approachavoid'}, \texttt{`y'}, \texttt{`P2L1L3 BL for comb boost and alc'},\texttt{`P2A Boost and alcohol'});\\
+
+The difference in approach rates is more pronounced between males (MANOVA, p = 1.1419e-07) than females (0.0134) in CCB vs AA tasks.
+
+\subsection{2i.}
+\texttt{[maleData,femaleData]} = \emph{varianceAnalysis}(\texttt{`approachavoid'}, \texttt{`y'}, \texttt{`P2L1L3 BL for comb boost and alc'}, \texttt{`P2A Boost and alcohol'});\\
+
+Variances in approach rates at four different concentrations shows significant difference between NCCB and AA tasks for males (F-test, p = 0.0000), but not for females (F-test, p = 0.0603).
+
+
+\section{Figure 3}
+\subsection{3a.}
+\emph{trajectoryPlot}(77530);\\
+\emph{trajectoryPlot}(77401);\\
+
+\subsection{3b.}
+\texttt{featureForEach} = \emph{masterPsychometricFunctionPlot}(\texttt{`time\_in\_feeder\_25'}, \texttt{`n'}, \texttt{`P2L1 BL for comb boost and alc'}, \texttt{`P2A Boost and alcohol'});\\
+\texttt{featureForEach} = \emph{masterPsychometricFunctionPlot}(\texttt{`time\_in\_feeder\_25'}, \texttt{`n'}, \texttt{`P2L1L3 BL for comb boost and alc'}, \texttt{`P2A Boost and alcohol'});\\
+
+The difference in time in reward zone across four different concentrations of sucrose solution is statistically significant between both NCCB and AA tasks (MANOVA, p = 0.0002), and CCB and AA tasks (MANOVA, p = 0.0000).
+
+\subsection{3c.}
+\texttt{param\_array} = \emph{fitParamKernelDensity}(\texttt{`shift'}, \texttt{`time\_in\_feeder\_25'}, 2, \texttt{`n'}, \texttt{`P2L1 BL for comb boost and alc'}, \texttt{`P2A Boost and alcohol'});\\
+\texttt{param\_array} = \emph{fitParamKernelDensity}(\texttt{`shift'}, \texttt{`time\_in\_feeder\_25'}, 2, \texttt{`n'}, \texttt{`P2L1L3 BL for comb boost and alc'}, \texttt{`P2A Boost and alcohol'});\\
+
+The distribution of kernel probability density plots of inflection point are significantly different between both NCCB and AA (KS test, p = 0.0030) and CCB and AA tasks (KS test, p = 0.0040).
+
+\subsection{3d.}
+\texttt{[featureForEachMale, featureForEachFemale]} = \emph{masterPsychometricFunctionPlot}(\texttt{`time\_in\_feeder\_25'}, \texttt{`y'}, \texttt{`P2L1 BL for comb boost and alc'},\texttt{`P2A Boost and alcohol'});\\
+
+The difference in time in reward zone is statistically significant between NCCB and AA tasks for males (MANOVA, p = 0.0000) but not for females (MANOVA, p = 0.5719).
+
+\subsection{3e.}
+\texttt{[maleParam, femaleParam]} = \emph{fitParamKernelDensity}(\texttt{`shift'}, \texttt{`time\_in\_feeder\_25'}, 2, \texttt{`y'}, \texttt{`P2L1 BL for comb boost and alc'}, \texttt{`P2A Boost and alcohol'});\\
+
+The distribution of kernel probability density is significantly different between NCCB and AA tasks in males (KS test, p = 0.0050), but not in females (KS test, p = 0.1700). 
+
+\subsection{3f.}
+\texttt{[featureForEachMale, featureForEachFemale]} = \emph{masterPsychometricFunctionPlot}(\texttt{`time\_in\_feeder\_25'}, \texttt{`y'}, \texttt{`P2L1L3 BL for comb boost and alc'},\texttt{`P2A Boost and alcohol'});\\
+
+The difference in time in reward zone is statistically significant between CCB and AA tasks for males (MANOVA, p = 0.0000) but not for females (MANOVA, p = 0.2946).
+
+\subsection{3g.}
+\texttt{[maleParam, femaleParam]} = \emph{fitParamKernelDensity}(\texttt{`shift'}, \texttt{`time\_in\_feeder\_25'}, 2, \texttt{`y'}, \texttt{`P2L1L3 BL for comb boost and alc'}, \texttt{`P2A Boost and alcohol'});\\
+
+The distributuion of kernel probability density is significantly different between CCB and AA tasks for males (KS test, p = 0.0090), but not for females (KS test, p = 0.1840).
+
+
+\section{Figure 4}
+\subsection{4a.}
+\emph{individualPsychPlotPerSession}(\texttt{`approachavoid'}, \texttt{`P2L1 BL for comb boost and alc'}, \texttt{`sully'});\\
+\emph{individualPsychPlotPerSession}(\texttt{`approachavoid'}, \texttt{`P2L1L3 BL for comb boost and alc'}, \texttt{`sully'});\\
+\emph{individualPsychPlotPerSession}(\texttt{`approachavoid'}, \texttt{`P2A Boost and alcohol'}, \texttt{`sully'});\\
+
+\subsection{4b.}
+\emph{individualPsychPlotPerSession}(\texttt{`approachavoid'}, \texttt{`P2L1 BL for comb boost and alc'}, \texttt{`shakira'});\\
+\emph{individualPsychPlotPerSession}(\texttt{`approachavoid'}, \texttt{`P2L1L3 BL for comb boost and alc'}, \texttt{`shakira'});\\
+\emph{individualPsychPlotPerSession}(\texttt{`approachavoid'}, \texttt{`P2A Boost and alcohol'}, \texttt{`shakira'});\\
+
+\subsection{4c.}
+\texttt{[count1, total1]} = \emph{calculateFractionOfSigmoid}(\texttt{`male'}, \texttt{`approachavoid'}, 2, \texttt{`P2A Boost and alcohol'});\\
+\texttt{[count2, total2]} = \emph{calculateFractionOfSigmoid}(\texttt{`female'}, \texttt{`approachavoid'}, 2, \texttt{`P2A Boost and alcohol'});\\
+
+\subsection{4d.}
+\emph{pie}(\texttt{[count1, total1 - count1]});\\
+\emph{pie}(\texttt{[count2, total2 - count2]});\\
+
+A significant difference in the proportion of weak and strong sigmoid responders between the two genders was found (chi-square test, p = 0.0246).
+
+
+\section{Figure 5}
+\subsection{5a.}
+\emph{individualPsychometricPlotOverlay}(\texttt{`approachavoid'}, \texttt{`n'}, \texttt{`P2L1 Boost and alcohol'});\\
+n\textsubscript{animal} = 20, n\textsubscript{session} = 115.\\
+\newline
+\emph{individualPsychometricPlotOverlay}(\texttt{`approachavoid'}, \texttt{`n'}, \texttt{`P2L1L3 Boost and alcohol'});\\
+n\textsubscript{animal} = 20, n\textsubscript{session} = 56.\\
+
+\subsection{5b.}
+\emph{individualPsychometricPlotOverlay}(\texttt{`approachavoid'}, \texttt{`n'}, \texttt{`P2L1 Post alcohol'});\\
+n\textsubscript{animal} = 20, n\textsubscript{session} = 60.\\
+\newline
+\emph{individualPsychometricPlotOverlay}(\texttt{`approachavoid'}, \texttt{`n'}, \texttt{`P2L1L3 Post alcohol'});\\
+n\textsubscript{animal} = 20, n\textsubscript{session} = 51.\\
+
+\subsection{5c.}
+\texttt{param\_array} = \emph{fitParamKernelDensity}(\texttt{`shift'}, \texttt{`approachavoid'}, 2, \texttt{`n'}, \texttt{`P2L1 BL for comb boost and alc'}, \texttt{`P2L1 Boost and alcohol'}, \texttt{`P2L1 Post alcohol'});\\
+\texttt{param\_array} = \emph{fitParamKernelDensity}(\texttt{`shift'}, \texttt{`approachavoid'}, 2, \texttt{`n'}, \texttt{`P2L1L3 BL for comb boost and alc'}, \texttt{`P2L1L3 Boost and alcohol'}, \texttt{`P2L1L3 Post alcohol'});\\
+
+A significant shift of inflection point in PC compared to CCB (KS test, p=0.0000). p\textsubscript{NCCB vs PNC} = , p\textsubscript{NCCB vs NCPA} = , p\textsubscript{NCCB vs CPA} = .
+
+\subsection{5d.}
+\texttt{featureForEach} = \emph{masterPsychometricFunctionPlot}(\texttt{`approachavoid'}, \texttt{`n'}, \texttt{`P2L1 BL for comb boost and alc'}, \texttt{`P2L1 Boost and alcohol'}, \texttt{`P2L1 Post alcohol'});\\
+\texttt{featureForEach} = \emph{masterPsychometricFunctionPlot}(\texttt{`approachavoid'}, \texttt{`n'}, \texttt{`P2L1L3 BL for comb boost and alc'}, \texttt{`P2L1L3 Boost and alcohol'}, \texttt{`P2L1L3 Post alcohol'});\\
+
+The difference in approach rates between cost-benefit and proxy alcohol is more pronounced in conflict task (NCCB vs PNC: MANOVA, p = 0.0023, CCB vs PC: MANOVA, p = 1.7170e-07). The post-alcohol conditions indicate a normalization of approach rates compared to the proxy alcohol conditions (NCCB vs NCPA: MANOVA, p = 0.0459, CCB vs CPA: MANOVA, p = 0.0413).
+
+\subsection{5e.}
+\texttt{data} = \emph{varianceAnalysis}(\texttt{`approachavoid'}, \texttt{`n'}, \texttt{`P2L1 BL for comb boost and alc'}, \texttt{`P2L1 Boost and alcohol'}, \texttt{`P2L1 Post alcohol'});\\
+\texttt{data} = \emph{varianceAnalysis}(\texttt{`approachavoid'}, \texttt{`n'}, \texttt{`P2L1L3 BL for comb boost and alc'}, \texttt{`P2L1L3 Boost and alcohol'}, \texttt{`P2L1L3 Post alcohol'});\\
+
+Variances in approach rates show greater change in conflict tasks (CCB vs PC: F-test, p = 0.0000; CCB vs CPA: F-test, p = 0.0000) than in non-conflict tasks (NCCB vs PNC: F-test, p = 0.0015; NCCB vs NCPA: F-test, p = 0.3755).
+
+
+\section{Figure 6}
+\subsection{6a.}
+\emph{individualPsychometricPlotOverlay}(\texttt{`approachavoid'}, \texttt{`y'}, \texttt{`P2L1 Boost and alcohol'});\\
+Male: n\textsubscript{animal} = 10, n\textsubscript{session} = 51.\\
+Female: n\textsubscript{animal} = 10, n\textsubscript{session} = 64.\\
+
+\subsection{6b.}
+\emph{individualPsychometricPlotOverlay}(\texttt{`approachavoid'}, \texttt{`y'}, \texttt{`P2L1 Post alcohol'});\\
+Male: n\textsubscript{animal} = 10, n\textsubscript{session} = 30.\\
+Female: n\textsubscript{animal} = 10, n\textsubscript{session} = 30.\\
+
+\subsection{6c.}
+\texttt{[maleParam, femaleParam]} = \emph{fitParamKernelDensity}(\texttt{`shift'}, \texttt{`approachavoid'}, 2, \texttt{`y'}, \texttt{`P2L1 BL for comb boost and alc'}, \texttt{`P2L1 Boost and alcohol'}, \texttt{`P2L1 Post alcohol'});\\
+
+The kernel probability densities of the inflection point for both the PNC and NCPA tasks show no significant changes compared to the NCCB task across both genders. In males, the comparisons were as follows: NCCB vs. PNC (KS test, p = 0.2420), and NCCB vs. NCPA (KS test, p = 0.1870). In females: NCCB vs. PNC (KS test, p = 0.5630), and NCCB vs. NCPA (KS test, p = 0.6610).
+
+\subsection{6d.}
+\texttt{[featureForEachMale, featureForEachFemale]} = \emph{masterPsychometricFunctionPlot}(\texttt{`approachavoid'}, \texttt{`y'}, \texttt{`P2L1 BL for comb boost and alc'}, \texttt{`P2L1 Boost and alcohol'}, \texttt{`P2L1 Post alcohol'});\\
+
+The difference in approach rates is statistically significant between NCCB and PNC tasks (MANOVA, p = 2.0177e-04), but not between NCCB and NCPA tasks in males (MANOVA, p = 0.1898). In females, the difference approach rates are not significant for both NCCB vs PNC (MANOVA, p = 0.1498) and NCCB vs PNC (MANOVA, p = 0.1761).
+
+\subsection{6e.}
+\texttt{[maleData,femaleData]} = \emph{varianceAnalysis}(\texttt{`approachavoid'}, \texttt{`y'}, \texttt{`P2L1 BL for comb boost and alc'}, \texttt{`P2L1 Boost and alcohol'}, \texttt{`P2L1 Post alcohol'});\\
+
+Variances in approach rates at four different concentrations of sucrose solutions shows significant difference between NCCB and PNC tasks in both males (F-test, p = 0.0149) and females (F-test, p = 0.0153). However, it shows no difference between NCCB and NCPA tasks in both males (F-test, p = 0.4042) and females (F-test, p = 0.2274).
+
+\subsection{6f.}
+\emph{individualPsychometricPlotOverlay}(\texttt{`approachavoid'}, \texttt{`y'}, \texttt{`P2L1L3 Boost and alcohol'});\\
+Male: n\textsubscript{animal} = 10, n\textsubscript{session} = 30.\\
+Female: n\textsubscript{animal} = 10, n\textsubscript{session} = 26.\\
+
+\subsection{6g.}
+\emph{individualPsychometricPlotOverlay}(\texttt{`approachavoid'}, \texttt{`y'}, \texttt{`P2L1L3 Post alcohol'});\\
+Male: n\textsubscript{animal} = 10, n\textsubscript{session} = 34.\\
+Female: n\textsubscript{animal} = 10, n\textsubscript{session} = 17.\\
+
+\subsection{6h.}
+\texttt{[maleParam, femaleParam]} = \emph{fitParamKernelDensity}(\texttt{`shift'}, \texttt{`approachavoid'}, 2, \texttt{`y'}, \texttt{`P2L1L3 BL for comb boost and alc'}, \texttt{`P2L1L3 Boost and alcohol'}, \texttt{`P2L1L3 Post alcohol'});\\
+
+The kernel probability densities of the inflection point for PC tasks show significant changes compared to the CCB task across both genders (In males, CCB vs. PC: KS test, p = 0.0020; in females, CCB vs. PC: KS test, p = 0.0200). But no change was observed for CPA task compared to CCB task across both genders (In males, CCB vs. CPA: KS test, p = 0.0570; in females, CCB vs. CPA: KS test, p = 0.0840).
+
+\subsection{6i.}
+\texttt{[featureForEachMale, featureForEachFemale]} = \emph{masterPsychometricFunctionPlot}(\texttt{`approachavoid'}, \texttt{`y'}, \texttt{`P2L1L3 BL for comb boost and alc'}, \texttt{`P2L1L3 Boost and alcohol'}, \texttt{`P2L1L3 Post alcohol'});\\
+
+The difference in approach rates is statistically significant between CCB and PC tasks across both genders (In males: MANOVA, p = 4.5992e-08; in females: MANOVA, p = 0.0046). The difference in approach rates between CCB and CPA tasks are significant in males (MANOVA, p = 6.5198e-04) but not in females (MANOVA, p = 0.1007).
+
+\subsection{6j.}
+\texttt{[maleData,femaleData]} = \emph{varianceAnalysis}(\texttt{`approachavoid'}, \texttt{`y'}, \texttt{`P2L1L3 BL for comb boost and alc'}, \texttt{`P2L1L3 Boost and alcohol'}, \texttt{`P2L1L3 Post alcohol'});\\
+
+Variances in approach rates in males shows significant difference in both tasks with respect to CCB task (CCB vs CP: F-test, p = 0.0000, CCB vs CPA: F-test, p = 0.0000).  However, it shows no difference in females (CCB vs CP: F-test, p = 0.3236, CCB vs CPA: F-test, p = 0.9659).
+
+\section{Figure 7}
+\subsection{7a.}
+\texttt{[count1, total1]} = \emph{calculateFractionOfSigmoid}(\texttt{`male'}, \texttt{`approachavoid'}, 2, \texttt{`P2L1 Boost and alcohol'});\\
+\texttt{[count2, total2]} = \emph{calculateFractionOfSigmoid}(\texttt{`female'}, \texttt{`approachavoid'}, 2, \texttt{`P2L1 Boost and alcohol'});\\
+
+\subsection{7b.}
+\emph{pie}(\texttt{[count1, total1 - count1]});\\
+\emph{pie}(\texttt{[count2, total2 - count2]});\\
+
+A significant difference in the proportion of weak and strong sigmoid responders between the two genders was found (chi-square test, p =  0.0098).
+
+\subsection{7c.}
+\texttt{[count1, total1]} = \emph{calculateFractionOfSigmoid}(\texttt{`male'}, \texttt{`approachavoid'}, 2, \texttt{`P2L1L3 Boost and alcohol'});\\
+\texttt{[count2, total2]} = \emph{calculateFractionOfSigmoid}(\texttt{`female'}, \texttt{`approachavoid'}, 2, \texttt{`P2L1L3 Boost and alcohol'});\\
+
+\subsection{7d.}
+\emph{pie}(\texttt{[count1, total1 - count1]});\\
+\emph{pie}(\texttt{[count2, total2 - count2]});\\
+
+No significant difference in the proportion of weak and strong sigmoid responders between the two genders was observed (chi-square test, p = 0.1596).
+
+
+\section{Supplementary Figure 1}
+\subsection{S. 1a.}
+\texttt{featureForEach} = \emph{masterPsychometricFunctionPlot}(\texttt{`approachavoid'}, \texttt{`n'}, \texttt{`P2L1 BL for comb boost and alc'},\texttt{`P2A Boost and alcohol'});\\
+
+Overall difference in approach rates is significant between NCCB and AA tasks (MANOVA, p = 0.0010).\\
+
+\texttt{[featureForEachMale, featureForEachFemale]} = \emph{masterPsychometricFunctionPlot}(\texttt{`approachavoid'}, \texttt{`y'}, \texttt{`P2L1 BL for comb boost and alc'},\texttt{`P2A Boost and alcohol'});\\
+
+Gender specific difference in approach rates is significant only in males (In males, MANOVA, p = 3.3390e-05; in females, MANOVA, p = 0.4701).
+
+\subsection{S. 1b.}
+\texttt{featureForEach} = \emph{masterPsychometricFunctionPlot}(\texttt{`approachavoid'}, \texttt{`n'}, \texttt{`P2L1L3 BL for comb boost and alc'},\texttt{`P2A Boost and alcohol'});\\
+
+Overall difference in approach rates is significant between CCB and AA tasks (MANOVA, p = 3.9096e-07).\\
+
+\texttt{[featureForEachMale, featureForEachFemale]} = \emph{masterPsychometricFunctionPlot}(\texttt{`approachavoid'}, \texttt{`y'}, \texttt{`P2L1L3 BL for comb boost and alc'},\texttt{`P2A Boost and alcohol'});\\
+
+Gender specific difference in approach rates is stronger in males (In males, MANOVA, p = 1.1419-07; in females, MANOVA, p = 0.0134).
+
+
+\section{Supplementary Figure 2}
+\subsection{S. 2a.}
+\texttt{males} = \{\texttt{`aladdin'}, \texttt{`carl'}, \texttt{`jafar'}, \texttt{`jimi'}, \texttt{`jr'}, \texttt{`kobe'}, \texttt{`mike'}, \texttt{`scar'}, \texttt{`simba'}, \texttt{`sully'}\};\\
+
+\texttt{females} = \{\texttt{`alexis'}, \texttt{`fiona'}, \texttt{`harley'}, \texttt{`juana'}, \texttt{`kryssia'}, \texttt{`neftali'}, \texttt{`raven'}, \texttt{`renata'}, \texttt{`sarah'}, \texttt{`shakira'}\};\\
+
+parfor animalIdx = 1:numel(males)
+    individualPsychPlotPerSession('approachavoid', 'P2L1 BL for comb boost and alc', males{animalIdx});
+    individualPsychPlotPerSession('approachavoid', 'P2L1L3 BL for comb boost and alc', males{animalIdx});
+    individualPsychPlotPerSession('approachavoid', 'P2A Boost and alcohol', males{animalIdx});
+end
+
+parfor animalIdx = 1:numel(females)
+    individualPsychPlotPerSession('approachavoid', 'P2L1 BL for comb boost and alc', females{animalIdx});
+    individualPsychPlotPerSession('approachavoid', 'P2L1L3 BL for comb boost and alc', females{animalIdx});
+    individualPsychPlotPerSession('approachavoid', 'P2A Boost and alcohol', females{animalIdx});
+end
+
+\subsection{S. 2b.}
+\texttt{[count1, total1]} = \emph{calculateFractionOfSigmoid}(\texttt{`male'}, \texttt{`approachavoid'}, 2, \texttt{`P2L1 BL for comb boost and alc'});\\
+\texttt{[count2, total2]} = \emph{calculateFractionOfSigmoid}(\texttt{`female'}, \texttt{`approachavoid'}, 2, \texttt{`P2L1 BL for comb boost and alc'});\\
+
+\subsection{2c.}
+\emph{pie}(\texttt{[count1, total1 - count1]});\\
+\emph{pie}(\texttt{[count2, total2 - count2]});\\
+
+No significant difference in the proportion of weak and strong sigmoid responders between the two genders was observed (chi-square test, p = 0.2636).
+
+\subsection{S. 2d.}
+\texttt{[count1, total1]} = \emph{calculateFractionOfSigmoid}(\texttt{`male'}, \texttt{`approachavoid'}, 2, \texttt{`P2L1L3 BL for comb boost and alc'});\\
+\texttt{[count2, total2]} = \emph{calculateFractionOfSigmoid}(\texttt{`female'}, \texttt{`approachavoid'}, 2, \texttt{`P2L1L3 BL for comb boost and alc'});\\
+
+\subsection{S. 2e.}
+\emph{pie}(\texttt{[count1, total1 - count1]});\\
+\emph{pie}(\texttt{[count2, total2 - count2]});\\
+
+No significant difference in the proportion of weak and strong sigmoid responders between the two genders was observed (chi-square test, p = 0.2636).
+
+
+\section{Supplementary Figure 3}
+\subsection{S. 3a.}
+\texttt{featureForEach} = \emph{masterPsychometricFunctionPlot}(\texttt{`time\_in\_feeder\_25'}, \texttt{`n'}, \texttt{`P2L1 BL for comb boost and alc'}, \texttt{`P2L1 Boost and alcohol'}, \texttt{`P2L1 Post alcohol'});\\
+
+\texttt{featureForEach} = \emph{masterPsychometricFunctionPlot}(\texttt{`time\_in\_feeder\_25'}, \texttt{`n'}, \texttt{`P2L1L3 BL for comb boost and alc'}, \texttt{`P2L1L3 Boost and alcohol'}, \texttt{`P2L1L3 Post alcohol'});\\
+
+The difference in time in reward zone is statistically significant between NCCB and PNC tasks (MANOVA, p = 0.0209), but not between NCCB and NCPA tasks in males (MANOVA, p = 0.6699). In conflict task, both PC and CPA tasks are significantly different than CCB task (CCB vs PC: MANOVA, p = 0.0001; CCB vs CPA: MANOVA, p = 0. 0001).
+
+\subsection{S. 3b.}
+\texttt{param\_array} = \emph{fitParamKernelDensity}(\texttt{`shift'}, \texttt{`time\_in\_feeder\_25'}, 2, \texttt{`n'}, \texttt{`P2L1 BL for comb boost and alc'}, \texttt{`P2L1 Boost and alcohol'}, \texttt{`P2L1 Post alcohol'});\\
+\texttt{param\_array} = \emph{fitParamKernelDensity}(\texttt{`shift'}, \texttt{`time\_in\_feeder\_25'}, 2, \texttt{`n'}, \texttt{`P2L1L3 BL for comb boost and alc'}, \texttt{`P2L1L3 Boost and alcohol'}, \texttt{`P2L1L3 Post alcohol'});\\
+
+The kernel probability densities of the inflection point show stronger difference in NCCB vs PNC tasks (KS test, p = 0.0000) than in NCCB vs NCPA tasks (KS test, p = 0.0350). In conflict task, the kernel probability densities show significant difference only between CCB vs PC tasks (CCB vs PC: KS test, p = 0.0000; CCB vs CPA: KS test, p = 0.1800).
+
+\subsection{S. 3c.}
+\texttt{[featureForEachMale, featureForEachFemale]} = \emph{masterPsychometricFunctionPlot}(\texttt{`time\_in\_feeder\_25'}, \texttt{`y'}, \texttt{`P2L1 BL for comb boost and alc'}, \texttt{`P2L1 Boost and alcohol'}, \texttt{`P2L1 Post alcohol'});\\
+
+Only males show significant difference in PNC and NCPA tasks compared to NCCB task (In males, NCCB vs PNC: MANOVA, p = 0.0021, NCCB vs NCPA: MANOVA, p = 0.0474; in females, NCCB vs PNC: MANOVA, p = 0.9198, NCCB vs NCPA: MANOVA, p = 0.8272).
+
+\subsection{S. 3d.}
+\texttt{[maleParam, femaleParam]} = \emph{fitParamKernelDensity}(\texttt{`shift'}, \texttt{`time\_in\_feeder\_25'}, 2, \texttt{`y'}, \texttt{`P2L1 BL for comb boost and alc'}, \texttt{`P2L1 Boost and alcohol'}, \texttt{`P2L1 Post alcohol'});\\
+
+The kernel probability densities of the inflection point show statistical difference in males for NCCB vs PNC tasks (KS test, p = 0.0030), but not in NCCB vs NCPA tasks (KS test, p = 0.1900). In females, no difference was observed in PNC and NCPA tasks compared to NCCB task (NCCB vs PNC: KS test, p = 0.0600; NCCB vs NCPA: KS test, p = 0.1550).
+
+\subsection{S. 3e.}
+\texttt{[featureForEachMale, featureForEachFemale]} = \emph{masterPsychometricFunctionPlot}(\texttt{`time\_in\_feeder\_25'}, \texttt{`y'}, \texttt{`P2L1L3 BL for comb boost and alc'}, \texttt{`P2L1L3 Boost and alcohol'}, \texttt{`P2L1L3 Post alcohol'});\\
+
+Only males show significant difference in PC and CPA tasks in terms of time in reward zone compared to CCB task (In males, CCB vs PC: MANOVA, p = 0.0000, CCB vs CPA: MANOVA, p = 0.0000; in females, CCB vs PC: MANOVA, p = 0.3020, CCB vs CPA: MANOVA, p = 0.7267).
+
+\subsection{S. 3f.}
+\texttt{[maleParam, femaleParam]} = \emph{fitParamKernelDensity}(\texttt{`shift'}, \texttt{`time\_in\_feeder\_25'}, 2, \texttt{`y'}, \texttt{`P2L1L3 BL for comb boost and alc'}, \texttt{`P2L1L3 Boost and alcohol'}, \texttt{`P2L1L3 Post alcohol'});\\
+
+Only males show significant difference in PC and CPA tasks in terms of kernel probability densities compared to CCB task (In males, CCB vs PC: KS test, p = 0.0000, CCB vs CPA: KS test, p = 0.0310; in females, CCB vs PC: KS test, p = 0.2120, CCB vs CPA: KS test, p = 0.8660).
+
+\subsection{S. 3g.}
+\texttt{[count1, total1]} = \emph{calculateFractionOfSigmoid}(\texttt{`male'}, \texttt{`approachavoid'}, 2, \texttt{`P2L1 Post alcohol'});\\
+\texttt{[count2, total2]} = \emph{calculateFractionOfSigmoid}(\texttt{`female'}, \texttt{`approachavoid'}, 2, \texttt{`P2L1 Post alcohol'});\\
+
+\subsection{S. 3h.}
+\emph{pie}(\texttt{[count1, total1 - count1]});\\
+\emph{pie}(\texttt{[count2, total2 - count2]});\\
+
+No significant difference in the proportion of weak and strong sigmoid responders between the two genders was observed (chi-square test, p = 1.0000).
+
+\subsection{S. 3h.}
+\texttt{[count1, total1]} = \emph{calculateFractionOfSigmoid}(\texttt{`male'}, \texttt{`approachavoid'}, 2, \texttt{`P2L1L3 Post alcohol'});\\
+\texttt{[count2, total2]} = \emph{calculateFractionOfSigmoid}(\texttt{`female'}, \texttt{`approachavoid'}, 2, \texttt{`P2L1L3 Post alcohol'});\\
+
+\subsection{S. 3i.}
+\emph{pie}(\texttt{[count1, total1 - count1]});\\
+\emph{pie}(\texttt{[count2, total2 - count2]});\\
+
+No significant difference in the proportion of weak and strong sigmoid responders between the two genders was observed (chi-square test, p = 1.0000).
+\end{document}
