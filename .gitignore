@@ -1,13 +1,76 @@
-*.asv
-*.mat
+# MATLAB files
+*.asv              # MATLAB autosave files
+*.mat              # MATLAB data files
+*.mex*             # MATLAB compiled MEX files
+*.mexw64           # Windows 64-bit MEX files
+*.mexmaci64        # Mac Intel 64-bit MEX files
+*.mexmaca64        # Mac Apple Silicon MEX files
+slprj/             # Simulink cache files
+*.slxc             # Simulink cache files
+
+# Code generation folders
+codegen/
+*.autosave
+
+# MATLAB toolbox packaging
+*.mltbx
+*.mlappinstall
+*.mlpkginstall
+
+# Output files
 *.png
+*.jpg
+*.jpeg
+*.tif
+*.tiff
 *.fig
 *.pdf
+*.eps
+*.svg
+
+# Data files
 *.xlsx
+*.xls
+*.csv
+*.txt
+*.dat
+
+# Python files
 __pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
 .ipynb_checkpoints/
+
+# System files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+
+# Project-specific
 Literature/ search\
 Analysis/.DS_Store
 Analysis/Fig\ files/
 Analysis/Clusters/Fig\ files/
+**/Fig\ files/
+**/Figures/
+
+# Temporary and backup files
+*.bak
+*.tmp
+*~
